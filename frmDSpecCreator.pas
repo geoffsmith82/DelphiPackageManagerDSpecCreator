@@ -436,6 +436,8 @@ begin
   edtRepositoryURL.Text := FOpenFile.metadata.repositoryUrl;
   cboLicense.Text := FOpenFile.metadata.license;
   edtTags.Text := FOpenFile.metadata.tags;
+  cboTemplate.Text := '';
+  CardPanel1.Visible := False;
   for j := 0 to clbCompilers.Count - 1 do
   begin
     clbCompilers.Checked[j] := False;
