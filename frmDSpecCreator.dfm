@@ -254,7 +254,7 @@ object Form5: TForm5
         Width = 452
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ActiveCard = crdRuntime
+        ActiveCard = crdBuild
         Caption = 'CardPanel1'
         TabOrder = 3
         object crdSource: TCard
@@ -290,6 +290,7 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtSource'
+            OnChange = edtSourceChange
           end
           object chkFlatten: TCheckBox
             Left = 74
@@ -307,6 +308,7 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 2
             Text = 'Edit1'
+            OnChange = edtDestChange
           end
           object lbExclude: TListBox
             Left = 74
@@ -395,6 +397,7 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtBuildId'
+            OnChange = edtBuildIdChange
           end
           object edtProject: TEdit
             Left = 96
@@ -404,6 +407,7 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 1
             Text = 'Edit1'
+            OnChange = edtProjectChange
           end
         end
         object crdRuntime: TCard
@@ -450,6 +454,7 @@ object Form5: TForm5
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
+            OnClick = edtRuntimeBuildIdClick
           end
           object edtRuntimeSrc: TEdit
             Left = 86
@@ -458,6 +463,7 @@ object Form5: TForm5
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 1
+            OnChange = edtRuntimeSrcChange
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -466,6 +472,7 @@ object Form5: TForm5
             Height = 17
             Caption = 'Copy Local'
             TabOrder = 2
+            OnClick = chkCopyLocalClick
           end
         end
       end

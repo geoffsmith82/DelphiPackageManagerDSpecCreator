@@ -101,9 +101,16 @@ type
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
+    procedure chkCopyLocalClick(Sender: TObject);
     procedure clbCompilersClick(Sender: TObject);
+    procedure edtBuildIdChange(Sender: TObject);
+    procedure edtDestChange(Sender: TObject);
     procedure edtIdChange(Sender: TObject);
+    procedure edtProjectChange(Sender: TObject);
     procedure edtProjectURLChange(Sender: TObject);
+    procedure edtRuntimeBuildIdClick(Sender: TObject);
+    procedure edtRuntimeSrcChange(Sender: TObject);
+    procedure edtSourceChange(Sender: TObject);
     procedure edtTagsChange(Sender: TObject);
     procedure edtVersionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -180,6 +187,14 @@ end;
 procedure TForm5.cboLicenseChange(Sender: TObject);
 begin
   FOpenFile.metadata.license := cboLicense.Text;
+end;
+
+procedure TForm5.chkCopyLocalClick(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).runtime.copyLocal := chkCopyLocal.Checked;
+  end;
 end;
 
 function TForm5.GetPlatform(compiler: string): TTargetPlatform;
@@ -281,6 +296,22 @@ begin
   cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(vplatform.template);
 end;
 
+procedure TForm5.edtBuildIdChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).build.id := edtBuildId.Text;
+  end;
+end;
+
+procedure TForm5.edtDestChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).source.dest := edtDest.Text;
+  end;
+end;
+
 procedure TForm5.LoadTemplates;
 var
   node: TTreeNode;
@@ -338,9 +369,41 @@ begin
   FOpenFile.metadata.id := edtId.Text;
 end;
 
+procedure TForm5.edtProjectChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).build.project := edtProject.Text;
+  end;
+end;
+
 procedure TForm5.edtProjectURLChange(Sender: TObject);
 begin
   FOpenFile.metadata.projectUrl := edtProjectURL.Text;
+end;
+
+procedure TForm5.edtRuntimeBuildIdClick(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).runtime.buildId := edtRuntimeBuildId.Text;
+  end;
+end;
+
+procedure TForm5.edtRuntimeSrcChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).runtime.src := edtRuntimeSrc.Text;
+  end;
+end;
+
+procedure TForm5.edtSourceChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).source.src := edtSource.Text;
+  end;
 end;
 
 procedure TForm5.edtTagsChange(Sender: TObject);
@@ -370,7 +433,7 @@ begin
   edtVersion.Text := FOpenFile.metadata.version;
   mmoDescription.Text := FOpenFile.metadata.description;
   edtProjectURL.Text := FOpenFile.metadata.projectUrl;
-  edtRepositoryURL.Text := '';
+  edtRepositoryURL.Text := FOpenFile.metadata.repositoryUrl;
   cboLicense.Text := FOpenFile.metadata.license;
   edtTags.Text := FOpenFile.metadata.tags;
   for j := 0 to clbCompilers.Count - 1 do

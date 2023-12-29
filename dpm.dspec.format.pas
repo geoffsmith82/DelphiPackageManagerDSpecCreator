@@ -63,6 +63,7 @@ type
     Fdescription: string;
     Fauthors: string;
     FprojectUrl: string;
+    FrepositoryUrl: string;
     Flicense: string;
     Fcopyright: string;
     Ftags: string;
@@ -72,6 +73,7 @@ type
     property description: string read Fdescription write Fdescription;
     property authors: string read Fauthors write Fauthors;
     property projectUrl: string read FprojectUrl write FprojectUrl;
+    property repositoryUrl: string read FrepositoryUrl write FrepositoryUrl;
     property license: string read Flicense write Flicense;
     property copyright: string read Fcopyright write Fcopyright;
     property tags: string read Ftags write Ftags;
