@@ -10,6 +10,12 @@
         <AppType>Application</AppType>
         <MainSource>DspecCreator.dpr</MainSource>
     </PropertyGroup>
+    <PropertyGroup>
+        <DPMCompiler>12.0</DPMCompiler>
+        <DPMCache Condition="'$(DPMCache)' == ''">$(APPDATA)\.dpm\packages</DPMCache>
+        <DPM>$(DPMCache)\$(DPMCompiler)\$(Platform)</DPM>
+        <DPMSearch Condition="'$(Platform)'=='Win32'">$(DPM)\VSoft.SemanticVersion\0.2.5\lib;</DPMSearch>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
@@ -70,6 +76,7 @@
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <SanitizedProjectName>DspecCreator</SanitizedProjectName>
+        <DCC_UnitSearchPath>$(DPMSearch);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>JvNet;vclwinx;DataSnapServer;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;dbxcds;vcledge;IcsCommonD12Run;FmxTeeUI;DBXFirebirdDriver;JvAppFrm;FireDACSqliteDriver;DbxClientDriver;JclVcl;soapmidas;TeeUI;Jcl;dbexpress;JvManagedThreads;IcsVclD12Run;inet;vcltouch;JvDB;FireDACDBXDriver;fmxdae;JvCustom;CustomIPTransport;FireDACMSSQLDriver;JvSystem;JvControls;PKIEDB29;JvCrypt;JvJans;JvMM;IndySystem;JvGlobus;JclContainers;JvPageComps;vclFireDAC;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;DOSCommandDR;bindcompdbx;rtl;FireDACMySQLDriver;DBXSqliteDriver;TMSVCLUIPackPkgDXE15;DBXSybaseASEDriver;JvRuntimeDesign;JvXPCtrls;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;JvDocking;JvDlgs;xmlrtl;dsnap;JvCmp;FireDACDb2Driver;DBXOracleDriver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;DatasnapConnectorsFreePascal;emshosting;FireDACCommonDriver;IndyIPClient;bindcompvclwinx;emsedge;bindcompfmx;TMSVCLUIPackPkgExDXE15;JvBands;inetdb;FireDACASADriver;Tee;vclactnband;TMSVCLUIPackPkgXlsDXE15;fmxFireDAC;FireDACInfxDriver;DBXMySQLDriver;VclSmp;DataSnapCommon;AWSSDK;JvPascalInterpreter;EurekaLogCore;fmxase;JvPluginSystem;TMSVCLUIPackPkgWizDXE15;DBXOdbcDriver;JvTimeFramework;dbrtl;FireDACOracleDriver;Skia.Package.FMX;TeeDB;FireDACMSAccDriver;IcsFmxD12Run;DataSnapIndy10ServerTransport;JclDeveloperTools;PKIECtrl29;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;JvWizards;FireDACTDataDriver;Skia.Package.VCL;vcldb;SynEditDR;JvCore;bindcomp;IndyCore;RESTBackendComponents;AWSSDKFMX;FireDACADSDriver;AWSSDKVCL;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;JvDotNetCtrls;JvHMI;SMImportD12;FixInsight_12;DBXDb2Driver;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;JvPrintPreview;tethering;JvStdCtrls;bindcompvcl;CloudService;DBXSybaseASADriver;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -127,6 +134,8 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="dpm.dspec.format.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Types.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -1108,6 +1117,9 @@
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
+        <DPM>
+            <PackageReference id="VSoft.SemanticVersion" platform="Win32" version="0.2.5"/>
+        </DPM>
     </ProjectExtensions>
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
     <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>

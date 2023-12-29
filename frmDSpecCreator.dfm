@@ -66,7 +66,7 @@ object Form5: TForm5
         Height = 15
         Caption = 'License:'
       end
-      object Label1: TLabel
+      object lblTags: TLabel
         Left = 57
         Top = 295
         Width = 26
@@ -223,7 +223,7 @@ object Form5: TForm5
         TabOrder = 0
         OnClick = btnAddTemplateClick
       end
-      object Button1: TButton
+      object btnDeleteTemplate: TButton
         Left = 95
         Top = 328
         Width = 98
@@ -254,7 +254,7 @@ object Form5: TForm5
         Width = 452
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ActiveCard = crdBuild
+        ActiveCard = crdSource
         Caption = 'CardPanel1'
         TabOrder = 3
         object crdSource: TCard
@@ -268,14 +268,14 @@ object Form5: TForm5
           DesignSize = (
             450
             340)
-          object Label2: TLabel
+          object lblSrc: TLabel
             Left = 48
             Top = 48
             Width = 19
             Height = 15
             Caption = 'Src:'
           end
-          object Label3: TLabel
+          object lblDest: TLabel
             Left = 41
             Top = 100
             Width = 26
@@ -320,7 +320,7 @@ object Form5: TForm5
             TabOrder = 3
           end
           object btnAddExclude: TButton
-            Left = 232
+            Left = 192
             Top = 229
             Width = 75
             Height = 25
@@ -328,7 +328,7 @@ object Form5: TForm5
             TabOrder = 4
             OnClick = btnAddExcludeClick
           end
-          object Button2: TButton
+          object btnDeleteExclude: TButton
             Left = 282
             Top = 229
             Width = 88
@@ -345,7 +345,7 @@ object Form5: TForm5
           Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
-          object Label4: TLabel
+          object lblSearchPaths: TLabel
             Left = 64
             Top = 32
             Width = 67
@@ -368,7 +368,7 @@ object Form5: TForm5
           DesignSize = (
             450
             340)
-          object Label6: TLabel
+          object lblBuild: TLabel
             Left = 40
             Top = 16
             Width = 27
@@ -382,7 +382,7 @@ object Form5: TForm5
             Height = 15
             Caption = 'BuildId:'
           end
-          object Label7: TLabel
+          object lblProject: TLabel
             Left = 40
             Top = 77
             Width = 40
@@ -426,7 +426,7 @@ object Form5: TForm5
           DesignSize = (
             444
             334)
-          object Label5: TLabel
+          object lblRuntime: TLabel
             Left = 64
             Top = 32
             Width = 45
@@ -483,36 +483,36 @@ object Form5: TForm5
     Top = 386
     object File1: TMenuItem
       Caption = '&File'
-      object New1: TMenuItem
+      object miNew: TMenuItem
         Caption = '&New'
-        OnClick = New1Click
+        OnClick = miNewClick
       end
-      object Open1: TMenuItem
+      object miOpen: TMenuItem
         Caption = '&Open...'
-        OnClick = Open1Click
+        OnClick = miOpenClick
       end
-      object Save1: TMenuItem
+      object miSave: TMenuItem
         Caption = '&Save'
       end
-      object SaveAs1: TMenuItem
+      object miSaveAs: TMenuItem
         Caption = 'Save &As...'
-        OnClick = SaveAs1Click
+        OnClick = miSaveAsClick
       end
       object N2: TMenuItem
         Caption = '-'
       end
-      object Print1: TMenuItem
+      object miPrint: TMenuItem
         Caption = '&Print...'
       end
-      object PrintSetup1: TMenuItem
+      object miPrintSetup: TMenuItem
         Caption = 'P&rint Setup...'
       end
       object N1: TMenuItem
         Caption = '-'
       end
-      object Exit1: TMenuItem
+      object miExit: TMenuItem
         Caption = 'E&xit'
-        OnClick = Exit1Click
+        OnClick = miExitClick
       end
     end
   end

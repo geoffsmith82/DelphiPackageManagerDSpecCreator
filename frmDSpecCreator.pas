@@ -50,19 +50,19 @@ type
     lblLicense: TLabel;
     cboLicense: TComboBox;
     tsPlatforms: TTabSheet;
-    Label1: TLabel;
+    lblTags: TLabel;
     edtTags: TEdit;
     clbCompilers: TCheckListBox;
     tsTemplates: TTabSheet;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
-    New1: TMenuItem;
-    Open1: TMenuItem;
-    Save1: TMenuItem;
-    SaveAs1: TMenuItem;
-    Print1: TMenuItem;
-    PrintSetup1: TMenuItem;
-    Exit1: TMenuItem;
+    miNew: TMenuItem;
+    miOpen: TMenuItem;
+    miSave: TMenuItem;
+    miSaveAs: TMenuItem;
+    miPrint: TMenuItem;
+    miPrintSetup: TMenuItem;
+    miExit: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
     cboTemplate: TComboBox;
@@ -71,27 +71,27 @@ type
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     btnAddTemplate: TButton;
-    Button1: TButton;
+    btnDeleteTemplate: TButton;
     tvTemplates: TTreeView;
     CardPanel1: TCardPanel;
     crdSource: TCard;
     crdSearchPaths: TCard;
-    Label2: TLabel;
+    lblSrc: TLabel;
     edtSource: TEdit;
     chkFlatten: TCheckBox;
-    Label3: TLabel;
+    lblDest: TLabel;
     edtDest: TEdit;
     lbExclude: TListBox;
     btnAddExclude: TButton;
-    Button2: TButton;
+    btnDeleteExclude: TButton;
     crdBuild: TCard;
     crdRuntime: TCard;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
+    lblSearchPaths: TLabel;
+    lblRuntime: TLabel;
+    lblBuild: TLabel;
     lblBuildId: TLabel;
     edtBuildId: TEdit;
-    Label7: TLabel;
+    lblProject: TLabel;
     edtProject: TEdit;
     lblRuntimeBuildId: TLabel;
     edtRuntimeBuildId: TEdit;
@@ -114,12 +114,12 @@ type
     procedure edtTagsChange(Sender: TObject);
     procedure edtVersionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure mmoDescriptionChange(Sender: TObject);
-    procedure New1Click(Sender: TObject);
-    procedure Open1Click(Sender: TObject);
-    procedure SaveAs1Click(Sender: TObject);
+    procedure miNewClick(Sender: TObject);
+    procedure miOpenClick(Sender: TObject);
+    procedure miSaveAsClick(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
     procedure tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
@@ -458,7 +458,7 @@ begin
 end;
 
 
-procedure TForm5.Exit1Click(Sender: TObject);
+procedure TForm5.miExitClick(Sender: TObject);
 begin
   Close;
 end;
@@ -513,7 +513,7 @@ begin
   FOpenFile.metadata.description := mmoDescription.Text;
 end;
 
-procedure TForm5.New1Click(Sender: TObject);
+procedure TForm5.miNewClick(Sender: TObject);
 begin
   FreeAndNil(FOpenFile);
   FOpenFile := TDPMSpecFormat.Create;
@@ -522,7 +522,7 @@ begin
   LoadDspecStructure;
 end;
 
-procedure TForm5.Open1Click(Sender: TObject);
+procedure TForm5.miOpenClick(Sender: TObject);
 var
   json : TJSONObject;
   dspecFilename : string;
@@ -543,7 +543,7 @@ begin
   end;
 end;
 
-procedure TForm5.SaveAs1Click(Sender: TObject);
+procedure TForm5.miSaveAsClick(Sender: TObject);
 begin
   if SaveDialog.Execute then
   begin
