@@ -64,8 +64,8 @@ type
     Button1: TButton;
     tvTemplates: TTreeView;
     CardPanel1: TCardPanel;
-    Card1: TCard;
-    Card2: TCard;
+    crdSource: TCard;
+    crdSearchPaths: TCard;
     Label2: TLabel;
     edtSource: TEdit;
     chkFlatten: TCheckBox;
@@ -74,6 +74,11 @@ type
     lbExclude: TListBox;
     btnAddExclude: TButton;
     Button2: TButton;
+    crdBuild: TCard;
+    crdRuntime: TCard;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
@@ -89,6 +94,7 @@ type
     procedure New1Click(Sender: TObject);
     procedure Open1Click(Sender: TObject);
     procedure SaveAs1Click(Sender: TObject);
+    procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
   private
     { Private declarations }
@@ -446,6 +452,26 @@ begin
   if SaveDialog.Execute then
   begin
     SaveDspecStructure(SaveDialog.Filename);
+  end;
+end;
+
+procedure TForm5.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
+begin
+  if node.Text = 'SearchPaths' then
+  begin
+    CardPanel1.ActiveCard := crdSearchPaths;
+  end
+  else if node.Text = 'Source' then
+  begin
+    CardPanel1.ActiveCard := crdSource;
+  end
+  else if Node.Text = 'Build' then
+  begin
+    CardPanel1.ActiveCard := crdBuild;
+  end
+  else if Node.Text = 'Runtime' then
+  begin
+    CardPanel1.ActiveCard := crdRuntime;
   end;
 end;
 

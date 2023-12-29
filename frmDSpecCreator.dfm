@@ -19,7 +19,7 @@ object Form5: TForm5
     Top = 0
     Width = 709
     Height = 441
-    ActivePage = tsPlatforms
+    ActivePage = tsTemplates
     Align = alClient
     TabOrder = 0
     object tsInfo: TTabSheet
@@ -241,6 +241,7 @@ object Form5: TForm5
         ReadOnly = True
         RowSelect = True
         TabOrder = 2
+        OnChange = tvTemplatesChange
         OnCollapsing = tvTemplatesCollapsing
       end
       object CardPanel1: TCardPanel
@@ -248,21 +249,17 @@ object Form5: TForm5
         Top = 3
         Width = 452
         Height = 342
-        ActiveCard = Card1
+        ActiveCard = crdBuild
         Caption = 'CardPanel1'
         TabOrder = 3
-        object Card1: TCard
+        object crdSource: TCard
           Left = 1
           Top = 1
           Width = 450
           Height = 340
-          Caption = 'Card1'
+          Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           object Label2: TLabel
             Left = 48
             Top = 48
@@ -327,18 +324,61 @@ object Form5: TForm5
             TabOrder = 5
           end
         end
-        object Card2: TCard
+        object crdSearchPaths: TCard
           Left = 1
           Top = 1
           Width = 450
           Height = 340
-          Caption = 'Card2'
+          Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
+          object Label4: TLabel
+            Left = 64
+            Top = 32
+            Width = 67
+            Height = 15
+            Caption = 'Search Paths'
+          end
+        end
+        object crdBuild: TCard
+          Left = 1
+          Top = 1
+          Width = 450
+          Height = 340
+          Caption = 'crdBuild'
+          CardIndex = 2
+          TabOrder = 2
           ExplicitLeft = 0
           ExplicitTop = 0
           ExplicitWidth = 185
           ExplicitHeight = 41
+          object Label6: TLabel
+            Left = 40
+            Top = 16
+            Width = 27
+            Height = 15
+            Caption = 'Build'
+          end
+        end
+        object crdRuntime: TCard
+          Left = 1
+          Top = 1
+          Width = 450
+          Height = 340
+          Caption = 'crdRuntime'
+          CardIndex = 3
+          TabOrder = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 185
+          ExplicitHeight = 41
+          object Label5: TLabel
+            Left = 64
+            Top = 32
+            Width = 45
+            Height = 15
+            Caption = 'Runtime'
+          end
         end
       end
     end
