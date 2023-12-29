@@ -128,9 +128,16 @@ type
     procedure miSaveAsClick(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
-    procedure tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var
-        Handled: Boolean);
+    procedure tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
+    procedure PopupAddBuildItem(Sender: TObject);
+    procedure PopupDeleteBuildItem(Sender: TObject);
+    procedure PopupAddRuntimeItem(Sender: TObject);
+    procedure PopupDeleteRuntimeItem(Sender: TObject);
+    procedure PopupAddSourceItem(Sender: TObject);
+    procedure PopupDeleteSourceItem(Sender: TObject);
+    procedure PopupAddSearchPathItem(Sender: TObject);
+    procedure PopupDeleteSearchPathItem(Sender: TObject);
   private
     { Private declarations }
     FLoaded: TDPMSpecFormat;
@@ -141,6 +148,8 @@ type
     function GetTemplate(templateName: string): TTemplate;
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
+    function AddBuildItem: TBuild;
+
   public
     { Public declarations }
     procedure LoadDspecStructure;
@@ -550,11 +559,6 @@ begin
     CanClose := True; // No changes were made, so it's okay to close
 end;
 
-procedure TForm5.mmoDescriptionChange(Sender: TObject);
-begin
-  FOpenFile.metadata.description := mmoDescription.Text;
-end;
-
 procedure TForm5.miNewClick(Sender: TObject);
 begin
   FreeAndNil(FOpenFile);
@@ -592,6 +596,112 @@ begin
     SaveDspecStructure(SaveDialog.Filename);
   end;
 end;
+
+
+procedure TForm5.mmoDescriptionChange(Sender: TObject);
+begin
+  FOpenFile.metadata.description := mmoDescription.Text;
+end;
+
+function TForm5.AddBuildItem: TBuild;
+var
+  build : TBuild;
+begin
+
+end;
+
+procedure TForm5.PopupAddBuildItem(Sender: TObject);
+var
+  templateName : string;
+  builds : TArray<TBuild>;
+begin
+  templateName := InputBox('build id', 'Enter Build ID', 'default');
+  builds := FTemplate.build;
+  SetLength(builds, length(builds) + 1);
+  builds[High(builds)] := TBuild.Create;
+  builds[High(builds)].id := templateName;
+  FTemplate.build := builds;
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupAddRuntimeItem(Sender: TObject);
+var
+  buildId : string;
+  runtimes : TArray<TRuntime>;
+begin
+  buildId := InputBox('build id', 'Enter Runtime build ID', 'default');
+  runtimes := FTemplate.runtime;
+  SetLength(runtimes, length(runtimes) + 1);
+  runtimes[High(runtimes)] := TRuntime.Create;
+  runtimes[High(runtimes)].buildId := buildId;
+  FTemplate.runtime := runtimes;
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupAddSearchPathItem(Sender: TObject);
+var
+  SearchPathId : string;
+  searchpath : TArray<TSearchPath>;
+begin
+  SearchPathId := InputBox('SearchPath', 'Enter SearchPath', 'default');
+  searchpath := FTemplate.searchPaths;
+  SetLength(searchpath, length(searchpath) + 1);
+  searchpath[High(searchpath)] := TSearchPath.Create;
+  searchpath[High(searchpath)].path := SearchPathId;
+  FTemplate.searchPaths := searchpath;
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupAddSourceItem(Sender: TObject);
+var
+  SearchPathId : string;
+  source : TArray<TSource>;
+begin
+  SearchPathId := InputBox('Src', 'Enter Src', 'default');
+  source := FTemplate.source;
+  SetLength(source, length(source) + 1);
+  source[High(source)] := TSource.Create;
+  source[High(source)].src := SearchPathId;
+  FTemplate.source := source;
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupDeleteBuildItem(Sender: TObject);
+var
+  builds : TArray<TBuild>;
+begin
+//
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupDeleteRuntimeItem(Sender: TObject);
+var
+  buildId : string;
+  runtimes : TArray<TRuntime>;
+begin
+//
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupDeleteSearchPathItem(Sender: TObject);
+var
+  SearchPathId : string;
+  searchpath : TArray<TSearchPath>;
+begin
+//
+  LoadTemplates;
+end;
+
+procedure TForm5.PopupDeleteSourceItem(Sender: TObject);
+var
+  SearchPathId : string;
+  source : TArray<TSource>;
+begin
+  source := FTemplate.source;
+
+  LoadTemplates;
+end;
+
 
 procedure TForm5.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
@@ -656,8 +766,7 @@ begin
   AllowCollapse := false;
 end;
 
-procedure TForm5.tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var
-    Handled: Boolean);
+procedure TForm5.tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 var
   item : TMenuItem;
   localPos : TPoint;
@@ -669,42 +778,57 @@ begin
     node := tvTemplates.Selected as TTemplateTreeNode;
     tvTemplates.PopupMenu.Items.Clear;
     node := tvTemplates.GetNodeAt(MousePos.X, MousePos.Y) as TTemplateTreeNode;
+
+    if Assigned(node.Template) then
+      FTemplate := node.Template
+    else if Assigned(node.Parent) and Assigned((node.Parent as TTemplateTreeNode).Template) then
+      FTemplate := (node.Parent as TTemplateTreeNode).Template
+    else if Assigned(node.Parent.Parent) and Assigned((node.Parent.Parent as TTemplateTreeNode).Template) then
+      FTemplate := (node.Parent.Parent as TTemplateTreeNode).Template;
+
     if node.IsBuild then
     begin
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Add Build Item';
-
+    item.OnClick := PopupAddBuildItem;
     tvTemplates.PopupMenu.Items.Add(item);
+
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Delete Build Item';
-    localPos := tvTemplates.ClientToScreen(MousePos);
+    item.OnClick := PopupDeleteBuildItem;
     tvTemplates.PopupMenu.Items.Add(item);
     end;
     if node.IsRuntime then
     begin
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Add Runtime Item';
+    item.OnClick := PopupAddRuntimeItem;
     tvTemplates.PopupMenu.Items.Add(item);
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Delete Runtime Item';
+    item.OnClick := PopupDeleteRuntimeItem;
     tvTemplates.PopupMenu.Items.Add(item);
     end;
     if node.IsSource then
     begin
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Add Source Item';
+    item.OnClick := PopupAddSourceItem;
     tvTemplates.PopupMenu.Items.Add(item);
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Delete Source Item';
+    item.OnClick := PopupDeleteSourceItem;
     tvTemplates.PopupMenu.Items.Add(item);
     end;
     if node.IsSearchPath then
     begin
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Add SearchPath Item';
+    item.OnClick := PopupAddSearchPathItem;
     tvTemplates.PopupMenu.Items.Add(item);
     item := TMenuItem.Create(PopupMenu);
     item.Caption := 'Delete SearchPath Item';
+    item.OnClick := PopupDeleteSearchPathItem;
     tvTemplates.PopupMenu.Items.Add(item);
     end;
 
