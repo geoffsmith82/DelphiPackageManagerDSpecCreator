@@ -19,7 +19,7 @@ object Form5: TForm5
     Top = 0
     Width = 709
     Height = 441
-    ActivePage = tsTemplates
+    ActivePage = tsInfo
     Align = alClient
     TabOrder = 0
     object tsInfo: TTabSheet
@@ -162,7 +162,7 @@ object Form5: TForm5
         Top = 48
         Width = 161
         Height = 329
-        ItemHeight = 15
+        ItemHeight = 17
         Items.Strings = (
           'XE2'
           'XE3'
@@ -196,7 +196,8 @@ object Form5: TForm5
         Top = 48
         Width = 161
         Height = 137
-        ItemHeight = 15
+        DoubleBuffered = True
+        ItemHeight = 17
         Items.Strings = (
           'Win32'
           'Win64'
@@ -205,6 +206,7 @@ object Form5: TForm5
           'Android64'
           'IOS'
           'OSX64')
+        ParentDoubleBuffered = False
         TabOrder = 2
       end
     end
@@ -361,10 +363,6 @@ object Form5: TForm5
           Caption = 'crdBuild'
           CardIndex = 2
           TabOrder = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           DesignSize = (
             450
             340)
@@ -419,10 +417,6 @@ object Form5: TForm5
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           DesignSize = (
             444
             334)
