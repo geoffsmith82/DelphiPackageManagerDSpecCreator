@@ -20,6 +20,7 @@ uses
   Data.Bind.DBScope,
   Vcl.WinXPanels,
   Vcl.ExtCtrls,
+  DPM.Core.Types,
   dpm.dspec.format
   ;
 
@@ -132,6 +133,7 @@ type
     function GetPlatform(compiler: string): TTargetPlatform;
     function GetTemplate(templateName: string): TTemplate;
     procedure LoadTemplates;
+    procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
   public
     { Public declarations }
     procedure LoadDspecStructure;
@@ -175,7 +177,9 @@ var
   templateName : string;
   templates : TArray<TTemplate>;
 begin
-  templateName := InputBox('Templates','Enter Template name','');
+  templateName := InputBox('Templates', 'Enter Template name', 'default');
+  if templateName.IsEmpty then
+    Exit;
   templates := FOpenFile.templates;
   SetLength(templates, length(templates) + 1);
   templates[High(templates)] := TTemplate.Create;
@@ -231,11 +235,18 @@ procedure TForm5.clbCompilersClick(Sender: TObject);
 var
   j : Integer;
   vplatform : TTargetPlatform;
+  compilerVersion : TCompilerVersion;
 begin
   if clbCompilers.ItemIndex < 0 then
     Exit;
 
   vplatform := GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
+  compilerVersion := StringToCompilerVersion(clbCompilers.Items[clbCompilers.ItemIndex]);
+
+  EnableDisablePlatform(compilerVersion);
+
+  if not Assigned(vplatform) then
+    Exit;
 
   if not Assigned(vplatform) then
   begin
@@ -457,6 +468,28 @@ procedure TForm5.SaveDspecStructure(filename: string);
 begin
   TFile.WriteAllText(Filename, TJson.ObjectToJsonObject(FOpenFile).Format);
   FSavefilename := Filename;
+end;
+
+procedure TForm5.EnableDisablePlatform(compilerVersion : TCompilerVersion);
+var
+  DpmPlatforms : TDPMPlatforms;
+  DpmPlatform: TDPMPlatform;
+  platformString : string;
+  i: Integer;
+begin
+  DpmPlatforms := AllPlatforms(compilerVersion);
+
+  for i := 0 to clbPlatforms.Count - 1 do
+  begin
+    platformString := clbPlatforms.Items[i];
+    if platformString.Equals('Linux') then
+      platformString := 'Linux64'
+    else if platformString.Equals('IOS') then
+      platformString := 'iOS64';
+
+    DpmPlatform := StringToDPMPlatform(platformString);
+    clbPlatforms.ItemEnabled[i] := DpmPlatform in DpmPlatforms;
+  end;
 end;
 
 
