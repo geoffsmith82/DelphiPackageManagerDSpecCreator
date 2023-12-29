@@ -24,6 +24,16 @@ uses
   ;
 
 type
+  TTemplateTreeNode = class (TTreeNode)
+  public
+    Template: TTemplate;
+    build: TBuild;
+    runtime: TRuntime;
+    source: TSource;
+    searchpath: TSearchPath;
+    function IsHeading: Boolean;
+  end;
+
   TForm5 = class(TForm)
     PageControl1: TPageControl;
     tsInfo: TTabSheet;
@@ -79,6 +89,15 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
+    lblBuildId: TLabel;
+    edtBuildId: TEdit;
+    Label7: TLabel;
+    edtProject: TEdit;
+    lblRuntimeBuildId: TLabel;
+    edtRuntimeBuildId: TEdit;
+    lblRuntimeSrc: TLabel;
+    edtRuntimeSrc: TEdit;
+    chkCopyLocal: TCheckBox;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
@@ -96,6 +115,7 @@ type
     procedure SaveAs1Click(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
+    procedure tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
   private
     { Private declarations }
     FLoaded: TDPMSpecFormat;
@@ -268,6 +288,10 @@ var
   nodeSearchPath: TTreeNode;
   nodeBuild: TTreeNode;
   nodeRuntime: TTreeNode;
+  buildNode: TTemplateTreeNode;
+  runtimeNode: TTemplateTreeNode;
+  sourceNode: TTemplateTreeNode;
+  searchPathNode: TTemplateTreeNode;
   i, j : Integer;
 begin
   tvTemplates.Items.Clear;
@@ -275,25 +299,34 @@ begin
   begin
     cboTemplate.Items.Add(FOpenFile.templates[i].name);
     node := tvTemplates.Items.Add(nil, FOpenFile.templates[i].name);
+    (node as TTemplateTreeNode).Template := FOpenFile.templates[i];
     nodeSource := tvTemplates.Items.AddChild(node, 'Source');
+    (nodeSource as TTemplateTreeNode).Template := FOpenFile.templates[i];
     for j := 0 to High(FOpenFile.templates[i].source) do
     begin
-      tvTemplates.Items.AddChild(nodeSource, FOpenFile.templates[i].source[j].src);
+      sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.templates[i].source[j].src) as TTemplateTreeNode;
+      sourceNode.source := FOpenFile.templates[i].source[j];
     end;
     nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths');
+    (nodeSearchPath as TTemplateTreeNode).Template := FOpenFile.templates[i];
     for j := 0 to High(FOpenFile.templates[i].searchPaths) do
     begin
-      tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.templates[i].searchPaths[j].path);
+      searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.templates[i].searchPaths[j].path) as TTemplateTreeNode;
+      searchPathNode.searchpath := FOpenFile.templates[i].searchPaths[j];
     end;
     nodeBuild := tvTemplates.Items.AddChild(node, 'Build');
+    (nodeBuild as TTemplateTreeNode).Template := FOpenFile.templates[i];
     for j := 0 to High(FOpenFile.templates[i].build) do
     begin
-      tvTemplates.Items.AddChild(nodeBuild, FOpenFile.templates[i].build[j].id);
+      buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.templates[i].build[j].id) as TTemplateTreeNode;
+      buildNode.build := FOpenFile.templates[i].build[j];
     end;
     nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime');
+    (nodeRuntime as TTemplateTreeNode).Template := FOpenFile.templates[i];
     for j := 0 to High(FOpenFile.templates[i].runtime) do
     begin
-      tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.templates[i].runtime[j].buildId);
+      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.templates[i].runtime[j].buildId) as TTemplateTreeNode;
+      runtimeNode.runtime := FOpenFile.templates[i].runtime[j];
     end;
 
     node.Expand(True);
@@ -457,28 +490,77 @@ end;
 
 procedure TForm5.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
-  if node.Text = 'SearchPaths' then
+  if (node.Text = 'SearchPaths') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel1.ActiveCard := crdSearchPaths;
+    CardPanel1.Visible := False;
   end
-  else if node.Text = 'Source' then
+  else if (node.Text = 'Source') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel1.ActiveCard := crdSource;
+    CardPanel1.Visible := False;
   end
-  else if Node.Text = 'Build' then
+  else if (Node.Text = 'Build') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel1.ActiveCard := crdBuild;
+    CardPanel1.Visible := False;
   end
-  else if Node.Text = 'Runtime' then
+  else if (Node.Text = 'Runtime') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel1.ActiveCard := crdRuntime;
+    CardPanel1.Visible := False;
+  end
+  else
+  begin
+    if (Node.Parent <> nil) then
+    begin
+      if (Node.Parent as TTemplateTreeNode).Text = 'SearchPaths' then
+      begin
+        CardPanel1.Visible := True;
+        CardPanel1.ActiveCard := crdSearchPaths;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Source' then
+      begin
+        CardPanel1.Visible := True;
+        CardPanel1.ActiveCard := crdSource;
+        edtSource.Text := (Node as TTemplateTreeNode).source.src;
+        chkFlatten.Checked := (Node as TTemplateTreeNode).source.flatten;
+        edtDest.Text := (Node as TTemplateTreeNode).source.dest;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Build' then
+      begin
+        CardPanel1.Visible := True;
+        CardPanel1.ActiveCard := crdBuild;
+        edtBuildId.Text := (Node as TTemplateTreeNode).build.id;
+        edtProject.Text := (Node as TTemplateTreeNode).build.project;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Runtime' then
+      begin
+        CardPanel1.Visible := True;
+        CardPanel1.ActiveCard := crdRuntime;
+        edtRuntimeBuildId.Text := (Node as TTemplateTreeNode).runtime.buildId;
+        edtRuntimeSrc.Text := (Node as TTemplateTreeNode).runtime.src;
+        chkCopyLocal.Checked := (Node as TTemplateTreeNode).runtime.copyLocal;
+      end;
+    end;
   end;
 end;
 
-procedure TForm5.tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var
-    AllowCollapse: Boolean);
+procedure TForm5.tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
 begin
   AllowCollapse := false;
+end;
+
+procedure TForm5.tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
+begin
+  NodeClass := TTemplateTreeNode;
+end;
+
+{ TTemplateTreeNode }
+
+function TTemplateTreeNode.IsHeading: Boolean;
+begin
+  Result := (build = nil) and (runtime = nil) and (source = nil) and (searchpath = nil);
 end;
 
 end.

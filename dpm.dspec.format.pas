@@ -51,7 +51,7 @@ type
     FcopyLocal: Boolean;
   public
     property buildId: string read FbuildId write FbuildId;
-    property project: string read Fsrc write Fsrc;
+    property src: string read Fsrc write Fsrc;
     property copyLocal: Boolean read FcopyLocal write FcopyLocal;
   end;
 

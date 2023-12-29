@@ -211,6 +211,9 @@ object Form5: TForm5
     object tsTemplates: TTabSheet
       Caption = 'Templates'
       ImageIndex = 2
+      DesignSize = (
+        701
+        411)
       object btnAddTemplate: TButton
         Left = 3
         Top = 328
@@ -243,13 +246,15 @@ object Form5: TForm5
         TabOrder = 2
         OnChange = tvTemplatesChange
         OnCollapsing = tvTemplatesCollapsing
+        OnCreateNodeClass = tvTemplatesCreateNodeClass
       end
       object CardPanel1: TCardPanel
         Left = 224
         Top = 3
         Width = 452
         Height = 342
-        ActiveCard = crdBuild
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        ActiveCard = crdRuntime
         Caption = 'CardPanel1'
         TabOrder = 3
         object crdSource: TCard
@@ -260,6 +265,9 @@ object Form5: TForm5
           Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
+          DesignSize = (
+            450
+            340)
           object Label2: TLabel
             Left = 48
             Top = 48
@@ -279,6 +287,7 @@ object Form5: TForm5
             Top = 45
             Width = 296
             Height = 23
+            Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtSource'
           end
@@ -291,10 +300,11 @@ object Form5: TForm5
             TabOrder = 1
           end
           object edtDest: TEdit
-            Left = 74
+            Left = 73
             Top = 97
             Width = 296
             Height = 23
+            Anchors = [akLeft, akTop, akRight]
             TabOrder = 2
             Text = 'Edit1'
           end
@@ -303,6 +313,7 @@ object Form5: TForm5
             Top = 126
             Width = 296
             Height = 97
+            Anchors = [akLeft, akTop, akRight]
             ItemHeight = 15
             TabOrder = 3
           end
@@ -352,6 +363,9 @@ object Form5: TForm5
           ExplicitTop = 0
           ExplicitWidth = 185
           ExplicitHeight = 41
+          DesignSize = (
+            450
+            340)
           object Label6: TLabel
             Left = 40
             Top = 16
@@ -359,12 +373,45 @@ object Form5: TForm5
             Height = 15
             Caption = 'Build'
           end
+          object lblBuildId: TLabel
+            Left = 40
+            Top = 48
+            Width = 40
+            Height = 15
+            Caption = 'BuildId:'
+          end
+          object Label7: TLabel
+            Left = 40
+            Top = 77
+            Width = 40
+            Height = 15
+            Caption = 'Project:'
+          end
+          object edtBuildId: TEdit
+            Left = 96
+            Top = 45
+            Width = 337
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 0
+            Text = 'edtBuildId'
+          end
+          object edtProject: TEdit
+            Left = 96
+            Top = 74
+            Width = 337
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 1
+            Text = 'Edit1'
+          end
         end
         object crdRuntime: TCard
-          Left = 1
-          Top = 1
-          Width = 450
-          Height = 340
+          AlignWithMargins = True
+          Left = 4
+          Top = 4
+          Width = 444
+          Height = 334
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
@@ -372,12 +419,53 @@ object Form5: TForm5
           ExplicitTop = 0
           ExplicitWidth = 185
           ExplicitHeight = 41
+          DesignSize = (
+            444
+            334)
           object Label5: TLabel
             Left = 64
             Top = 32
             Width = 45
             Height = 15
             Caption = 'Runtime'
+          end
+          object lblRuntimeBuildId: TLabel
+            Left = 40
+            Top = 72
+            Width = 40
+            Height = 15
+            Caption = 'BuildId:'
+          end
+          object lblRuntimeSrc: TLabel
+            Left = 61
+            Top = 112
+            Width = 19
+            Height = 15
+            Caption = 'Src:'
+          end
+          object edtRuntimeBuildId: TEdit
+            Left = 86
+            Top = 69
+            Width = 339
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 0
+          end
+          object edtRuntimeSrc: TEdit
+            Left = 86
+            Top = 109
+            Width = 339
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 1
+          end
+          object chkCopyLocal: TCheckBox
+            Left = 86
+            Top = 144
+            Width = 97
+            Height = 17
+            Caption = 'Copy Local'
+            TabOrder = 2
           end
         end
       end
