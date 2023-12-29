@@ -3,7 +3,7 @@ object Form5: TForm5
   Top = 0
   Caption = '.dspec Creator'
   ClientHeight = 441
-  ClientWidth = 709
+  ClientWidth = 871
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,11 +17,12 @@ object Form5: TForm5
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 709
+    Width = 871
     Height = 441
     ActivePage = tsInfo
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 709
     object tsInfo: TTabSheet
       Caption = 'Package Info'
       object lblId: TLabel
@@ -214,7 +215,7 @@ object Form5: TForm5
       Caption = 'Templates'
       ImageIndex = 2
       DesignSize = (
-        701
+        863
         411)
       object btnAddTemplate: TButton
         Left = 3
@@ -236,24 +237,27 @@ object Form5: TForm5
       object tvTemplates: TTreeView
         Left = 3
         Top = 57
-        Width = 206
+        Width = 286
         Height = 265
         AutoExpand = True
         DoubleBuffered = True
         HideSelection = False
         Indent = 19
         ParentDoubleBuffered = False
+        PopupMenu = PopupMenu
         ReadOnly = True
+        RightClickSelect = True
         RowSelect = True
         TabOrder = 2
         OnChange = tvTemplatesChange
         OnCollapsing = tvTemplatesCollapsing
+        OnContextPopup = tvTemplatesContextPopup
         OnCreateNodeClass = tvTemplatesCreateNodeClass
       end
       object CardPanel1: TCardPanel
-        Left = 224
+        Left = 312
         Top = 3
-        Width = 452
+        Width = 526
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
         ActiveCard = crdSource
@@ -262,13 +266,14 @@ object Form5: TForm5
         object crdSource: TCard
           Left = 1
           Top = 1
-          Width = 450
+          Width = 524
           Height = 340
           Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
+          ExplicitWidth = 450
           DesignSize = (
-            450
+            524
             340)
           object lblSrc: TLabel
             Left = 48
@@ -287,12 +292,13 @@ object Form5: TForm5
           object edtSource: TEdit
             Left = 74
             Top = 45
-            Width = 296
+            Width = 370
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtSource'
             OnChange = edtSourceChange
+            ExplicitWidth = 296
           end
           object chkFlatten: TCheckBox
             Left = 74
@@ -305,21 +311,23 @@ object Form5: TForm5
           object edtDest: TEdit
             Left = 73
             Top = 97
-            Width = 296
+            Width = 370
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 2
             Text = 'Edit1'
             OnChange = edtDestChange
+            ExplicitWidth = 296
           end
           object lbExclude: TListBox
             Left = 74
             Top = 126
-            Width = 296
+            Width = 370
             Height = 97
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 15
             TabOrder = 3
+            ExplicitWidth = 296
           end
           object btnAddExclude: TButton
             Left = 192
@@ -342,11 +350,12 @@ object Form5: TForm5
         object crdSearchPaths: TCard
           Left = 1
           Top = 1
-          Width = 450
+          Width = 524
           Height = 340
           Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
+          ExplicitWidth = 450
           object lblSearchPaths: TLabel
             Left = 64
             Top = 32
@@ -358,13 +367,14 @@ object Form5: TForm5
         object crdBuild: TCard
           Left = 1
           Top = 1
-          Width = 450
+          Width = 524
           Height = 340
           Caption = 'crdBuild'
           CardIndex = 2
           TabOrder = 2
+          ExplicitWidth = 450
           DesignSize = (
-            450
+            524
             340)
           object lblBuild: TLabel
             Left = 40
@@ -390,35 +400,38 @@ object Form5: TForm5
           object edtBuildId: TEdit
             Left = 96
             Top = 45
-            Width = 337
+            Width = 411
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtBuildIdChange
+            ExplicitWidth = 337
           end
           object edtProject: TEdit
             Left = 96
             Top = 74
-            Width = 337
+            Width = 411
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtProjectChange
+            ExplicitWidth = 337
           end
         end
         object crdRuntime: TCard
           AlignWithMargins = True
           Left = 4
           Top = 4
-          Width = 444
+          Width = 518
           Height = 334
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
+          ExplicitWidth = 444
           DesignSize = (
-            444
+            518
             334)
           object lblRuntime: TLabel
             Left = 64
@@ -444,20 +457,22 @@ object Form5: TForm5
           object edtRuntimeBuildId: TEdit
             Left = 86
             Top = 69
-            Width = 339
+            Width = 413
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             OnClick = edtRuntimeBuildIdClick
+            ExplicitWidth = 339
           end
           object edtRuntimeSrc: TEdit
             Left = 86
             Top = 109
-            Width = 339
+            Width = 413
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 1
             OnChange = edtRuntimeSrcChange
+            ExplicitWidth = 339
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -521,5 +536,9 @@ object Form5: TForm5
     Filter = 'Delphi Package Manager Spec Files|*.dspec'
     Left = 460
     Top = 362
+  end
+  object PopupMenu: TPopupMenu
+    Left = 84
+    Top = 122
   end
 end

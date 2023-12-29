@@ -33,6 +33,10 @@ type
     source: TSource;
     searchpath: TSearchPath;
     function IsHeading: Boolean;
+    function IsBuild: Boolean;
+    function IsRuntime: Boolean;
+    function IsSource: Boolean;
+    function IsSearchPath: Boolean;
   end;
 
   TForm5 = class(TForm)
@@ -99,6 +103,7 @@ type
     lblRuntimeSrc: TLabel;
     edtRuntimeSrc: TEdit;
     chkCopyLocal: TCheckBox;
+    PopupMenu: TPopupMenu;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
@@ -123,6 +128,8 @@ type
     procedure miSaveAsClick(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
+    procedure tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var
+        Handled: Boolean);
     procedure tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
   private
     { Private declarations }
@@ -649,6 +656,64 @@ begin
   AllowCollapse := false;
 end;
 
+procedure TForm5.tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var
+    Handled: Boolean);
+var
+  item : TMenuItem;
+  localPos : TPoint;
+  node : TTemplateTreeNode;
+begin
+  localPos := tvTemplates.ClientToScreen(MousePos);
+  if Assigned(tvTemplates.Selected) then
+  begin
+    node := tvTemplates.Selected as TTemplateTreeNode;
+    tvTemplates.PopupMenu.Items.Clear;
+    node := tvTemplates.GetNodeAt(MousePos.X, MousePos.Y) as TTemplateTreeNode;
+    if node.IsBuild then
+    begin
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Add Build Item';
+
+    tvTemplates.PopupMenu.Items.Add(item);
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Delete Build Item';
+    localPos := tvTemplates.ClientToScreen(MousePos);
+    tvTemplates.PopupMenu.Items.Add(item);
+    end;
+    if node.IsRuntime then
+    begin
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Add Runtime Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Delete Runtime Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    end;
+    if node.IsSource then
+    begin
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Add Source Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Delete Source Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    end;
+    if node.IsSearchPath then
+    begin
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Add SearchPath Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := 'Delete SearchPath Item';
+    tvTemplates.PopupMenu.Items.Add(item);
+    end;
+
+    tvTemplates.PopupMenu.Popup(localPos.X, localPos.Y);
+
+    Handled := True;
+  end;
+end;
+
 procedure TForm5.tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
 begin
   NodeClass := TTemplateTreeNode;
@@ -656,9 +721,29 @@ end;
 
 { TTemplateTreeNode }
 
+function TTemplateTreeNode.IsBuild: Boolean;
+begin
+  Result := (build <> nil);
+end;
+
 function TTemplateTreeNode.IsHeading: Boolean;
 begin
   Result := (build = nil) and (runtime = nil) and (source = nil) and (searchpath = nil);
+end;
+
+function TTemplateTreeNode.IsRuntime: Boolean;
+begin
+  Result := (runtime <> nil);
+end;
+
+function TTemplateTreeNode.IsSearchPath: Boolean;
+begin
+  Result := (searchpath <> nil);
+end;
+
+function TTemplateTreeNode.IsSource: Boolean;
+begin
+  Result := (source <> nil);
 end;
 
 end.
