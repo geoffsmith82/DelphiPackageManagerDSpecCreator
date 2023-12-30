@@ -107,6 +107,7 @@ type
     BalloonHint1: TBalloonHint;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
+    procedure btnDeleteTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
     procedure cboTemplateChange(Sender: TObject);
     procedure chkCopyLocalClick(Sender: TObject);
@@ -207,6 +208,15 @@ begin
     FreeAndNil(TemplateForm);
   end;
   FOpenfile.NewTemplate(templateName);
+  LoadTemplates;
+end;
+
+procedure TForm5.btnDeleteTemplateClick(Sender: TObject);
+var
+  templateName: string;
+begin
+  templateName := (tvTemplates.Selected as TTemplateTreeNode).Template.name;
+  FOpenFile.DeleteTemplate(templateName);
   LoadTemplates;
 end;
 

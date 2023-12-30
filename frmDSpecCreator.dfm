@@ -234,6 +234,7 @@ object Form5: TForm5
         Height = 25
         Caption = 'Delete Template'
         TabOrder = 1
+        OnClick = btnDeleteTemplateClick
       end
       object tvTemplates: TTreeView
         Left = 3

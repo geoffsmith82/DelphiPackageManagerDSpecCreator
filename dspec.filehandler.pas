@@ -16,6 +16,7 @@ type
   public
     structure : TDPMSpecFormat;
     procedure NewTemplate(templateName: string);
+    procedure DeleteTemplate(templateName: string);
     procedure RenameTemplate(originalName: string; newName: string);
     function DoesTemplateExist(templateName: string): Boolean;
     function GetTemplate(templateName: string): TTemplate;
@@ -44,6 +45,26 @@ constructor TDSpecFile.Create;
 begin
   structure := TDPMSpecFormat.Create;
   FLoaded := TDPMSpecFormat.Create;
+end;
+
+procedure TDSpecFile.DeleteTemplate(templateName: string);
+var
+  templates : TArray<TTemplate>;
+  templateNew : TArray<TTemplate>;
+  i, j: Integer;
+begin
+  templates := structure.templates;
+  SetLength(templateNew, Length(templates) - 1);
+  j := 0;
+  for i := 0 to High(templates) do
+  begin
+    if templates[i].name <> templateName then
+    begin
+      templateNew[j] := templates[i];
+      Inc(j);
+    end;
+  end;
+  structure.templates := templateNew;
 end;
 
 destructor TDSpecFile.Destroy;
