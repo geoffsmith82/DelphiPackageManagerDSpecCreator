@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.RegularExpressions,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -38,6 +39,19 @@ type
     function IsSource: Boolean;
     function IsSearchPath: Boolean;
   end;
+
+
+type
+  TClassReplacer = class
+  private
+    FCompiler : TCompilerVersion;
+    function matcher(const Match: TMatch): String;
+    function Replace(inputStr: string): string;
+  public
+    constructor Create(compiler: TCompilerVersion);
+    class function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+  end;
+
 
   TForm5 = class(TForm)
     PageControl1: TPageControl;
@@ -171,7 +185,6 @@ uses
   System.JSON,
   REST.Json,
   System.IOUtils,
-  System.RegularExpressions,
   System.UITypes
   ;
 
@@ -339,7 +352,6 @@ end;
 procedure TForm5.edtDestChange(Sender: TObject);
 var
   str : string;
-  tmp : string;
   compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
@@ -418,7 +430,6 @@ end;
 procedure TForm5.edtProjectChange(Sender: TObject);
 var
   str : string;
-  tmp : string;
   compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
@@ -431,7 +442,7 @@ begin
     begin
       if compiler = TCompilerVersion.UnknownVersion then
         continue;
-      str := str  + System.sLineBreak + ReplaceVars(edtProject.Text, compiler);;
+      str := str  + System.sLineBreak + ReplaceVars(edtProject.Text, compiler);
     end;
     edtProject.Hint := str;
   end;
@@ -451,45 +462,13 @@ begin
 end;
 
 function TForm5.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
-var
-  regex: TRegEx;
-  match: TMatch;
 begin
-  // Regular expression to find placeholders like $something$, case-insensitive
-  regex := TRegEx.Create('\$(.*?)\$', [roIgnoreCase]);
-
-  // Initialize result
-  Result := inputStr;
-
-  // Find all matches in the input string
-  match := regex.Match(inputStr);
-  while match.Success do
-  begin
-    // Check the captured group to determine the placeholder, in a case-insensitive manner
-    if SameText(match.Groups[1].Value, 'compiler') then
-      Result := Result.Replace(match.Value, CompilerToString(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'compilerNoPoint') then
-      Result := Result.Replace(match.Value, CompilerToStringNoPoint(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'compilerCodeName') then
-      Result := Result.Replace(match.Value, CompilerCodeName(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'compilerWithCodeName') then
-      Result := Result.Replace(match.Value, CompilerWithCodeName(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'compilerVersion') then
-      Result := Result.Replace(match.Value, CompilerToCompilerVersionIntStr(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'libSuffix') then
-      Result := Result.Replace(match.Value, CompilerToLibSuffix(compiler), [rfReplaceAll])
-    else if SameText(match.Groups[1].Value, 'bdsVersion') then
-      Result := Result.Replace(match.Value, CompilerToBDSVersion(compiler), [rfReplaceAll]);
-
-    // Move to the next match
-    match := match.NextMatch;
-  end;
+  Result := TClassReplacer.ReplaceVars(inputStr, compiler);
 end;
 
 procedure TForm5.edtRuntimeSrcChange(Sender: TObject);
 var
   str : string;
-  tmp : string;
   compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
@@ -510,7 +489,7 @@ end;
 
 procedure TForm5.edtSourceChange(Sender: TObject);
 var
-  str, tmp : string;
+  str : string;
   compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
@@ -1009,6 +988,50 @@ end;
 function TTemplateTreeNode.IsSource: Boolean;
 begin
   Result := (source <> nil);
+end;
+
+{ TClassReplacer }
+
+constructor TClassReplacer.Create(compiler: TCompilerVersion);
+begin
+  FCompiler := compiler;
+end;
+
+function TClassReplacer.matcher(const Match: TMatch): String;
+begin
+  if SameText(Match.Groups[1].Value, 'compiler') then
+    Exit(CompilerToString(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'compilerNoPoint') then
+    Exit(CompilerToStringNoPoint(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'compilerCodeName') then
+    Exit(CompilerCodeName(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'compilerWithCodeName') then
+    Exit(CompilerWithCodeName(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'compilerVersion') then
+    Exit(CompilerToCompilerVersionIntStr(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'libSuffix') then
+    Exit(CompilerToLibSuffix(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'bdsVersion') then
+    Exit(CompilerToBDSVersion(FCompiler))
+  else
+    Exit(Match.Value);  // In case of no match, return the original placeholder
+end;
+
+function TClassReplacer.Replace(inputStr: string): string;
+begin
+  Result := TRegEx.Replace(inputStr, '\$(.*?)\$', matcher);
+end;
+
+class function TClassReplacer.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+var
+  replacer : TClassReplacer;
+begin
+  replacer := TClassReplacer.Create(compiler);
+  try
+    Result := replacer.Replace(inputStr);
+  finally
+    FreeAndNil(replacer);
+  end;
 end;
 
 end.
