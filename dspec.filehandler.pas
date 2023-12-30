@@ -26,6 +26,8 @@ type
     procedure LoadFromFile(filename: string);
     procedure SaveToFile(filename: string);
     function IsModified: Boolean;
+    constructor Create;
+    destructor Destroy; override;
   end;
 
 
@@ -37,6 +39,19 @@ uses
   ;
 
 { TDSpecFile }
+
+constructor TDSpecFile.Create;
+begin
+  structure := TDPMSpecFormat.Create;
+  FLoaded := TDPMSpecFormat.Create;
+end;
+
+destructor TDSpecFile.Destroy;
+begin
+  FreeAndNil(structure);
+  FreeAndNil(FLoaded);
+  inherited;
+end;
 
 function TDSpecFile.DoesTemplateExist(templateName: string): Boolean;
 var
