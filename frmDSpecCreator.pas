@@ -148,8 +148,6 @@ type
     FMenuSearchPath: TSearchPath;
     FMenuBuild: TBuild;
     FSavefilename : string;
-    function GetPlatform(const compiler: string): TTargetPlatform;
-    function GetTemplate(const templateName: string): TTemplate;
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
     function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
@@ -192,16 +190,11 @@ end;
 procedure TForm5.btnAddTemplateClick(Sender: TObject);
 var
   templateName : string;
-  templates : TArray<TTemplate>;
 begin
   templateName := InputBox('Templates', 'Enter Template name', 'default');
   if templateName.IsEmpty then
     Exit;
-  templates := FOpenFile.structure.templates;
-  SetLength(templates, length(templates) + 1);
-  templates[High(templates)] := TTemplate.Create;
-  templates[High(templates)].name := templateName;
-  FOpenFile.structure.templates := templates;
+  FOpenfile.NewTemplate(templateName);
   LoadTemplates;
 end;
 
@@ -209,6 +202,15 @@ procedure TForm5.cboLicenseChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.license := cboLicense.Text;
 end;
+
+procedure TForm5.cboTemplateChange(Sender: TObject);
+begin
+  if cboTemplate.Items[cboTemplate.ItemIndex] = 'Create New Template...' then
+  begin
+    PageControl1.ActivePage := tsTemplates;
+    btnAddTemplateClick(Sender);
+    cboTemplate.ItemIndex := -1;
+  end;
 end;
 
 procedure TForm5.chkCopyLocalClick(Sender: TObject);
@@ -216,36 +218,6 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).runtime.copyLocal := chkCopyLocal.Checked;
-  end;
-end;
-
-function TForm5.GetPlatform(const compiler: string): TTargetPlatform;
-var
-  i: Integer;
-begin
-  Result := nil;
-  for i := 0 to length(FOpenFile.structure.targetPlatforms) - 1 do
-  begin
-    if FOpenFile.structure.targetPlatforms[i].compiler = compiler then
-    begin
-      Result := FOpenFile.structure.targetPlatforms[i];
-      Exit;
-    end;
-  end;
-end;
-
-function TForm5.GetTemplate(const templateName: string): TTemplate;
-var
-  i: Integer;
-begin
-  Result := nil;
-  for i := 0 to length(FOpenFile.structure.targetPlatforms) - 1 do
-  begin
-    if FOpenFile.structure.templates[i].name = templateName then
-    begin
-      Result := FOpenFile.structure.templates[i];
-      Exit;
-    end;
   end;
 end;
 
@@ -258,7 +230,7 @@ begin
   if clbCompilers.ItemIndex < 0 then
     Exit;
 
-  vplatform := GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
+  vplatform := FOpenFile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
   compilerVersion := StringToCompilerVersion(clbCompilers.Items[clbCompilers.ItemIndex]);
 
   EnableDisablePlatform(compilerVersion);
@@ -655,43 +627,29 @@ end;
 
 procedure TForm5.PopupAddBuildItem(Sender: TObject);
 var
-  templateName : string;
-  builds : TArray<TBuild>;
+  buildId : string;
 begin
-  templateName := InputBox('build id', 'Enter Build ID', 'default');
-  builds := FTemplate.build;
-  SetLength(builds, length(builds) + 1);
-  builds[High(builds)] := TBuild.Create;
-  builds[High(builds)].id := templateName;
-  FTemplate.build := builds;
+  buildId := InputBox('build id', 'Enter Build ID', 'default');
+  FOpenFile.NewBuild(FTemplate.name, buildId);
   LoadTemplates;
 end;
 
 procedure TForm5.PopupAddRuntimeItem(Sender: TObject);
 var
   buildId : string;
-  runtimes : TArray<TRuntime>;
 begin
   buildId := InputBox('build id', 'Enter Runtime build ID', 'default');
-  runtimes := FTemplate.runtime;
-  SetLength(runtimes, length(runtimes) + 1);
-  runtimes[High(runtimes)] := TRuntime.Create;
-  runtimes[High(runtimes)].buildId := buildId;
-  FTemplate.runtime := runtimes;
+
+  FOpenFile.NewRuntime(FTemplate.name, buildId);
   LoadTemplates;
 end;
 
 procedure TForm5.PopupAddSearchPathItem(Sender: TObject);
 var
   SearchPathId : string;
-  searchpath : TArray<TSearchPath>;
 begin
   SearchPathId := InputBox('SearchPath', 'Enter SearchPath', 'default');
-  searchpath := FTemplate.searchPaths;
-  SetLength(searchpath, length(searchpath) + 1);
-  searchpath[High(searchpath)] := TSearchPath.Create;
-  searchpath[High(searchpath)].path := SearchPathId;
-  FTemplate.searchPaths := searchpath;
+  FOpenFile.NewSearchPath(FTemplate.name, SearchPathId);
   LoadTemplates;
 end;
 
