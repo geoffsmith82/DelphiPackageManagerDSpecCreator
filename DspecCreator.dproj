@@ -136,6 +136,8 @@
         <DCCReference Include="dpm.dspec.format.pas"/>
         <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Types.pas"/>
         <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas"/>
+        <DCCReference Include="dspec.filehandler.pas"/>
+        <DCCReference Include="dpm.dspec.replacer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
