@@ -189,8 +189,9 @@ object Form5: TForm5
         Top = 224
         Width = 161
         Height = 23
+        Style = csDropDownList
         TabOrder = 1
-        Text = 'cboTemplate'
+        OnChange = cboTemplateChange
       end
       object clbPlatforms: TCheckListBox
         Left = 256

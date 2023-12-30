@@ -16,11 +16,10 @@ uses
   Vcl.StdCtrls,
   Vcl.CheckLst,
   Vcl.Menus,
-  Data.Bind.Components,
-  Data.Bind.DBScope,
   Vcl.WinXPanels,
   Vcl.ExtCtrls,
   DPM.Core.Types,
+  dspec.filehandler,
   dpm.dspec.format
   ;
 
@@ -108,6 +107,7 @@ type
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
+    procedure cboTemplateChange(Sender: TObject);
     procedure chkCopyLocalClick(Sender: TObject);
     procedure clbCompilersClick(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
@@ -141,8 +141,7 @@ type
     procedure PopupDeleteSearchPathItem(Sender: TObject);
   private
     { Private declarations }
-    FLoaded: TDPMSpecFormat;
-    FOpenFile : TDPMSpecFormat;
+    FOpenFile : TDSpecFile;
     FTemplate : TTemplate;
     FMenuSource : TSource;
     FMenuRuntime : TRuntime;
@@ -168,9 +167,6 @@ implementation
 {$R *.dfm}
 
 uses
-  System.JSON,
-  REST.Json,
-  System.IOUtils,
   System.UITypes,
   dpm.dspec.replacer
   ;
@@ -201,17 +197,18 @@ begin
   templateName := InputBox('Templates', 'Enter Template name', 'default');
   if templateName.IsEmpty then
     Exit;
-  templates := FOpenFile.templates;
+  templates := FOpenFile.structure.templates;
   SetLength(templates, length(templates) + 1);
   templates[High(templates)] := TTemplate.Create;
   templates[High(templates)].name := templateName;
-  FOpenFile.templates := templates;
+  FOpenFile.structure.templates := templates;
   LoadTemplates;
 end;
 
 procedure TForm5.cboLicenseChange(Sender: TObject);
 begin
-  FOpenFile.metadata.license := cboLicense.Text;
+  FOpenFile.structure.metadata.license := cboLicense.Text;
+end;
 end;
 
 procedure TForm5.chkCopyLocalClick(Sender: TObject);
@@ -227,11 +224,11 @@ var
   i: Integer;
 begin
   Result := nil;
-  for i := 0 to length(FOpenFile.targetPlatforms) - 1 do
+  for i := 0 to length(FOpenFile.structure.targetPlatforms) - 1 do
   begin
-    if FOpenFile.targetPlatforms[i].compiler = compiler then
+    if FOpenFile.structure.targetPlatforms[i].compiler = compiler then
     begin
-      Result := FOpenFile.targetPlatforms[i];
+      Result := FOpenFile.structure.targetPlatforms[i];
       Exit;
     end;
   end;
@@ -242,11 +239,11 @@ var
   i: Integer;
 begin
   Result := nil;
-  for i := 0 to length(FOpenFile.targetPlatforms) - 1 do
+  for i := 0 to length(FOpenFile.structure.targetPlatforms) - 1 do
   begin
-    if FOpenFile.templates[i].name = templateName then
+    if FOpenFile.structure.templates[i].name = templateName then
     begin
-      Result := FOpenFile.templates[i];
+      Result := FOpenFile.structure.templates[i];
       Exit;
     end;
   end;
@@ -371,38 +368,39 @@ var
   i, j : Integer;
 begin
   tvTemplates.Items.Clear;
-  for i := 0 to High(FOpenFile.templates) do
+  cboTemplate.Clear;
+  for i := 0 to High(FOpenFile.structure.templates) do
   begin
-    cboTemplate.Items.Add(FOpenFile.templates[i].name);
-    node := tvTemplates.Items.Add(nil, FOpenFile.templates[i].name);
-    (node as TTemplateTreeNode).Template := FOpenFile.templates[i];
+    cboTemplate.Items.Add(FOpenFile.structure.templates[i].name);
+    node := tvTemplates.Items.Add(nil, FOpenFile.structure.templates[i].name);
+    (node as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
     nodeSource := tvTemplates.Items.AddChild(node, 'Source');
-    (nodeSource as TTemplateTreeNode).Template := FOpenFile.templates[i];
-    for j := 0 to High(FOpenFile.templates[i].source) do
+    (nodeSource as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    for j := 0 to High(FOpenFile.structure.templates[i].source) do
     begin
-      sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.templates[i].source[j].src) as TTemplateTreeNode;
-      sourceNode.source := FOpenFile.templates[i].source[j];
+      sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.structure.templates[i].source[j].src) as TTemplateTreeNode;
+      sourceNode.source := FOpenFile.structure.templates[i].source[j];
     end;
     nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths');
-    (nodeSearchPath as TTemplateTreeNode).Template := FOpenFile.templates[i];
-    for j := 0 to High(FOpenFile.templates[i].searchPaths) do
+    (nodeSearchPath as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    for j := 0 to High(FOpenFile.structure.templates[i].searchPaths) do
     begin
-      searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.templates[i].searchPaths[j].path) as TTemplateTreeNode;
-      searchPathNode.searchpath := FOpenFile.templates[i].searchPaths[j];
+      searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.structure.templates[i].searchPaths[j].path) as TTemplateTreeNode;
+      searchPathNode.searchpath := FOpenFile.structure.templates[i].searchPaths[j];
     end;
     nodeBuild := tvTemplates.Items.AddChild(node, 'Build');
-    (nodeBuild as TTemplateTreeNode).Template := FOpenFile.templates[i];
-    for j := 0 to High(FOpenFile.templates[i].build) do
+    (nodeBuild as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    for j := 0 to High(FOpenFile.structure.templates[i].build) do
     begin
-      buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.templates[i].build[j].id) as TTemplateTreeNode;
-      buildNode.build := FOpenFile.templates[i].build[j];
+      buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.structure.templates[i].build[j].id) as TTemplateTreeNode;
+      buildNode.build := FOpenFile.structure.templates[i].build[j];
     end;
     nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime');
-    (nodeRuntime as TTemplateTreeNode).Template := FOpenFile.templates[i];
-    for j := 0 to High(FOpenFile.templates[i].runtime) do
+    (nodeRuntime as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    for j := 0 to High(FOpenFile.structure.templates[i].runtime) do
     begin
-      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.templates[i].runtime[j].buildId) as TTemplateTreeNode;
-      runtimeNode.runtime := FOpenFile.templates[i].runtime[j];
+      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].buildId) as TTemplateTreeNode;
+      runtimeNode.runtime := FOpenFile.structure.templates[i].runtime[j];
     end;
 
     node.Expand(True);
@@ -411,7 +409,7 @@ end;
 
 procedure TForm5.edtIdChange(Sender: TObject);
 begin
-  FOpenFile.metadata.id := edtId.Text;
+  FOpenFile.structure.metadata.id := edtId.Text;
 end;
 
 procedure TForm5.edtProjectChange(Sender: TObject);
@@ -437,7 +435,7 @@ end;
 
 procedure TForm5.edtProjectURLChange(Sender: TObject);
 begin
-  FOpenFile.metadata.projectUrl := edtProjectURL.Text;
+  FOpenFile.structure.metadata.projectUrl := edtProjectURL.Text;
 end;
 
 procedure TForm5.edtRuntimeBuildIdClick(Sender: TObject);
@@ -497,18 +495,17 @@ end;
 
 procedure TForm5.edtTagsChange(Sender: TObject);
 begin
-  FOpenFile.metadata.tags := edtTags.Text;
+  FOpenFile.structure.metadata.tags := edtTags.Text;
 end;
 
 procedure TForm5.edtVersionChange(Sender: TObject);
 begin
-  FOpenFile.metadata.version := edtVersion.Text;
+  FOpenFile.structure.metadata.version := edtVersion.Text;
 end;
 
 procedure TForm5.FormCreate(Sender: TObject);
 begin
-  FOpenFile := TDPMSpecFormat.Create;
-  FLoaded := TDPMSpecFormat.Create;
+  FOpenFile := TDSpecFile.Create;
   LoadDspecStructure;
   FSavefilename := '';
 end;
@@ -518,13 +515,13 @@ var
   i : Integer;
   j: Integer;
 begin
-  edtId.Text := FOpenFile.metadata.id;
-  edtVersion.Text := FOpenFile.metadata.version;
-  mmoDescription.Text := FOpenFile.metadata.description;
-  edtProjectURL.Text := FOpenFile.metadata.projectUrl;
-  edtRepositoryURL.Text := FOpenFile.metadata.repositoryUrl;
-  cboLicense.Text := FOpenFile.metadata.license;
-  edtTags.Text := FOpenFile.metadata.tags;
+  edtId.Text := FOpenFile.structure.metadata.id;
+  edtVersion.Text := FOpenFile.structure.metadata.version;
+  mmoDescription.Text := FOpenFile.structure.metadata.description;
+  edtProjectURL.Text := FOpenFile.structure.metadata.projectUrl;
+  edtRepositoryURL.Text := FOpenFile.structure.metadata.repositoryUrl;
+  cboLicense.Text := FOpenFile.structure.metadata.license;
+  edtTags.Text := FOpenFile.structure.metadata.tags;
   cboTemplate.Text := '';
   CardPanel1.Visible := False;
   for j := 0 to clbCompilers.Count - 1 do
@@ -532,9 +529,9 @@ begin
     clbCompilers.Checked[j] := False;
   end;
 
-  for i := 0 to High(FOpenFile.targetPlatforms) do
+  for i := 0 to High(FOpenFile.structure.targetPlatforms) do
   begin
-     j := clbCompilers.Items.IndexOf(FOpenFile.targetPlatforms[i].compiler);
+     j := clbCompilers.Items.IndexOf(FOpenFile.structure.targetPlatforms[i].compiler);
      if j >= 0 then
        clbCompilers.Checked[j] := j >= 0;
   end;
@@ -544,7 +541,7 @@ end;
 
 procedure TForm5.SaveDspecStructure(const filename: string);
 begin
-  TFile.WriteAllText(Filename, TJson.ObjectToJsonObject(FOpenFile).Format);
+  FOpenFile.SaveToFile(filename);
   FSavefilename := Filename;
 end;
 
@@ -580,7 +577,7 @@ procedure TForm5.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
   UserChoice: Integer;
 begin
-  if TJson.ObjectToJsonObject(FOpenFile).Format <> TJson.ObjectToJsonObject(FLoaded).Format then
+  if FOpenFile.IsModified then
   begin
     UserChoice := MessageDlg('Do you want to save the changes?', mtConfirmation, [mbYes, mbNo, mbCancel], 0);
     case UserChoice of
@@ -624,30 +621,21 @@ end;
 procedure TForm5.miNewClick(Sender: TObject);
 begin
   FreeAndNil(FOpenFile);
-  FOpenFile := TDPMSpecFormat.Create;
-  FLoaded := TDPMSpecFormat.Create;
+  FOpenFile := TDSpecFile.Create;
   FSavefilename := '';
   LoadDspecStructure;
 end;
 
 procedure TForm5.miOpenClick(Sender: TObject);
 var
-  json : TJSONObject;
   dspecFilename : string;
 begin
-  json := nil;
   if OpenDialog.Execute then
   begin
     dspecFilename := OpenDialog.FileName;
-    try
-      json := TJSONObject.ParseJSONValue(TFile.ReadAllText(dspecFilename)) as TJSONObject;
-      FOpenFile := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
-      FLoaded := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
-      FSavefilename := dspecFilename;
-      LoadDspecStructure;
-    finally
-      FreeAndNil(json);
-    end;
+    FOpenFile.LoadFromFile( dspecFilename);
+    FSavefilename := dspecFilename;
+    LoadDspecStructure;
   end;
 end;
 
@@ -662,7 +650,7 @@ end;
 
 procedure TForm5.mmoDescriptionChange(Sender: TObject);
 begin
-  FOpenFile.metadata.description := mmoDescription.Text;
+  FOpenFile.structure.metadata.description := mmoDescription.Text;
 end;
 
 procedure TForm5.PopupAddBuildItem(Sender: TObject);
