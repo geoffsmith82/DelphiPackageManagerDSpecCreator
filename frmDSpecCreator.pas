@@ -104,6 +104,7 @@ type
     edtRuntimeSrc: TEdit;
     chkCopyLocal: TCheckBox;
     PopupMenu: TPopupMenu;
+    BalloonHint1: TBalloonHint;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
@@ -152,8 +153,7 @@ type
     function GetTemplate(const templateName: string): TTemplate;
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
-    function AddBuildItem: TBuild;
-
+    function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
   public
     { Public declarations }
     procedure LoadDspecStructure;
@@ -171,6 +171,7 @@ uses
   System.JSON,
   REST.Json,
   System.IOUtils,
+  System.RegularExpressions,
   System.UITypes
   ;
 
@@ -336,10 +337,24 @@ begin
 end;
 
 procedure TForm5.edtDestChange(Sender: TObject);
+var
+  str : string;
+  tmp : string;
+  compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).source.dest := edtDest.Text;
+
+    str := 'Possible Expanded Paths:' + System.sLineBreak;
+
+    for compiler := Low(TCompilerVersion) to High(TCompilerVersion) do
+    begin
+      if compiler = TCompilerVersion.UnknownVersion then
+        continue;
+      str := str  + System.sLineBreak + ReplaceVars(edtDest.Text, compiler);;
+    end;
+    edtDest.Hint := str;
   end;
 end;
 
@@ -401,10 +416,24 @@ begin
 end;
 
 procedure TForm5.edtProjectChange(Sender: TObject);
+var
+  str : string;
+  tmp : string;
+  compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).build.project := edtProject.Text;
+
+    str := 'Possible Expanded Paths:' + System.sLineBreak;
+
+    for compiler := Low(TCompilerVersion) to High(TCompilerVersion) do
+    begin
+      if compiler = TCompilerVersion.UnknownVersion then
+        continue;
+      str := str  + System.sLineBreak + ReplaceVars(edtProject.Text, compiler);;
+    end;
+    edtProject.Hint := str;
   end;
 end;
 
@@ -421,19 +450,82 @@ begin
   end;
 end;
 
+function TForm5.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+var
+  regex: TRegEx;
+  match: TMatch;
+begin
+  // Regular expression to find placeholders like $something$, case-insensitive
+  regex := TRegEx.Create('\$(.*?)\$', [roIgnoreCase]);
+
+  // Initialize result
+  Result := inputStr;
+
+  // Find all matches in the input string
+  match := regex.Match(inputStr);
+  while match.Success do
+  begin
+    // Check the captured group to determine the placeholder, in a case-insensitive manner
+    if SameText(match.Groups[1].Value, 'compiler') then
+      Result := Result.Replace(match.Value, CompilerToString(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'compilerNoPoint') then
+      Result := Result.Replace(match.Value, CompilerToStringNoPoint(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'compilerCodeName') then
+      Result := Result.Replace(match.Value, CompilerCodeName(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'compilerWithCodeName') then
+      Result := Result.Replace(match.Value, CompilerWithCodeName(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'compilerVersion') then
+      Result := Result.Replace(match.Value, CompilerToCompilerVersionIntStr(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'libSuffix') then
+      Result := Result.Replace(match.Value, CompilerToLibSuffix(compiler), [rfReplaceAll])
+    else if SameText(match.Groups[1].Value, 'bdsVersion') then
+      Result := Result.Replace(match.Value, CompilerToBDSVersion(compiler), [rfReplaceAll]);
+
+    // Move to the next match
+    match := match.NextMatch;
+  end;
+end;
+
 procedure TForm5.edtRuntimeSrcChange(Sender: TObject);
+var
+  str : string;
+  tmp : string;
+  compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).runtime.src := edtRuntimeSrc.Text;
+
+    str := 'Possible Expanded Paths:' + System.sLineBreak;
+
+    for compiler := Low(TCompilerVersion) to High(TCompilerVersion) do
+    begin
+      if compiler = TCompilerVersion.UnknownVersion then
+        continue;
+      str := str  + System.sLineBreak + ReplaceVars(edtRuntimeSrc.Text, compiler);
+    end;
+    edtRuntimeSrc.Hint := str;
   end;
 end;
 
 procedure TForm5.edtSourceChange(Sender: TObject);
+var
+  str, tmp : string;
+  compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).source.src := edtSource.Text;
+
+    str := 'Possible Expanded Paths:' + System.sLineBreak;
+
+    for compiler := Low(TCompilerVersion) to High(TCompilerVersion) do
+    begin
+      if compiler = TCompilerVersion.UnknownVersion then
+        continue;
+      str := str  + System.sLineBreak + ReplaceVars(edtSource.Text, compiler);
+    end;
+    edtSource.Hint := str;
   end;
 end;
 
@@ -605,13 +697,6 @@ end;
 procedure TForm5.mmoDescriptionChange(Sender: TObject);
 begin
   FOpenFile.metadata.description := mmoDescription.Text;
-end;
-
-function TForm5.AddBuildItem: TBuild;
-var
-  build : TBuild;
-begin
-
 end;
 
 procedure TForm5.PopupAddBuildItem(Sender: TObject);

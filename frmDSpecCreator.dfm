@@ -294,11 +294,13 @@ object Form5: TForm5
             Top = 45
             Width = 370
             Height = 23
+            CustomHint = BalloonHint1
             Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
             Text = 'edtSource'
             OnChange = edtSourceChange
-            ExplicitWidth = 296
           end
           object chkFlatten: TCheckBox
             Left = 74
@@ -314,10 +316,11 @@ object Form5: TForm5
             Width = 370
             Height = 23
             Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 2
             Text = 'Edit1'
             OnChange = edtDestChange
-            ExplicitWidth = 296
           end
           object lbExclude: TListBox
             Left = 74
@@ -414,10 +417,11 @@ object Form5: TForm5
             Width = 411
             Height = 23
             Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtProjectChange
-            ExplicitWidth = 337
           end
         end
         object crdRuntime: TCard
@@ -470,9 +474,10 @@ object Form5: TForm5
             Width = 413
             Height = 23
             Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 1
             OnChange = edtRuntimeSrcChange
-            ExplicitWidth = 339
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -540,5 +545,9 @@ object Form5: TForm5
   object PopupMenu: TPopupMenu
     Left = 84
     Top = 122
+  end
+  object BalloonHint1: TBalloonHint
+    Left = 389
+    Top = 286
   end
 end
