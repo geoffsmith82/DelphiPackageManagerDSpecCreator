@@ -138,6 +138,10 @@
         <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas"/>
         <DCCReference Include="dspec.filehandler.pas"/>
         <DCCReference Include="dpm.dspec.replacer.pas"/>
+        <DCCReference Include="frmTemplates.pas">
+            <Form>TemplateForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

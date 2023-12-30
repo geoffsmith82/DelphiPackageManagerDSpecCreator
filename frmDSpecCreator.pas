@@ -18,6 +18,7 @@ uses
   Vcl.Menus,
   Vcl.WinXPanels,
   Vcl.ExtCtrls,
+  System.RegularExpressions,
   DPM.Core.Types,
   dspec.filehandler,
   dpm.dspec.format
@@ -166,6 +167,7 @@ implementation
 
 uses
   System.UITypes,
+  frmTemplates,
   dpm.dspec.replacer
   ;
 
@@ -190,10 +192,20 @@ end;
 procedure TForm5.btnAddTemplateClick(Sender: TObject);
 var
   templateName : string;
+  TemplateForm: TTemplateForm;
 begin
-  templateName := InputBox('Templates', 'Enter Template name', 'default');
-  if templateName.IsEmpty then
-    Exit;
+  TemplateForm := TTemplateForm.Create(nil);
+  try
+    if not FOpenFile.DoesTemplateExist('default') then
+      TemplateForm.edtTemplate.Text := 'default';
+    if TemplateForm.ShowModal =  mrCancel then
+      Exit;
+    templateName := TemplateForm.edtTemplate.Text;
+    if templateName.IsEmpty then
+      Exit;
+  finally
+    FreeAndNil(TemplateForm);
+  end;
   FOpenfile.NewTemplate(templateName);
   LoadTemplates;
 end;
@@ -377,6 +389,7 @@ begin
 
     node.Expand(True);
   end;
+  cboTemplate.Items.Add('Create New Template...');
 end;
 
 procedure TForm5.edtIdChange(Sender: TObject);
@@ -922,6 +935,5 @@ function TTemplateTreeNode.IsSource: Boolean;
 begin
   Result := (source <> nil);
 end;
-
 
 end.

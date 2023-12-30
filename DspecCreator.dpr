@@ -7,7 +7,8 @@ uses
   DPM.Core.Types in 'Libs\DPM\Source\Core\DPM.Core.Types.pas',
   DPM.Core.Utils.Strings in 'Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas',
   dspec.filehandler in 'dspec.filehandler.pas',
-  dpm.dspec.replacer in 'dpm.dspec.replacer.pas';
+  dpm.dspec.replacer in 'dpm.dspec.replacer.pas',
+  frmTemplates in 'frmTemplates.pas' {TemplateForm};
 
 {$R *.res}
 
