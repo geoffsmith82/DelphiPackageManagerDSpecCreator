@@ -503,6 +503,7 @@ begin
   FOpenFile := TDSpecFile.Create;
   LoadDspecStructure;
   FSavefilename := '';
+  Caption := 'Untitled - dspec Creator';
 end;
 
 procedure TForm5.LoadDspecStructure;
@@ -618,6 +619,7 @@ begin
   FreeAndNil(FOpenFile);
   FOpenFile := TDSpecFile.Create;
   FSavefilename := '';
+  Caption := 'Untitled - dspec Creator';
   LoadDspecStructure;
 end;
 
@@ -630,6 +632,7 @@ begin
     dspecFilename := OpenDialog.FileName;
     FOpenFile.LoadFromFile( dspecFilename);
     FSavefilename := dspecFilename;
+    Caption := dspecFilename + ' - dspec Creator';
     LoadDspecStructure;
   end;
 end;
