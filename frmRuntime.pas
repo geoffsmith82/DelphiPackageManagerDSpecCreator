@@ -19,17 +19,28 @@ type
   TRuntimeForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
+    procedure btnCancelClick(Sender: TObject);
+    procedure btnOkClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  RuntimeForm: TRuntimeForm;
-
 implementation
 
 {$R *.dfm}
+
+procedure TRuntimeForm.btnCancelClick(Sender: TObject);
+begin
+  Close;
+  ModalResult := mrCancel;
+end;
+
+procedure TRuntimeForm.btnOkClick(Sender: TObject);
+begin
+  Close;
+  ModalResult := mrOk;
+end;
 
 end.

@@ -177,6 +177,10 @@ implementation
 uses
   System.UITypes,
   frmTemplates,
+  frmBuild,
+  frmSource,
+  frmRuntime,
+  frmSearchPath,
   dpm.dspec.replacer
   ;
 

@@ -19,17 +19,28 @@ type
   TSearchPathForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
+    procedure btnCancelClick(Sender: TObject);
+    procedure btnOkClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  SearchPathForm: TSearchPathForm;
-
 implementation
 
 {$R *.dfm}
+
+procedure TSearchPathForm.btnCancelClick(Sender: TObject);
+begin
+  Close;
+  ModalResult := mrCancel;
+end;
+
+procedure TSearchPathForm.btnOkClick(Sender: TObject);
+begin
+  Close;
+  ModalResult := mrOk;
+end;
 
 end.

@@ -20,6 +20,7 @@ object SearchPathForm: TSearchPathForm
     Cancel = True
     Caption = 'Cancel'
     TabOrder = 0
+    OnClick = btnCancelClick
   end
   object btnOk: TButton
     Left = 478
@@ -29,5 +30,6 @@ object SearchPathForm: TSearchPathForm
     Caption = 'OK'
     Default = True
     TabOrder = 1
+    OnClick = btnOkClick
   end
 end

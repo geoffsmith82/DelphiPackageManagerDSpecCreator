@@ -36,6 +36,7 @@ implementation
 procedure TTemplateForm.btnCancelClick(Sender: TObject);
 begin
   Close;
+  ModalResult := mrCancel;
 end;
 
 procedure TTemplateForm.btnOkClick(Sender: TObject);

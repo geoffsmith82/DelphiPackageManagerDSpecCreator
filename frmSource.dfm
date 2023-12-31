@@ -1,6 +1,7 @@
 object SourceForm: TSourceForm
   Left = 0
   Top = 0
+  BorderStyle = bsDialog
   Caption = 'SourceForm'
   ClientHeight = 246
   ClientWidth = 624
@@ -19,6 +20,7 @@ object SourceForm: TSourceForm
     Cancel = True
     Caption = 'Cancel'
     TabOrder = 0
+    OnClick = btnCancelClick
   end
   object btnOk: TButton
     Left = 494
@@ -28,5 +30,6 @@ object SourceForm: TSourceForm
     Caption = 'OK'
     Default = True
     TabOrder = 1
+    OnClick = btnOkClick
   end
 end

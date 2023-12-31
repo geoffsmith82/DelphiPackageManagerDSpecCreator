@@ -20,6 +20,7 @@ object RuntimeForm: TRuntimeForm
     Cancel = True
     Caption = 'Cancel'
     TabOrder = 0
+    OnClick = btnCancelClick
   end
   object btnOk: TButton
     Left = 494
@@ -29,5 +30,6 @@ object RuntimeForm: TRuntimeForm
     Caption = 'OK'
     Default = True
     TabOrder = 1
+    OnClick = btnOkClick
   end
 end
