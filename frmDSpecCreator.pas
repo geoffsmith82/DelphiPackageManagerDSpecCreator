@@ -32,6 +32,7 @@ type
     runtime: TRuntime;
     source: TSource;
     searchpath: TSearchPath;
+
     function IsHeading: Boolean;
     function IsBuild: Boolean;
     function IsRuntime: Boolean;
@@ -227,6 +228,8 @@ procedure TDSpecCreatorForm.btnDeleteTemplateClick(Sender: TObject);
 var
   templateName: string;
 begin
+  if not Assigned(tvTemplates.Selected) then
+    raise Exception.Create('Select Template to delete');
   templateName := (tvTemplates.Selected as TTemplateTreeNode).Template.name;
   FOpenFile.DeleteTemplate(templateName);
   LoadTemplates;
@@ -761,42 +764,93 @@ end;
 procedure TDSpecCreatorForm.PopupAddBuildItem(Sender: TObject);
 var
   buildId : string;
+  BuildForm: TBuildForm;
+  build : TBuild;
 begin
-  buildId := InputBox('build id', 'Enter Build ID', 'default');
-  FOpenFile.NewBuild(FTemplate.name, buildId);
+  BuildForm := TBuildForm.Create(nil);
+  try
+    BuildForm.edtBuildId.Text := 'default';
+
+    if BuildForm.ShowModal =  mrCancel then
+      Exit;
+    buildId := BuildForm.edtBuildId.Text;
+    if buildId.IsEmpty then
+      Exit;
+    build := FOpenFile.NewBuild(FTemplate.name, buildId);
+    build.project := BuildForm.edtProject.Text;
+  finally
+    FreeAndNil(BuildForm);
+  end;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupAddRuntimeItem(Sender: TObject);
 var
-  buildId : string;
+  runtimebuildId : string;
+  RuntimeForm: TRuntimeForm;
+  runtime : TRuntime;
 begin
-  buildId := InputBox('build id', 'Enter Runtime build ID', 'default');
+  RuntimeForm := TRuntimeForm.Create(nil);
+  try
+      RuntimeForm.edtRuntimeBuildId.Text := 'default';
 
-  FOpenFile.NewRuntime(FTemplate.name, buildId);
+    if RuntimeForm.ShowModal =  mrCancel then
+      Exit;
+    runtimebuildId := RuntimeForm.edtRuntimeBuildId.Text;
+    if runtimebuildId.IsEmpty then
+      Exit;
+    runtime := FOpenFile.NewRuntime(FTemplate.name, runtimebuildId);
+    runtime.src := RuntimeForm.edtRuntimeSrc.Text;
+    runtime.copyLocal := RuntimeForm.chkCopyLocal.Checked;
+  finally
+    FreeAndNil(RuntimeForm);
+  end;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupAddSearchPathItem(Sender: TObject);
 var
-  SearchPathId : string;
+  searchPathStr : string;
+  SearchPathForm: TSearchPathForm;
+  searchPath : TSearchPath;
 begin
-  SearchPathId := InputBox('SearchPath', 'Enter SearchPath', 'default');
-  FOpenFile.NewSearchPath(FTemplate.name, SearchPathId);
+  SearchPathForm := TSearchPathForm.Create(nil);
+  try
+      SearchPathForm.edtSearchPath.Text := 'default';
+
+    if SearchPathForm.ShowModal =  mrCancel then
+      Exit;
+    searchPathStr := SearchPathForm.edtSearchPath.Text;
+    if searchPathStr.IsEmpty then
+      Exit;
+    searchPath := FOpenFile.NewSearchPath(FTemplate.name, searchPathStr);
+  finally
+    FreeAndNil(SearchPathForm);
+  end;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupAddSourceItem(Sender: TObject);
 var
-  SearchPathId : string;
-  source : TArray<TSource>;
+  SourceSrc : string;
+  SourceForm: TSourceForm;
+  source : TSource;
 begin
-  SearchPathId := InputBox('Src', 'Enter Src', 'default');
-  source := FTemplate.source;
-  SetLength(source, length(source) + 1);
-  source[High(source)] := TSource.Create;
-  source[High(source)].src := SearchPathId;
-  FTemplate.source := source;
+  SourceForm := TSourceForm.Create(nil);
+  try
+      SourceForm.edtSource.Text := 'default';
+
+    if SourceForm.ShowModal =  mrCancel then
+      Exit;
+    SourceSrc := SourceForm.edtSource.Text;
+    if SourceSrc.IsEmpty then
+      Exit;
+    source := FOpenFile.NewSource(FTemplate.name, SourceSrc);
+    source.flatten := SourceForm.chkFlatten.Checked;
+    source.dest := SourceForm.edtDest.Text;
+  finally
+    FreeAndNil(SourceForm);
+  end;
   LoadTemplates;
 end;
 

@@ -20,9 +20,10 @@ type
     procedure RenameTemplate(const originalName: string; const newName: string);
     function DoesTemplateExist(const templateName: string): Boolean;
     function GetTemplate(const templateName: string): TTemplate;
-    procedure NewBuild(const templateName: string; BuildId: string);
-    procedure NewRuntime(const templateName: string; const BuildId: string);
-    procedure NewSearchPath(const templateName: string; const SearchPathId: string);
+    function NewSource(const templateName: string; srcPath: string): TSource;
+    function NewBuild(const templateName: string; BuildId: string): TBuild;
+    function NewRuntime(const templateName: string; const BuildId: string): TRuntime;
+    function NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
     function GetPlatform(const compiler: string): TTargetPlatform;
     function AddCompiler(const compiler: string): TTargetPlatform;
     procedure DeleteCompiler(const compiler: string);
@@ -195,11 +196,12 @@ begin
   structure.templates := templates;
 end;
 
-procedure TDSpecFile.NewBuild(const templateName: string; BuildId: string);
+function TDSpecFile.NewBuild(const templateName: string; BuildId: string): TBuild;
 var
   builds : TArray<TBuild>;
   template : TTemplate;
 begin
+  Result := nil;
   if BuildId.IsEmpty then
     Exit;
   if not DoesTemplateExist(templateName) then
@@ -211,14 +213,16 @@ begin
   SetLength(builds, length(builds) + 1);
   builds[High(builds)] := TBuild.Create;
   builds[High(builds)].id := BuildId;
+  Result := builds[High(builds)];
   template.build := builds;
 end;
 
-procedure TDSpecFile.NewRuntime(const templateName: string; const BuildId: string);
+function TDSpecFile.NewRuntime(const templateName: string; const BuildId: string): TRuntime;
 var
   runtime : TArray<TRuntime>;
   template : TTemplate;
 begin
+  Result := nil;
   if BuildId.IsEmpty then
     Exit;
   if not DoesTemplateExist(templateName) then
@@ -230,14 +234,16 @@ begin
   SetLength(runtime, length(runtime) + 1);
   runtime[High(runtime)] := TRuntime.Create;
   runtime[High(runtime)].buildId := BuildId;
+  Result := runtime[High(runtime)];
   template.runtime := runtime;
 end;
 
-procedure TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string);
+function TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
 var
   searchPaths : TArray<TSearchPath>;
   template : TTemplate;
 begin
+  Result := nil;
   if SearchPathId.IsEmpty then
     Exit;
   if not DoesTemplateExist(templateName) then
@@ -249,7 +255,29 @@ begin
   SetLength(searchPaths, length(searchPaths) + 1);
   searchPaths[High(searchPaths)] := TSearchPath.Create;
   searchPaths[High(searchPaths)].path := SearchPathId;
+  Result := searchPaths[High(searchPaths)];
   template.searchPaths := searchPaths;
+end;
+
+function TDSpecFile.NewSource(const templateName: string; srcPath: string): TSource;
+var
+  sources : TArray<TSource>;
+  template : TTemplate;
+begin
+  Result := nil;
+  if srcPath.IsEmpty then
+    Exit;
+  if not DoesTemplateExist(templateName) then
+    raise Exception.Create('Template does not exist');
+
+  template := GetTemplate(templateName);
+
+  sources := template.source;
+  SetLength(sources, length(sources) + 1);
+  sources[High(sources)] := TSource.Create;
+  sources[High(sources)].src := srcPath;
+  Result := sources[High(sources)];
+  template.source := sources;
 end;
 
 function TDSpecFile.GetPlatform(const compiler: string): TTargetPlatform;

@@ -19,6 +19,11 @@ type
   TSourceForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
+    lblSrc: TLabel;
+    edtSource: TEdit;
+    chkFlatten: TCheckBox;
+    lblDest: TLabel;
+    edtDest: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private

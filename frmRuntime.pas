@@ -19,6 +19,11 @@ type
   TRuntimeForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
+    chkCopyLocal: TCheckBox;
+    lblRuntimeSrc: TLabel;
+    edtRuntimeSrc: TEdit;
+    lblRuntimeBuildId: TLabel;
+    edtRuntimeBuildId: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private

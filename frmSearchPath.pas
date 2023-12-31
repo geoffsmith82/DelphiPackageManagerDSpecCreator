@@ -19,6 +19,8 @@ type
   TSearchPathForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
+    lblRuntimeSrc: TLabel;
+    edtSearchPath: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private

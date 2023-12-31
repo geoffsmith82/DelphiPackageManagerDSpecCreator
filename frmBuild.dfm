@@ -11,6 +11,7 @@ object BuildForm: TBuildForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
   DesignSize = (
     522
     168)
