@@ -130,7 +130,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="frmDSpecCreator.pas">
-            <Form>Form5</Form>
+            <Form>DSpecCreatorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="dpm.dspec.format.pas"/>
@@ -140,6 +140,22 @@
         <DCCReference Include="dpm.dspec.replacer.pas"/>
         <DCCReference Include="frmTemplates.pas">
             <Form>TemplateForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="frmSource.pas">
+            <Form>SourceForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="frmBuild.pas">
+            <Form>BuildForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="frmRuntime.pas">
+            <Form>RuntimeForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="frmSearchPath.pas">
+            <Form>SearchPathForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

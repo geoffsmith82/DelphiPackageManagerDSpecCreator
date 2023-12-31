@@ -39,7 +39,7 @@ type
     function IsSearchPath: Boolean;
   end;
 
-  TForm5 = class(TForm)
+  TDSpecCreatorForm = class(TForm)
     PageControl: TPageControl;
     tsInfo: TTabSheet;
     edtId: TEdit;
@@ -105,6 +105,10 @@ type
     chkCopyLocal: TCheckBox;
     PopupMenu: TPopupMenu;
     BalloonHint1: TBalloonHint;
+    TabSheet1: TTabSheet;
+    lblCompilers: TLabel;
+    lblPlatform: TLabel;
+    lblTemplateView: TLabel;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
@@ -164,7 +168,7 @@ type
   end;
 
 var
-  Form5: TForm5;
+  DSpecCreatorForm: TDSpecCreatorForm;
 
 implementation
 
@@ -176,7 +180,7 @@ uses
   dpm.dspec.replacer
   ;
 
-procedure TForm5.btnAddExcludeClick(Sender: TObject);
+procedure TDSpecCreatorForm.btnAddExcludeClick(Sender: TObject);
 var
   src : string;
   templateSource : TArray<TSource>;
@@ -194,7 +198,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.btnAddTemplateClick(Sender: TObject);
+procedure TDSpecCreatorForm.btnAddTemplateClick(Sender: TObject);
 var
   templateName : string;
   TemplateForm: TTemplateForm;
@@ -215,7 +219,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.btnDeleteTemplateClick(Sender: TObject);
+procedure TDSpecCreatorForm.btnDeleteTemplateClick(Sender: TObject);
 var
   templateName: string;
 begin
@@ -224,14 +228,15 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.cboLicenseChange(Sender: TObject);
+procedure TDSpecCreatorForm.cboLicenseChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.license := cboLicense.Text;
 end;
 
-procedure TForm5.cboTemplateChange(Sender: TObject);
+procedure TDSpecCreatorForm.cboTemplateChange(Sender: TObject);
 var
   templateName: string;
+  compilerName: string;
   vPlatform : TTargetPlatform;
 begin
   templateName := cboTemplate.Items[cboTemplate.ItemIndex];
@@ -245,6 +250,8 @@ begin
 //  if Assigned(tvTemplates.Selected) then
 //  begin
 //    (tvTemplates.Selected as TTemplateTreeNode).template := FOpenFile.GetTemplate(templateName);
+    if clbCompilers.ItemIndex < 0 then
+      raise Exception.Create('Please select a compiler before trying to set the template');
     vPlatform := FOpenfile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
 //  end;
   if not Assigned(vPlatform) then
@@ -256,7 +263,7 @@ begin
 
 end;
 
-procedure TForm5.chkCopyLocalClick(Sender: TObject);
+procedure TDSpecCreatorForm.chkCopyLocalClick(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
@@ -264,7 +271,7 @@ begin
   end;
 end;
 
-procedure TForm5.clbCompilersClick(Sender: TObject);
+procedure TDSpecCreatorForm.clbCompilersClick(Sender: TObject);
 var
   j : Integer;
   vplatform : TTargetPlatform;
@@ -345,7 +352,7 @@ begin
   cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(vplatform.template);
 end;
 
-procedure TForm5.clbCompilersClickCheck(Sender: TObject);
+procedure TDSpecCreatorForm.clbCompilersClickCheck(Sender: TObject);
 var
   vPlatform : TTargetPlatform;
   compiler : string;
@@ -364,14 +371,16 @@ begin
   end;
 end;
 
-procedure TForm5.clbPlatformsClickCheck(Sender: TObject);
+procedure TDSpecCreatorForm.clbPlatformsClickCheck(Sender: TObject);
 var
   vPlatform : TTargetPlatform;
   compiler : string;
   platformString : string;
 begin
   if clbCompilers.ItemIndex < 0 then
-    Exit;
+  begin
+    raise Exception.Create('You must select a compiler before you can select platforms');
+  end;
   if clbPlatforms.ItemIndex < 0 then
     Exit;
 
@@ -386,7 +395,7 @@ begin
 
 end;
 
-procedure TForm5.edtBuildIdChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtBuildIdChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
@@ -394,7 +403,7 @@ begin
   end;
 end;
 
-procedure TForm5.edtDestChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtDestChange(Sender: TObject);
 var
   str : string;
   compiler : TCompilerVersion;
@@ -415,7 +424,7 @@ begin
   end;
 end;
 
-procedure TForm5.LoadTemplates;
+procedure TDSpecCreatorForm.LoadTemplates;
 var
   node: TTreeNode;
   nodeSource: TTreeNode;
@@ -473,12 +482,12 @@ begin
   cboTemplate.Items.Add('Create New Template...');
 end;
 
-procedure TForm5.edtIdChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtIdChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.id := edtId.Text;
 end;
 
-procedure TForm5.edtProjectChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtProjectChange(Sender: TObject);
 var
   str : string;
   compiler : TCompilerVersion;
@@ -499,12 +508,12 @@ begin
   end;
 end;
 
-procedure TForm5.edtProjectURLChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtProjectURLChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.projectUrl := edtProjectURL.Text;
 end;
 
-procedure TForm5.edtRuntimeBuildIdClick(Sender: TObject);
+procedure TDSpecCreatorForm.edtRuntimeBuildIdClick(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
@@ -512,12 +521,12 @@ begin
   end;
 end;
 
-function TForm5.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+function TDSpecCreatorForm.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
 begin
   Result := TClassReplacer.ReplaceVars(inputStr, compiler);
 end;
 
-procedure TForm5.edtRuntimeSrcChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtRuntimeSrcChange(Sender: TObject);
 var
   str : string;
   compiler : TCompilerVersion;
@@ -538,7 +547,7 @@ begin
   end;
 end;
 
-procedure TForm5.edtSourceChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtSourceChange(Sender: TObject);
 var
   str : string;
   compiler : TCompilerVersion;
@@ -559,17 +568,17 @@ begin
   end;
 end;
 
-procedure TForm5.edtTagsChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtTagsChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.tags := edtTags.Text;
 end;
 
-procedure TForm5.edtVersionChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtVersionChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.version := edtVersion.Text;
 end;
 
-procedure TForm5.FormCreate(Sender: TObject);
+procedure TDSpecCreatorForm.FormCreate(Sender: TObject);
 begin
   FOpenFile := TDSpecFile.Create;
   LoadDspecStructure;
@@ -577,7 +586,7 @@ begin
   Caption := 'Untitled - dspec Creator';
 end;
 
-procedure TForm5.LoadDspecStructure;
+procedure TDSpecCreatorForm.LoadDspecStructure;
 var
   i : Integer;
   j: Integer;
@@ -606,13 +615,13 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.SaveDspecStructure(const filename: string);
+procedure TDSpecCreatorForm.SaveDspecStructure(const filename: string);
 begin
   FOpenFile.SaveToFile(filename);
   FSavefilename := Filename;
 end;
 
-function TForm5.SelectedPlatform: TTargetPlatform;
+function TDSpecCreatorForm.SelectedPlatform: TTargetPlatform;
 begin
   Result := nil;
   if clbPlatforms.ItemIndex < 0  then
@@ -620,7 +629,7 @@ begin
   Result := FOpenFile.GetPlatform(clbPlatforms.Items[clbPlatforms.ItemIndex]);
 end;
 
-procedure TForm5.EnableDisablePlatform(compilerVersion : TCompilerVersion);
+procedure TDSpecCreatorForm.EnableDisablePlatform(compilerVersion : TCompilerVersion);
 var
   DpmPlatforms : TDPMPlatforms;
   DpmPlatform: TDPMPlatform;
@@ -643,12 +652,12 @@ begin
 end;
 
 
-procedure TForm5.miExitClick(Sender: TObject);
+procedure TDSpecCreatorForm.miExitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TForm5.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TDSpecCreatorForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
   UserChoice: Integer;
 begin
@@ -693,7 +702,7 @@ begin
     CanClose := True; // No changes were made, so it's okay to close
 end;
 
-procedure TForm5.miNewClick(Sender: TObject);
+procedure TDSpecCreatorForm.miNewClick(Sender: TObject);
 begin
   FreeAndNil(FOpenFile);
   FOpenFile := TDSpecFile.Create;
@@ -702,7 +711,7 @@ begin
   LoadDspecStructure;
 end;
 
-procedure TForm5.miOpenClick(Sender: TObject);
+procedure TDSpecCreatorForm.miOpenClick(Sender: TObject);
 var
   dspecFilename : string;
 begin
@@ -716,7 +725,7 @@ begin
   end;
 end;
 
-procedure TForm5.miSaveAsClick(Sender: TObject);
+procedure TDSpecCreatorForm.miSaveAsClick(Sender: TObject);
 begin
   if SaveDialog.Execute then
   begin
@@ -724,7 +733,7 @@ begin
   end;
 end;
 
-procedure TForm5.miSaveClick(Sender: TObject);
+procedure TDSpecCreatorForm.miSaveClick(Sender: TObject);
 begin
   if FSavefilename.IsEmpty then
   begin
@@ -740,12 +749,12 @@ begin
 end;
 
 
-procedure TForm5.mmoDescriptionChange(Sender: TObject);
+procedure TDSpecCreatorForm.mmoDescriptionChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.description := mmoDescription.Text;
 end;
 
-procedure TForm5.PopupAddBuildItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupAddBuildItem(Sender: TObject);
 var
   buildId : string;
 begin
@@ -754,7 +763,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupAddRuntimeItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupAddRuntimeItem(Sender: TObject);
 var
   buildId : string;
 begin
@@ -764,7 +773,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupAddSearchPathItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupAddSearchPathItem(Sender: TObject);
 var
   SearchPathId : string;
 begin
@@ -773,7 +782,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupAddSourceItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupAddSourceItem(Sender: TObject);
 var
   SearchPathId : string;
   source : TArray<TSource>;
@@ -787,7 +796,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupDeleteBuildItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupDeleteBuildItem(Sender: TObject);
 var
   build : TArray<TBuild>;
   buildNew : TArray<TBuild>;
@@ -808,7 +817,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupDeleteRuntimeItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupDeleteRuntimeItem(Sender: TObject);
 var
   runtimes : TArray<TRuntime>;
   runtimesNew : TArray<TRuntime>;
@@ -829,7 +838,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupDeleteSearchPathItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupDeleteSearchPathItem(Sender: TObject);
 var
   searchpath : TArray<TSearchPath>;
   searchpathNew : TArray<TSearchPath>;
@@ -850,7 +859,7 @@ begin
   LoadTemplates;
 end;
 
-procedure TForm5.PopupDeleteSourceItem(Sender: TObject);
+procedure TDSpecCreatorForm.PopupDeleteSourceItem(Sender: TObject);
 var
   source : TArray<TSource>;
   sourceNew : TArray<TSource>;
@@ -872,7 +881,7 @@ begin
 end;
 
 
-procedure TForm5.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
+procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
   if (node.Text = 'SearchPaths') and ((Node as TTemplateTreenode).IsHeading) then
   begin
@@ -930,12 +939,12 @@ begin
   end;
 end;
 
-procedure TForm5.tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
+procedure TDSpecCreatorForm.tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
 begin
   AllowCollapse := false;
 end;
 
-procedure TForm5.tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+procedure TDSpecCreatorForm.tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 var
   item : TMenuItem;
   localPos : TPoint;
@@ -1011,7 +1020,7 @@ begin
   end;
 end;
 
-procedure TForm5.tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
+procedure TDSpecCreatorForm.tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
 begin
   NodeClass := TTemplateTreeNode;
 end;

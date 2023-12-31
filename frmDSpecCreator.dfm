@@ -1,4 +1,4 @@
-object Form5: TForm5
+object DSpecCreatorForm: TDSpecCreatorForm
   Left = 0
   Top = 0
   Caption = '.dspec Creator'
@@ -157,6 +157,20 @@ object Form5: TForm5
         Height = 15
         Caption = 'Template'
       end
+      object lblCompilers: TLabel
+        Left = 72
+        Top = 27
+        Width = 54
+        Height = 15
+        Caption = 'Compilers'
+      end
+      object lblPlatform: TLabel
+        Left = 256
+        Top = 27
+        Width = 46
+        Height = 15
+        Caption = 'Platform'
+      end
       object clbCompilers: TCheckListBox
         Left = 72
         Top = 48
@@ -218,6 +232,13 @@ object Form5: TForm5
       DesignSize = (
         863
         411)
+      object lblTemplateView: TLabel
+        Left = 3
+        Top = 36
+        Width = 76
+        Height = 15
+        Caption = 'Template View'
+      end
       object btnAddTemplate: TButton
         Left = 3
         Top = 328
