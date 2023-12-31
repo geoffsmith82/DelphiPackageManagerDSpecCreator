@@ -59,7 +59,7 @@ type
     edtTags: TEdit;
     clbCompilers: TCheckListBox;
     tsTemplates: TTabSheet;
-    MainMenu1: TMainMenu;
+    MainMenu: TMainMenu;
     File1: TMenuItem;
     miNew: TMenuItem;
     miOpen: TMenuItem;
@@ -112,6 +112,8 @@ type
     procedure cboTemplateChange(Sender: TObject);
     procedure chkCopyLocalClick(Sender: TObject);
     procedure clbCompilersClick(Sender: TObject);
+    procedure clbCompilersClickCheck(Sender: TObject);
+    procedure clbPlatformsClickCheck(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
     procedure edtDestChange(Sender: TObject);
     procedure edtIdChange(Sender: TObject);
@@ -129,6 +131,7 @@ type
     procedure miNewClick(Sender: TObject);
     procedure miOpenClick(Sender: TObject);
     procedure miSaveAsClick(Sender: TObject);
+    procedure miSaveClick(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
     procedure tvTemplatesCollapsing(Sender: TObject; Node: TTreeNode; var AllowCollapse: Boolean);
     procedure tvTemplatesContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
@@ -157,6 +160,7 @@ type
     { Public declarations }
     procedure LoadDspecStructure;
     procedure SaveDspecStructure(const filename: string);
+    function SelectedPlatform: TTargetPlatform;
   end;
 
 var
@@ -226,13 +230,30 @@ begin
 end;
 
 procedure TForm5.cboTemplateChange(Sender: TObject);
+var
+  templateName: string;
+  vPlatform : TTargetPlatform;
 begin
-  if cboTemplate.Items[cboTemplate.ItemIndex] = 'Create New Template...' then
+  templateName := cboTemplate.Items[cboTemplate.ItemIndex];
+  if templateName = 'Create New Template...' then
   begin
     PageControl1.ActivePage := tsTemplates;
     btnAddTemplateClick(Sender);
     cboTemplate.ItemIndex := -1;
+    Exit;
   end;
+//  if Assigned(tvTemplates.Selected) then
+//  begin
+//    (tvTemplates.Selected as TTemplateTreeNode).template := FOpenFile.GetTemplate(templateName);
+    vPlatform := FOpenfile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
+//  end;
+  if not Assigned(vPlatform) then
+  begin
+    vPlatform := FOpenFile.AddCompiler(clbCompilers.Items[clbCompilers.ItemIndex]);
+  end;
+  vPlatform.template := templateName;
+  cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(templateName);
+
 end;
 
 procedure TForm5.chkCopyLocalClick(Sender: TObject);
@@ -257,18 +278,23 @@ begin
 
   EnableDisablePlatform(compilerVersion);
 
-  if not Assigned(vplatform) then
-    Exit;
+  if clbCompilers.Checked[clbCompilers.ItemIndex] and not Assigned(vplatform) then
+  begin
+    vplatform := FOpenFile.AddCompiler(clbCompilers.Items[clbCompilers.ItemIndex]);
+  end;
 
-  if not Assigned(vplatform) then
+  if Assigned(vplatform) then
   begin
     for j := 0 to clbPlatforms.Count - 1 do
     begin
       clbPlatforms.Checked[j] := False;
     end;
-    cboTemplate.ItemIndex := -1;
-    Exit;
+    cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(vplatform.template);
+   // Exit;
   end;
+
+  if not Assigned(vplatform) then
+    Exit;
 
   if vplatform.platforms.Contains('Win32') then
   begin
@@ -317,6 +343,47 @@ begin
   LoadTemplates;
 
   cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(vplatform.template);
+end;
+
+procedure TForm5.clbCompilersClickCheck(Sender: TObject);
+var
+  vPlatform : TTargetPlatform;
+  compiler : string;
+begin
+  if clbCompilers.ItemIndex < 0 then
+    Exit;
+  compiler := clbCompilers.Items[clbCompilers.ItemIndex];
+  vPlatform := FOpenfile.GetPlatform(compiler);
+  if clbCompilers.Checked[clbCompilers.ItemIndex] and not Assigned(vPlatform) then
+  begin
+    vPlatform := FOpenFile.AddCompiler(compiler);
+  end
+  else if Assigned(vPlatform) and (clbCompilers.Checked[clbCompilers.ItemIndex] = False) then
+  begin
+    FOpenFile.DeleteCompiler(compiler);
+  end;
+end;
+
+procedure TForm5.clbPlatformsClickCheck(Sender: TObject);
+var
+  vPlatform : TTargetPlatform;
+  compiler : string;
+  platformString : string;
+begin
+  if clbCompilers.ItemIndex < 0 then
+    Exit;
+  if clbPlatforms.ItemIndex < 0 then
+    Exit;
+
+
+  compiler := clbCompilers.Items[clbCompilers.ItemIndex];
+  vPlatform := FOpenfile.GetPlatform(compiler);
+
+  platformString := clbPlatforms.Items[clbPlatforms.ItemIndex];
+
+  StringToDPMPlatform(platformString);
+
+
 end;
 
 procedure TForm5.edtBuildIdChange(Sender: TObject);
@@ -541,6 +608,14 @@ begin
   FSavefilename := Filename;
 end;
 
+function TForm5.SelectedPlatform: TTargetPlatform;
+begin
+  Result := nil;
+  if clbPlatforms.ItemIndex < 0  then
+    Exit;
+  Result := FOpenFile.GetPlatform(clbPlatforms.Items[clbPlatforms.ItemIndex]);
+end;
+
 procedure TForm5.EnableDisablePlatform(compilerVersion : TCompilerVersion);
 var
   DpmPlatforms : TDPMPlatforms;
@@ -642,6 +717,21 @@ begin
   if SaveDialog.Execute then
   begin
     SaveDspecStructure(SaveDialog.Filename);
+  end;
+end;
+
+procedure TForm5.miSaveClick(Sender: TObject);
+begin
+  if FSavefilename.IsEmpty then
+  begin
+    if SaveDialog.Execute then
+    begin
+      SaveDspecStructure(SaveDialog.Filename);
+    end;
+  end
+  else
+  begin
+    SaveDspecStructure(FSavefilename);
   end;
 end;
 

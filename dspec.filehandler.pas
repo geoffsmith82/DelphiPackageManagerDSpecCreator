@@ -15,17 +15,19 @@ type
     FLoaded : TDPMSpecFormat;
   public
     structure : TDPMSpecFormat;
-    procedure NewTemplate(templateName: string);
-    procedure DeleteTemplate(templateName: string);
-    procedure RenameTemplate(originalName: string; newName: string);
-    function DoesTemplateExist(templateName: string): Boolean;
-    function GetTemplate(templateName: string): TTemplate;
-    procedure NewBuild(templateName: string; BuildId: string);
-    procedure NewRuntime(templateName, BuildId: string);
-    procedure NewSearchPath(templateName, SearchPathId: string);
+    procedure NewTemplate(const templateName: string);
+    procedure DeleteTemplate(const templateName: string);
+    procedure RenameTemplate(const originalName: string; const newName: string);
+    function DoesTemplateExist(const templateName: string): Boolean;
+    function GetTemplate(const templateName: string): TTemplate;
+    procedure NewBuild(const templateName: string; BuildId: string);
+    procedure NewRuntime(const templateName: string; const BuildId: string);
+    procedure NewSearchPath(const templateName: string; const SearchPathId: string);
     function GetPlatform(const compiler: string): TTargetPlatform;
-    procedure LoadFromFile(filename: string);
-    procedure SaveToFile(filename: string);
+    function AddCompiler(const compiler: string): TTargetPlatform;
+    procedure DeleteCompiler(const compiler: string);
+    procedure LoadFromFile(const filename: string);
+    procedure SaveToFile(const filename: string);
     function IsModified: Boolean;
     constructor Create;
     destructor Destroy; override;
@@ -41,13 +43,27 @@ uses
 
 { TDSpecFile }
 
+function TDSpecFile.AddCompiler(const compiler: string): TTargetPlatform;
+var
+  platforms : TArray<TTargetPlatform>;
+begin
+  if Assigned(GetPlatform(compiler)) then
+    raise Exception.Create('Platform already exists in file');
+  platforms := structure.targetPlatforms;
+  SetLength(platforms, Length(platforms) + 1);
+  platforms[High(platforms)] := TTargetPlatform.Create;
+  platforms[High(platforms)].compiler := compiler;
+  structure.targetPlatforms := platforms;
+  Result := platforms[High(platforms)];
+end;
+
 constructor TDSpecFile.Create;
 begin
   structure := TDPMSpecFormat.Create;
   FLoaded := TDPMSpecFormat.Create;
 end;
 
-procedure TDSpecFile.DeleteTemplate(templateName: string);
+procedure TDSpecFile.DeleteTemplate(const templateName: string);
 var
   templates : TArray<TTemplate>;
   templateNew : TArray<TTemplate>;
@@ -67,6 +83,27 @@ begin
   structure.templates := templateNew;
 end;
 
+procedure TDSpecFile.DeleteCompiler(const compiler: string);
+var
+  targetPlatforms : TArray<TTargetPlatform>;
+  targetPlatformsNew : TArray<TTargetPlatform>;
+  i, j: Integer;
+begin
+  targetPlatforms := structure.targetPlatforms;
+  SetLength(targetPlatformsNew, Length(targetPlatforms) - 1);
+  j := 0;
+  for i := 0 to High(targetPlatforms) do
+  begin
+    if targetPlatforms[i].compiler <> compiler then
+    begin
+      targetPlatformsNew[j] := targetPlatforms[i];
+      Inc(j);
+    end;
+  end;
+  structure.targetPlatforms := targetPlatformsNew;
+end;
+
+
 destructor TDSpecFile.Destroy;
 begin
   FreeAndNil(structure);
@@ -74,7 +111,7 @@ begin
   inherited;
 end;
 
-function TDSpecFile.DoesTemplateExist(templateName: string): Boolean;
+function TDSpecFile.DoesTemplateExist(const templateName: string): Boolean;
 var
   i : Integer;
 begin
@@ -89,7 +126,7 @@ begin
   end;
 end;
 
-function TDSpecFile.GetTemplate(templateName: string): TTemplate;
+function TDSpecFile.GetTemplate(const templateName: string): TTemplate;
 var
   i : Integer;
 begin
@@ -109,7 +146,7 @@ begin
   Result := TJson.ObjectToJsonObject(structure).Format <> TJson.ObjectToJsonObject(FLoaded).Format;
 end;
 
-procedure TDSpecFile.LoadFromFile(filename: string);
+procedure TDSpecFile.LoadFromFile(const filename: string);
 var
   json : TJSONObject;
 begin
@@ -122,7 +159,7 @@ begin
   end;
 end;
 
-procedure TDSpecFile.RenameTemplate(originalName, newName: string);
+procedure TDSpecFile.RenameTemplate(const originalName: string; const newName: string);
 var
   i : Integer;
 begin
@@ -145,7 +182,7 @@ begin
   end;
 end;
 
-procedure TDSpecFile.NewTemplate(templateName: string);
+procedure TDSpecFile.NewTemplate(const templateName: string);
 var
   templates : TArray<TTemplate>;
 begin
@@ -158,7 +195,7 @@ begin
   structure.templates := templates;
 end;
 
-procedure TDSpecFile.NewBuild(templateName: string; BuildId: string);
+procedure TDSpecFile.NewBuild(const templateName: string; BuildId: string);
 var
   builds : TArray<TBuild>;
   template : TTemplate;
@@ -177,7 +214,7 @@ begin
   template.build := builds;
 end;
 
-procedure TDSpecFile.NewRuntime(templateName: string; BuildId: string);
+procedure TDSpecFile.NewRuntime(const templateName: string; const BuildId: string);
 var
   runtime : TArray<TRuntime>;
   template : TTemplate;
@@ -196,7 +233,7 @@ begin
   template.runtime := runtime;
 end;
 
-procedure TDSpecFile.NewSearchPath(templateName: string; SearchPathId: string);
+procedure TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string);
 var
   searchPaths : TArray<TSearchPath>;
   template : TTemplate;
@@ -230,7 +267,7 @@ begin
   end;
 end;
 
-procedure TDSpecFile.SaveToFile(filename: string);
+procedure TDSpecFile.SaveToFile(const filename: string);
 begin
   TFile.WriteAllText(Filename, TJson.ObjectToJsonObject(structure).Format);
 end;

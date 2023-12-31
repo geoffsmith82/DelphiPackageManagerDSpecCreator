@@ -10,7 +10,7 @@ object Form5: TForm5
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = MainMenu
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   TextHeight = 15
@@ -181,8 +181,8 @@ object Form5: TForm5
           '12.0')
         TabOrder = 0
         OnClick = clbCompilersClick
+        OnClickCheck = clbCompilersClickCheck
         OnDblClick = clbCompilersClick
-        OnMouseEnter = clbCompilersClick
       end
       object cboTemplate: TComboBox
         Left = 256
@@ -210,6 +210,7 @@ object Form5: TForm5
           'OSX64')
         ParentDoubleBuffered = False
         TabOrder = 2
+        OnClickCheck = clbPlatformsClickCheck
       end
     end
     object tsTemplates: TTabSheet
@@ -494,21 +495,25 @@ object Form5: TForm5
       end
     end
   end
-  object MainMenu1: TMainMenu
+  object MainMenu: TMainMenu
     Left = 12
     Top = 386
     object File1: TMenuItem
       Caption = '&File'
       object miNew: TMenuItem
         Caption = '&New'
+        ShortCut = 16462
         OnClick = miNewClick
       end
       object miOpen: TMenuItem
         Caption = '&Open...'
+        ShortCut = 16463
         OnClick = miOpenClick
       end
       object miSave: TMenuItem
         Caption = '&Save'
+        ShortCut = 16467
+        OnClick = miSaveClick
       end
       object miSaveAs: TMenuItem
         Caption = 'Save &As...'
