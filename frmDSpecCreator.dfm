@@ -14,7 +14,7 @@ object Form5: TForm5
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   TextHeight = 15
-  object PageControl1: TPageControl
+  object PageControl: TPageControl
     Left = 0
     Top = 0
     Width = 871
@@ -22,7 +22,6 @@ object Form5: TForm5
     ActivePage = tsInfo
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 709
     object tsInfo: TTabSheet
       Caption = 'Package Info'
       object lblId: TLabel
@@ -163,7 +162,7 @@ object Form5: TForm5
         Top = 48
         Width = 161
         Height = 329
-        ItemHeight = 17
+        ItemHeight = 15
         Items.Strings = (
           'XE2'
           'XE3'
@@ -199,7 +198,7 @@ object Form5: TForm5
         Width = 161
         Height = 137
         DoubleBuffered = True
-        ItemHeight = 17
+        ItemHeight = 15
         Items.Strings = (
           'Win32'
           'Win64'
@@ -257,7 +256,7 @@ object Form5: TForm5
         OnContextPopup = tvTemplatesContextPopup
         OnCreateNodeClass = tvTemplatesCreateNodeClass
       end
-      object CardPanel1: TCardPanel
+      object CardPanel: TCardPanel
         Left = 312
         Top = 3
         Width = 526
@@ -274,7 +273,6 @@ object Form5: TForm5
           Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
-          ExplicitWidth = 450
           DesignSize = (
             524
             340)
@@ -333,7 +331,6 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 15
             TabOrder = 3
-            ExplicitWidth = 296
           end
           object btnAddExclude: TButton
             Left = 192
@@ -361,7 +358,6 @@ object Form5: TForm5
           Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
-          ExplicitWidth = 450
           object lblSearchPaths: TLabel
             Left = 64
             Top = 32
@@ -378,7 +374,6 @@ object Form5: TForm5
           Caption = 'crdBuild'
           CardIndex = 2
           TabOrder = 2
-          ExplicitWidth = 450
           DesignSize = (
             524
             340)
@@ -412,7 +407,6 @@ object Form5: TForm5
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtBuildIdChange
-            ExplicitWidth = 337
           end
           object edtProject: TEdit
             Left = 96
@@ -436,7 +430,6 @@ object Form5: TForm5
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
-          ExplicitWidth = 444
           DesignSize = (
             518
             334)
@@ -469,7 +462,6 @@ object Form5: TForm5
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             OnClick = edtRuntimeBuildIdClick
-            ExplicitWidth = 339
           end
           object edtRuntimeSrc: TEdit
             Left = 86

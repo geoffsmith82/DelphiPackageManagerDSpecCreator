@@ -40,7 +40,7 @@ type
   end;
 
   TForm5 = class(TForm)
-    PageControl1: TPageControl;
+    PageControl: TPageControl;
     tsInfo: TTabSheet;
     edtId: TEdit;
     lblId: TLabel;
@@ -78,7 +78,7 @@ type
     btnAddTemplate: TButton;
     btnDeleteTemplate: TButton;
     tvTemplates: TTreeView;
-    CardPanel1: TCardPanel;
+    CardPanel: TCardPanel;
     crdSource: TCard;
     crdSearchPaths: TCard;
     lblSrc: TLabel;
@@ -237,7 +237,7 @@ begin
   templateName := cboTemplate.Items[cboTemplate.ItemIndex];
   if templateName = 'Create New Template...' then
   begin
-    PageControl1.ActivePage := tsTemplates;
+    PageControl.ActivePage := tsTemplates;
     btnAddTemplateClick(Sender);
     cboTemplate.ItemIndex := -1;
     Exit;
@@ -441,6 +441,7 @@ begin
     begin
       sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.structure.templates[i].source[j].src) as TTemplateTreeNode;
       sourceNode.source := FOpenFile.structure.templates[i].source[j];
+      sourceNode.Template := FOpenFile.structure.templates[i];
     end;
     nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths');
     (nodeSearchPath as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
@@ -448,6 +449,7 @@ begin
     begin
       searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.structure.templates[i].searchPaths[j].path) as TTemplateTreeNode;
       searchPathNode.searchpath := FOpenFile.structure.templates[i].searchPaths[j];
+      searchPathNode.Template := FOpenFile.structure.templates[i];
     end;
     nodeBuild := tvTemplates.Items.AddChild(node, 'Build');
     (nodeBuild as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
@@ -455,6 +457,7 @@ begin
     begin
       buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.structure.templates[i].build[j].id) as TTemplateTreeNode;
       buildNode.build := FOpenFile.structure.templates[i].build[j];
+      buildNode.Template := FOpenFile.structure.templates[i];
     end;
     nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime');
     (nodeRuntime as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
@@ -462,6 +465,7 @@ begin
     begin
       runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].buildId) as TTemplateTreeNode;
       runtimeNode.runtime := FOpenFile.structure.templates[i].runtime[j];
+      runtimeNode.Template := FOpenFile.structure.templates[i];
     end;
 
     node.Expand(True);
@@ -586,7 +590,7 @@ begin
   cboLicense.Text := FOpenFile.structure.metadata.license;
   edtTags.Text := FOpenFile.structure.metadata.tags;
   cboTemplate.Text := '';
-  CardPanel1.Visible := False;
+  CardPanel.Visible := False;
   for j := 0 to clbCompilers.Count - 1 do
   begin
     clbCompilers.Checked[j] := False;
@@ -872,23 +876,23 @@ procedure TForm5.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
   if (node.Text = 'SearchPaths') and ((Node as TTemplateTreenode).IsHeading) then
   begin
-    CardPanel1.ActiveCard := crdSearchPaths;
-    CardPanel1.Visible := False;
+    CardPanel.ActiveCard := crdSearchPaths;
+    CardPanel.Visible := False;
   end
   else if (node.Text = 'Source') and ((Node as TTemplateTreenode).IsHeading) then
   begin
-    CardPanel1.ActiveCard := crdSource;
-    CardPanel1.Visible := False;
+    CardPanel.ActiveCard := crdSource;
+    CardPanel.Visible := False;
   end
   else if (Node.Text = 'Build') and ((Node as TTemplateTreenode).IsHeading) then
   begin
-    CardPanel1.ActiveCard := crdBuild;
-    CardPanel1.Visible := False;
+    CardPanel.ActiveCard := crdBuild;
+    CardPanel.Visible := False;
   end
   else if (Node.Text = 'Runtime') and ((Node as TTemplateTreenode).IsHeading) then
   begin
-    CardPanel1.ActiveCard := crdRuntime;
-    CardPanel1.Visible := False;
+    CardPanel.ActiveCard := crdRuntime;
+    CardPanel.Visible := False;
   end
   else
   begin
@@ -896,28 +900,28 @@ begin
     begin
       if (Node.Parent as TTemplateTreeNode).Text = 'SearchPaths' then
       begin
-        CardPanel1.Visible := True;
-        CardPanel1.ActiveCard := crdSearchPaths;
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdSearchPaths;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Source' then
       begin
-        CardPanel1.Visible := True;
-        CardPanel1.ActiveCard := crdSource;
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdSource;
         edtSource.Text := (Node as TTemplateTreeNode).source.src;
         chkFlatten.Checked := (Node as TTemplateTreeNode).source.flatten;
         edtDest.Text := (Node as TTemplateTreeNode).source.dest;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Build' then
       begin
-        CardPanel1.Visible := True;
-        CardPanel1.ActiveCard := crdBuild;
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdBuild;
         edtBuildId.Text := (Node as TTemplateTreeNode).build.id;
         edtProject.Text := (Node as TTemplateTreeNode).build.project;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Runtime' then
       begin
-        CardPanel1.Visible := True;
-        CardPanel1.ActiveCard := crdRuntime;
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdRuntime;
         edtRuntimeBuildId.Text := (Node as TTemplateTreeNode).runtime.buildId;
         edtRuntimeSrc.Text := (Node as TTemplateTreeNode).runtime.src;
         chkCopyLocal.Checked := (Node as TTemplateTreeNode).runtime.copyLocal;
@@ -951,7 +955,7 @@ begin
     else if Assigned(node.Parent.Parent) and Assigned((node.Parent.Parent as TTemplateTreeNode).Template) then
       FTemplate := (node.Parent.Parent as TTemplateTreeNode).Template;
 
-    if node.IsBuild then
+    if node.IsBuild or ((node.Text='Build') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
       item.Caption := 'Add Build Item';
@@ -964,7 +968,7 @@ begin
       tvTemplates.PopupMenu.Items.Add(item);
       FMenuBuild := (node as TTemplateTreeNode).build;
     end;
-    if node.IsRuntime then
+    if node.IsRuntime or ((node.Text='Runtime') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
       item.Caption := 'Add Runtime Item';
@@ -976,7 +980,7 @@ begin
       tvTemplates.PopupMenu.Items.Add(item);
       FMenuRuntime := (node as TTemplateTreeNode).runtime;
     end;
-    if node.IsSource then
+    if node.IsSource or ((node.Text='Source') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
       item.Caption := 'Add Source Item';
@@ -988,7 +992,7 @@ begin
       tvTemplates.PopupMenu.Items.Add(item);
       FMenuSource := (node as TTemplateTreeNode).source;
     end;
-    if node.IsSearchPath then
+    if node.IsSearchPath or ((node.Text='SearchPaths') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
       item.Caption := 'Add SearchPath Item';
