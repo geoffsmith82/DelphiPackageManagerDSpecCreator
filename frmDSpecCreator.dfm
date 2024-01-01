@@ -386,6 +386,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Search Paths'
           end
+          object edtSearchPath: TEdit
+            Left = 64
+            Top = 53
+            Width = 401
+            Height = 23
+            TabOrder = 0
+            Text = 'edtSearchPath'
+            OnChange = edtSearchPathChange
+          end
         end
         object crdBuild: TCard
           Left = 1
@@ -482,7 +491,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
-            OnClick = edtRuntimeBuildIdClick
+            OnChange = edtRuntimeBuildIdOnChange
           end
           object edtRuntimeSrc: TEdit
             Left = 86

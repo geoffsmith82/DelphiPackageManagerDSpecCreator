@@ -110,6 +110,7 @@ type
     lblCompilers: TLabel;
     lblPlatform: TLabel;
     lblTemplateView: TLabel;
+    edtSearchPath: TEdit;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
@@ -124,8 +125,9 @@ type
     procedure edtIdChange(Sender: TObject);
     procedure edtProjectChange(Sender: TObject);
     procedure edtProjectURLChange(Sender: TObject);
-    procedure edtRuntimeBuildIdClick(Sender: TObject);
+    procedure edtRuntimeBuildIdOnChange(Sender: TObject);
     procedure edtRuntimeSrcChange(Sender: TObject);
+    procedure edtSearchPathChange(Sender: TObject);
     procedure edtSourceChange(Sender: TObject);
     procedure edtTagsChange(Sender: TObject);
     procedure edtVersionChange(Sender: TObject);
@@ -254,20 +256,17 @@ begin
     cboTemplate.ItemIndex := -1;
     Exit;
   end;
-//  if Assigned(tvTemplates.Selected) then
-//  begin
-//    (tvTemplates.Selected as TTemplateTreeNode).template := FOpenFile.GetTemplate(templateName);
-    if clbCompilers.ItemIndex < 0 then
-      raise Exception.Create('Please select a compiler before trying to set the template');
-    vPlatform := FOpenfile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
-//  end;
+
+  if clbCompilers.ItemIndex < 0 then
+    raise Exception.Create('Please select a compiler before trying to set the template');
+  vPlatform := FOpenfile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
+
   if not Assigned(vPlatform) then
   begin
     vPlatform := FOpenFile.AddCompiler(clbCompilers.Items[clbCompilers.ItemIndex]);
   end;
   vPlatform.template := templateName;
   cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(templateName);
-
 end;
 
 procedure TDSpecCreatorForm.chkCopyLocalClick(Sender: TObject);
@@ -413,6 +412,7 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).build.id := edtBuildId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtBuildId.Text;
   end;
 end;
 
@@ -526,11 +526,12 @@ begin
   FOpenFile.structure.metadata.projectUrl := edtProjectURL.Text;
 end;
 
-procedure TDSpecCreatorForm.edtRuntimeBuildIdClick(Sender: TObject);
+procedure TDSpecCreatorForm.edtRuntimeBuildIdOnChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).runtime.buildId := edtRuntimeBuildId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeBuildId.Text;
   end;
 end;
 
@@ -560,6 +561,15 @@ begin
   end;
 end;
 
+procedure TDSpecCreatorForm.edtSearchPathChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).searchpath.path:= edtSearchPath.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtSearchPath.Text
+  end;
+end;
+
 procedure TDSpecCreatorForm.edtSourceChange(Sender: TObject);
 var
   str : string;
@@ -568,6 +578,8 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).source.src := edtSource.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtSource.Text;
+
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -973,6 +985,7 @@ begin
     begin
       if (Node.Parent as TTemplateTreeNode).Text = 'SearchPaths' then
       begin
+        edtSearchPath.Text := (Node as TTemplateTreeNode).searchpath.path;
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSearchPaths;
       end;
