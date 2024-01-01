@@ -537,7 +537,7 @@ end;
 
 function TDSpecCreatorForm.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
 begin
-  Result := TClassReplacer.ReplaceVars(inputStr, compiler);
+  Result := TClassReplacer.ReplaceVars(inputStr, compiler, FOpenFile.structure);
 end;
 
 procedure TDSpecCreatorForm.edtRuntimeSrcChange(Sender: TObject);

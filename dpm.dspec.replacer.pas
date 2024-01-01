@@ -5,18 +5,20 @@ interface
 uses
   System.SysUtils,
   System.RegularExpressions,
-  DPM.Core.Types
+  DPM.Core.Types,
+  DPM.dspec.format
   ;
 
 type
   TClassReplacer = class
   private
+    FStructure : TDPMSpecFormat;
     FCompiler : TCompilerVersion;
     function matcher(const Match: TMatch): String;
     function Replace(inputStr: string): string;
-    constructor Create(compiler: TCompilerVersion);
+    constructor Create(compiler: TCompilerVersion; structure : TDPMSpecFormat);
   public
-    class function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+    class function ReplaceVars(inputStr: String; compiler: TCompilerVersion; structure: TDPMSpecFormat): string;
   end;
 
 
@@ -24,9 +26,10 @@ implementation
 
 { TClassReplacer }
 
-constructor TClassReplacer.Create(compiler: TCompilerVersion);
+constructor TClassReplacer.Create(compiler: TCompilerVersion; structure : TDPMSpecFormat);
 begin
   FCompiler := compiler;
+  FStructure := structure;
 end;
 
 function TClassReplacer.matcher(const Match: TMatch): String;
@@ -45,6 +48,18 @@ begin
     Exit(CompilerToLibSuffix(FCompiler))
   else if SameText(Match.Groups[1].Value, 'bdsVersion') then
     Exit(CompilerToBDSVersion(FCompiler))
+  else if SameText(Match.Groups[1].Value, 'id') then
+    Exit(FStructure.metadata.id)
+  else if SameText(Match.Groups[1].Value, 'version') then
+    Exit(FStructure.metadata.version)
+  else if SameText(Match.Groups[1].Value, 'author') then
+    Exit(FStructure.metadata.authors)
+  else if SameText(Match.Groups[1].Value, 'title') then
+    Exit(FStructure.metadata.id)
+  else if SameText(Match.Groups[1].Value, 'description') then
+    Exit(FStructure.metadata.description)
+  else if SameText(Match.Groups[1].Value, 'copyright') then
+    Exit(FStructure.metadata.copyright)
   else
     Exit(Match.Value);  // In case of no match, return the original placeholder
 end;
@@ -54,11 +69,11 @@ begin
   Result := TRegEx.Replace(inputStr, '\$(.*?)\$', matcher);
 end;
 
-class function TClassReplacer.ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+class function TClassReplacer.ReplaceVars(inputStr: String; compiler: TCompilerVersion; structure: TDPMSpecFormat): string;
 var
   replacer : TClassReplacer;
 begin
-  replacer := TClassReplacer.Create(compiler);
+  replacer := TClassReplacer.Create(compiler, structure);
   try
     Result := replacer.Replace(inputStr);
   finally
