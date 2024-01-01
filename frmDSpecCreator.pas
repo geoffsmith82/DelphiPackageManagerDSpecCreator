@@ -142,6 +142,7 @@ type
     procedure mmoDescriptionChange(Sender: TObject);
     procedure miNewClick(Sender: TObject);
     procedure miOpenClick(Sender: TObject);
+    procedure miOptionsClick(Sender: TObject);
     procedure miSaveAsClick(Sender: TObject);
     procedure miSaveClick(Sender: TObject);
     procedure tvTemplatesChange(Sender: TObject; Node: TTreeNode);
@@ -189,6 +190,7 @@ uses
   frmSource,
   frmRuntime,
   frmSearchPath,
+  frmOptions,
   dpm.dspec.replacer
   ;
 
@@ -763,6 +765,18 @@ begin
     FSavefilename := dspecFilename;
     Caption := dspecFilename + ' - dspec Creator';
     LoadDspecStructure;
+  end;
+end;
+
+procedure TDSpecCreatorForm.miOptionsClick(Sender: TObject);
+var
+  OptionsForm : TOptionsForm;
+begin
+  OptionsForm := TOptionsForm.Create(nil);
+  try
+    OptionsForm.ShowModal;
+  finally
+    FreeAndNil(OptionsForm);
   end;
 end;
 

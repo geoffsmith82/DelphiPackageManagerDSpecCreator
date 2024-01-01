@@ -580,6 +580,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
     end
     object miOptions: TMenuItem
       Caption = 'Options'
+      OnClick = miOptionsClick
     end
   end
   object OpenDialog: TOpenDialog

@@ -123,7 +123,7 @@
         <DPMCompiler>12.0</DPMCompiler>
         <DPMCache Condition="'$(DPMCache)' == ''">$(APPDATA)\.dpm\packages</DPMCache>
         <DPM>$(DPMCache)\$(DPMCompiler)\$(Platform)</DPM>
-        <DPMSearch Condition="'$(Platform)'=='Win32'">$(DPM)\VSoft.SemanticVersion\0.2.5\lib;</DPMSearch>
+        <DPMSearch Condition="'$(Platform)'=='Win32'">$(DPM)\VSoft.Uri\0.3.2\lib;$(DPM)\VSoft.SemanticVersion\0.2.5\lib;$(DPM)\VSoft.JsonDataObjects\0.2.1\lib;$(DPM)\Spring4D.Extensions\2.0.1\lib;$(DPM)\Spring4D.Core\2.0.1\lib;$(DPM)\Spring4D.Base\2.0.1\lib;</DPMSearch>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -158,6 +158,105 @@
             <Form>SearchPathForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="frmOptions.pas">
+            <Form>OptionsForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.AddInOptionsFrame.pas">
+            <Form>DPMOptionsFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Logging\DPM.Core.Logging.pas"/>
+        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.Types.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Constants.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.System.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Classes.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Types.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Enum.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Config.pas"/>
+        <RcItem Include="Libs\DPM\Source\images\add_16px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>ADD_PACKAGE_16</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\remove_16px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>REMOVE_PACKAGE_16</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\add_24px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>ADD_PACKAGE_24</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\add_32px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>ADD_PACKAGE_32</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\add_48px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>ADD_PACKAGE_48</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\remove_24px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>REMOVE_PACKAGE_24</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\remove_32px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>REMOVE_PACKAGE_32</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\remove_48px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>REMOVE_PACKAGE_48</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-up_16px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_UP_16</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-up_24px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_UP_24</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-up_32px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_UP_32</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-up_48px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_UP_48</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-down_16px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_DOWN_16</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-down_24px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_DOWN_24</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-down_32px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_DOWN_32</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\move-down_48px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>MOVE_DOWN_48</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\open_16px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>OPEN_16</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\open_24px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>OPEN_24</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\open_32px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>OPEN_32</ResourceId>
+        </RcItem>
+        <RcItem Include="Libs\DPM\Source\images\open_48px.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>OPEN_48</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -187,7 +286,16 @@
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
         <DPM>
+            <PackageReference id="Spring4D.Base" platform="Win32" version="2.0.1"/>
+            <PackageReference id="Spring4D.Core" platform="Win32" version="2.0.1">
+                <PackageReference id="Spring4D.Base" platform="Win32" version="2.0.1" range="2.0.1"/>
+            </PackageReference>
+            <PackageReference id="Spring4D.Extensions" platform="Win32" version="2.0.1">
+                <PackageReference id="Spring4D.Base" platform="Win32" version="2.0.1" range="2.0.1"/>
+            </PackageReference>
+            <PackageReference id="VSoft.JsonDataObjects" platform="Win32" version="0.2.1"/>
             <PackageReference id="VSoft.SemanticVersion" platform="Win32" version="0.2.5"/>
+            <PackageReference id="VSoft.Uri" platform="Win32" version="0.3.2"/>
         </DPM>
     </ProjectExtensions>
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
