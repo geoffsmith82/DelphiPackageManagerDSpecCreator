@@ -166,12 +166,15 @@ type
     procedure PopupDeleteSourceItem(Sender: TObject);
     procedure PopupAddSearchPathItem(Sender: TObject);
     procedure PopupDeleteSearchPathItem(Sender: TObject);
+    procedure PopupAddDependencyItem(Sender: TObject);
+    procedure PopupDeleteDependencyItem(Sender: TObject);
   private
     { Private declarations }
     FOpenFile : TDSpecFile;
     FTemplate : TTemplate;
     FMenuSource : TSource;
     FMenuRuntime : TRuntime;
+    FMenuDependency : TDependency;
     FMenuSearchPath: TSearchPath;
     FMenuBuild: TBuild;
     FSavefilename : string;
@@ -200,6 +203,7 @@ uses
   frmRuntime,
   frmSearchPath,
   frmOptions,
+  frmDependency,
   dpm.dspec.replacer
   ;
 
@@ -883,6 +887,29 @@ begin
   LoadTemplates;
 end;
 
+procedure TDSpecCreatorForm.PopupAddDependencyItem(Sender: TObject);
+var
+  dependancyId : string;
+  DependencyForm: TDependencyForm;
+  dependency : TDependency;
+begin
+  DependencyForm := TDependencyForm.Create(nil);
+  try
+    DependencyForm.edtDependencyId.Text := 'default';
+
+    if DependencyForm.ShowModal =  mrCancel then
+      Exit;
+    dependancyId := DependencyForm.edtDependencyId.Text;
+    if dependancyId.IsEmpty then
+      Exit;
+    dependency := FOpenFile.NewDependency(FTemplate.name, dependancyId);
+    dependency.version := DependencyForm.edtVersion.Text;
+  finally
+    FreeAndNil(DependencyForm);
+  end;
+  LoadTemplates;
+end;
+
 procedure TDSpecCreatorForm.PopupAddRuntimeItem(Sender: TObject);
 var
   runtimebuildId : string;
@@ -971,6 +998,27 @@ begin
     end;
   end;
   FTemplate.build := buildNew;
+  LoadTemplates;
+end;
+
+procedure TDSpecCreatorForm.PopupDeleteDependencyItem(Sender: TObject);
+var
+  dependencies : TArray<TDependency>;
+  dependenciesNew : TArray<TDependency>;
+  i, j: Integer;
+begin
+  dependencies := FTemplate.dependencies;
+  SetLength(dependenciesNew, Length(dependencies) - 1);
+  j := 0;
+  for i := 0 to High(dependencies) do
+  begin
+    if dependencies[i].id <> FMenuDependency.id then
+    begin
+      dependenciesNew[j] := dependencies[i];
+      Inc(j);
+    end;
+  end;
+  FTemplate.dependencies := dependenciesNew;
   LoadTemplates;
 end;
 
@@ -1158,6 +1206,18 @@ begin
       item.OnClick := PopupDeleteRuntimeItem;
       tvTemplates.PopupMenu.Items.Add(item);
       FMenuRuntime := (node as TTemplateTreeNode).runtime;
+    end;
+    if node.IsDependency or ((node.Text='Dependencies') and node.IsHeading) then
+    begin
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Add Dependency Item';
+      item.OnClick := PopupAddDependencyItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Delete Dependency Item';
+      item.OnClick := PopupDeleteDependencyItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      FMenuDependency := (node as TTemplateTreeNode).dependency;
     end;
     if node.IsSource or ((node.Text='Source') and node.IsHeading) then
     begin

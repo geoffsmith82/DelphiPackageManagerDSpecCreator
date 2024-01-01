@@ -4,7 +4,6 @@ interface
 
 uses
   System.JSON,
-  REST.Json,
   dpm.dspec.format
   ;
 
@@ -22,6 +21,7 @@ type
     function GetTemplate(const templateName: string): TTemplate;
     function NewSource(const templateName: string; srcPath: string): TSource;
     function NewBuild(const templateName: string; BuildId: string): TBuild;
+    function NewDependency(const templateName: string; DependencyId: string): TDependency;
     function NewRuntime(const templateName: string; const BuildId: string): TRuntime;
     function NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
     function GetPlatform(const compiler: string): TTargetPlatform;
@@ -39,7 +39,10 @@ implementation
 
 uses
   System.IOUtils,
-  System.SysUtils
+  System.Classes,
+  System.SysUtils,
+  System.JSON.Writers,
+  REST.Json
   ;
 
 { TDSpecFile }
@@ -154,7 +157,7 @@ end;
 
 function TDSpecFile.IsModified: Boolean;
 begin
-  Result := TJson.ObjectToJsonObject(structure).Format <> TJson.ObjectToJsonObject(FLoaded).Format;
+  Result := TJSON.ObjectToJsonObject(structure).Format <> TJson.ObjectToJsonObject(FLoaded).Format;
 end;
 
 procedure TDSpecFile.LoadFromFile(const filename: string);
@@ -162,6 +165,10 @@ var
   json : TJSONObject;
 begin
   json := TJSONObject.ParseJSONValue(TFile.ReadAllText(Filename)) as TJSONObject;
+  if not Assigned(json) then
+  begin
+    raise Exception.Create('Failed to load ' + filename);
+  end;
   try
     structure := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
     FLoaded := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
@@ -225,6 +232,27 @@ begin
   builds[High(builds)].id := BuildId;
   Result := builds[High(builds)];
   template.build := builds;
+end;
+
+function TDSpecFile.NewDependency(const templateName: string; DependencyId: string): TDependency;
+var
+  dependencies : TArray<TDependency>;
+  template : TTemplate;
+begin
+  Result := nil;
+  if DependencyId.IsEmpty then
+    Exit;
+  if not DoesTemplateExist(templateName) then
+    raise Exception.Create('Template does not exist');
+
+  template := GetTemplate(templateName);
+
+  dependencies := template.dependencies;
+  SetLength(dependencies, length(dependencies) + 1);
+  dependencies[High(dependencies)] := TDependency.Create;
+  dependencies[High(dependencies)].id := DependencyId;
+  Result := dependencies[High(dependencies)];
+  template.dependencies := dependencies;
 end;
 
 function TDSpecFile.NewRuntime(const templateName: string; const BuildId: string): TRuntime;
@@ -306,8 +334,15 @@ begin
 end;
 
 procedure TDSpecFile.SaveToFile(const filename: string);
+var
+  json : TJSONObject;
 begin
-  TFile.WriteAllText(Filename, TJson.ObjectToJsonObject(structure).Format);
+  json := TJson.ObjectToJsonObject(structure);
+  try
+    TFile.WriteAllText(Filename, json.Format);
+  finally
+    FreeAndNil(json);
+  end;
 end;
 
 end.
