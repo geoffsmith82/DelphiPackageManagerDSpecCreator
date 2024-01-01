@@ -5,5 +5,10 @@ DSpecCreator is a project that can be used to create and edit .dspec files that 
 https://github.com/DelphiPackageManager/DPM
 
 ## Project Status
-Project is still very much a work in progress.  Currently you should be able to create the basic structure of the dspec file, but adding/editing and removing 
-some parts may not be fully implemented yet.
+Project is still very much a work in progress.  You should be able to create a usable .dspec file though.  The below screenshots show the main screens of the program
+
+![image](./Images/package-info.png)
+
+![image](./Images/package-platforms.png)
+
+![image](./Images/package-templates.png)
