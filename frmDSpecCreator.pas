@@ -285,7 +285,10 @@ var
   compilerVersion : TCompilerVersion;
 begin
   if clbCompilers.ItemIndex < 0 then
+  begin
+    cboTemplate.ItemIndex := -1;
     Exit;
+  end;
 
   vplatform := FOpenFile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
   compilerVersion := StringToCompilerVersion(clbCompilers.Items[clbCompilers.ItemIndex]);
@@ -308,7 +311,10 @@ begin
   end;
 
   if not Assigned(vplatform) then
+  begin
+    cboTemplate.ItemIndex := -1;
     Exit;
+  end;
 
   if vplatform.platforms.Contains('Win32') then
   begin
