@@ -73,6 +73,15 @@ begin
   templates := structure.templates;
   SetLength(templateNew, Length(templates) - 1);
   j := 0;
+
+  for i := 0 to High(structure.targetPlatforms) do
+  begin
+    if structure.targetPlatforms[i].template = templateName then
+    begin
+      structure.targetPlatforms[i].template := '';
+    end;
+  end;
+
   for i := 0 to High(templates) do
   begin
     if templates[i].name <> templateName then
@@ -81,6 +90,7 @@ begin
       Inc(j);
     end;
   end;
+
   structure.templates := templateNew;
 end;
 
