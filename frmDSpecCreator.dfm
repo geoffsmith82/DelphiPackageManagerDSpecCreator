@@ -530,6 +530,55 @@ object DSpecCreatorForm: TDSpecCreatorForm
             OnClick = chkCopyLocalClick
           end
         end
+        object crdDependencies: TCard
+          Left = 1
+          Top = 1
+          Width = 524
+          Height = 340
+          Caption = 'crdDependencies'
+          CardIndex = 4
+          TabOrder = 4
+          ExplicitLeft = 0
+          DesignSize = (
+            524
+            340)
+          object Label1: TLabel
+            Left = 48
+            Top = 85
+            Width = 41
+            Height = 15
+            Caption = 'Version:'
+          end
+          object lblDependencyId: TLabel
+            Left = 48
+            Top = 56
+            Width = 13
+            Height = 15
+            Caption = 'Id:'
+          end
+          object edtDependencyId: TEdit
+            Left = 104
+            Top = 53
+            Width = 411
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 0
+            Text = 'edtBuildId'
+            OnChange = edtDependencyIdChange
+          end
+          object edtDependencyVersion: TEdit
+            Left = 104
+            Top = 82
+            Width = 411
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 1
+            Text = 'Edit1'
+            OnChange = edtDependencyVersionChange
+          end
+        end
       end
     end
     object tsDependencies: TTabSheet

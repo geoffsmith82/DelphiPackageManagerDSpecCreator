@@ -32,12 +32,14 @@ type
     runtime: TRuntime;
     source: TSource;
     searchpath: TSearchPath;
+    dependency: TDependency;
 
     function IsHeading: Boolean;
     function IsBuild: Boolean;
     function IsRuntime: Boolean;
     function IsSource: Boolean;
     function IsSearchPath: Boolean;
+    function IsDependency: Boolean;
   end;
 
   TDSpecCreatorForm = class(TForm)
@@ -114,6 +116,11 @@ type
     miOptions: TMenuItem;
     lblAuthor: TLabel;
     edtAuthor: TEdit;
+    crdDependencies: TCard;
+    Label1: TLabel;
+    lblDependencyId: TLabel;
+    edtDependencyId: TEdit;
+    edtDependencyVersion: TEdit;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
@@ -125,6 +132,8 @@ type
     procedure clbPlatformsClickCheck(Sender: TObject);
     procedure edtAuthorChange(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
+    procedure edtDependencyIdChange(Sender: TObject);
+    procedure edtDependencyVersionChange(Sender: TObject);
     procedure edtDestChange(Sender: TObject);
     procedure edtIdChange(Sender: TObject);
     procedure edtProjectChange(Sender: TObject);
@@ -252,7 +261,6 @@ end;
 procedure TDSpecCreatorForm.cboTemplateChange(Sender: TObject);
 var
   templateName: string;
-  compilerName: string;
   vPlatform : TTargetPlatform;
 begin
   templateName := cboTemplate.Items[cboTemplate.ItemIndex];
@@ -442,6 +450,23 @@ begin
   end;
 end;
 
+procedure TDSpecCreatorForm.edtDependencyIdChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).dependency.id := edtDependencyId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text;
+  end;
+end;
+
+procedure TDSpecCreatorForm.edtDependencyVersionChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).dependency.version := edtDependencyVersion.Text;
+  end;
+end;
+
 procedure TDSpecCreatorForm.edtDestChange(Sender: TObject);
 var
   str : string;
@@ -470,10 +495,12 @@ var
   nodeSearchPath: TTreeNode;
   nodeBuild: TTreeNode;
   nodeRuntime: TTreeNode;
+  nodeDependency: TTreeNode;
   buildNode: TTemplateTreeNode;
   runtimeNode: TTemplateTreeNode;
   sourceNode: TTemplateTreeNode;
   searchPathNode: TTemplateTreeNode;
+  dependencyNode: TTemplateTreeNode;
   i, j : Integer;
 begin
   tvTemplates.Items.Clear;
@@ -514,6 +541,15 @@ begin
       runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].buildId) as TTemplateTreeNode;
       runtimeNode.runtime := FOpenFile.structure.templates[i].runtime[j];
       runtimeNode.Template := FOpenFile.structure.templates[i];
+    end;
+
+    nodeDependency := tvTemplates.Items.AddChild(node, 'Dependencies');
+    (nodeDependency as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    for j := 0 to High(FOpenFile.structure.templates[i].dependencies) do
+    begin
+      dependencyNode := tvTemplates.Items.AddChild(nodeDependency, FOpenFile.structure.templates[i].dependencies[j].id) as TTemplateTreeNode;
+      dependencyNode.dependency := FOpenFile.structure.templates[i].dependencies[j];
+      dependencyNode.Template := FOpenFile.structure.templates[i];
     end;
 
     node.Expand(True);
@@ -1024,6 +1060,11 @@ begin
     CardPanel.ActiveCard := crdRuntime;
     CardPanel.Visible := False;
   end
+  else if (Node.Text = 'Dependencies') and ((Node as TTemplateTreenode).IsHeading) then
+  begin
+    CardPanel.ActiveCard := crdDependencies;
+    CardPanel.Visible := False;
+  end
   else
   begin
     if (Node.Parent <> nil) then
@@ -1056,6 +1097,13 @@ begin
         edtRuntimeBuildId.Text := (Node as TTemplateTreeNode).runtime.buildId;
         edtRuntimeSrc.Text := (Node as TTemplateTreeNode).runtime.src;
         chkCopyLocal.Checked := (Node as TTemplateTreeNode).runtime.copyLocal;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Dependencies' then
+      begin
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdDependencies;
+        edtDependencyId.Text := (Node as TTemplateTreeNode).dependency.id;
+        edtDependencyVersion.Text := (Node as TTemplateTreeNode).dependency.version;
       end;
     end;
   end;
@@ -1152,6 +1200,11 @@ end;
 function TTemplateTreeNode.IsBuild: Boolean;
 begin
   Result := (build <> nil);
+end;
+
+function TTemplateTreeNode.IsDependency: Boolean;
+begin
+  Result := (dependency <> nil);
 end;
 
 function TTemplateTreeNode.IsHeading: Boolean;
