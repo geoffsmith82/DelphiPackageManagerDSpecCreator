@@ -47,31 +47,38 @@ object DSpecCreatorForm: TDSpecCreatorForm
       end
       object lblProjectURL: TLabel
         Left = 19
-        Top = 194
+        Top = 226
         Width = 64
         Height = 15
         Caption = 'Project URL:'
       end
       object lblRepositoryURL: TLabel
         Left = 0
-        Top = 223
+        Top = 255
         Width = 83
         Height = 15
         Caption = 'Repository URL:'
       end
       object lblLicense: TLabel
         Left = 41
-        Top = 255
+        Top = 287
         Width = 42
         Height = 15
         Caption = 'License:'
       end
       object lblTags: TLabel
         Left = 57
-        Top = 295
+        Top = 327
         Width = 26
         Height = 15
         Caption = 'Tags:'
+      end
+      object lblAuthor: TLabel
+        Left = 19
+        Top = 194
+        Width = 40
+        Height = 15
+        Caption = 'Author:'
       end
       object edtId: TEdit
         Left = 89
@@ -102,7 +109,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
       end
       object edtProjectURL: TEdit
         Left = 89
-        Top = 191
+        Top = 223
         Width = 376
         Height = 23
         TabOrder = 3
@@ -110,14 +117,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
       end
       object edtRepositoryURL: TEdit
         Left = 89
-        Top = 220
+        Top = 252
         Width = 376
         Height = 23
         TabOrder = 4
+        OnChange = edtRepositoryURLChange
       end
       object cboLicense: TComboBox
         Left = 89
-        Top = 252
+        Top = 284
         Width = 376
         Height = 23
         TabOrder = 5
@@ -140,11 +148,19 @@ object DSpecCreatorForm: TDSpecCreatorForm
       end
       object edtTags: TEdit
         Left = 89
-        Top = 292
+        Top = 324
         Width = 376
         Height = 23
         TabOrder = 6
         OnChange = edtTagsChange
+      end
+      object edtAuthor: TEdit
+        Left = 89
+        Top = 191
+        Width = 376
+        Height = 23
+        TabOrder = 7
+        OnChange = edtAuthorChange
       end
     end
     object tsPlatforms: TTabSheet
@@ -516,6 +532,10 @@ object DSpecCreatorForm: TDSpecCreatorForm
         end
       end
     end
+    object tsDependencies: TTabSheet
+      Caption = 'Dependencies'
+      ImageIndex = 3
+    end
   end
   object MainMenu: TMainMenu
     Left = 12
@@ -557,6 +577,9 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Caption = 'E&xit'
         OnClick = miExitClick
       end
+    end
+    object miOptions: TMenuItem
+      Caption = 'Options'
     end
   end
   object OpenDialog: TOpenDialog

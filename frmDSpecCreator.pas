@@ -106,11 +106,14 @@ type
     chkCopyLocal: TCheckBox;
     PopupMenu: TPopupMenu;
     BalloonHint1: TBalloonHint;
-    TabSheet1: TTabSheet;
+    tsDependencies: TTabSheet;
     lblCompilers: TLabel;
     lblPlatform: TLabel;
     lblTemplateView: TLabel;
     edtSearchPath: TEdit;
+    miOptions: TMenuItem;
+    lblAuthor: TLabel;
+    edtAuthor: TEdit;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
@@ -120,11 +123,13 @@ type
     procedure clbCompilersClick(Sender: TObject);
     procedure clbCompilersClickCheck(Sender: TObject);
     procedure clbPlatformsClickCheck(Sender: TObject);
+    procedure edtAuthorChange(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
     procedure edtDestChange(Sender: TObject);
     procedure edtIdChange(Sender: TObject);
     procedure edtProjectChange(Sender: TObject);
     procedure edtProjectURLChange(Sender: TObject);
+    procedure edtRepositoryURLChange(Sender: TObject);
     procedure edtRuntimeBuildIdOnChange(Sender: TObject);
     procedure edtRuntimeSrcChange(Sender: TObject);
     procedure edtSearchPathChange(Sender: TObject);
@@ -407,6 +412,11 @@ begin
 
 end;
 
+procedure TDSpecCreatorForm.edtAuthorChange(Sender: TObject);
+begin
+  FOpenFile.structure.metadata.authors := edtAuthor.Text;
+end;
+
 procedure TDSpecCreatorForm.edtBuildIdChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
@@ -526,6 +536,11 @@ begin
   FOpenFile.structure.metadata.projectUrl := edtProjectURL.Text;
 end;
 
+procedure TDSpecCreatorForm.edtRepositoryURLChange(Sender: TObject);
+begin
+  FOpenFile.structure.metadata.repositoryUrl := edtRepositoryURL.Text;
+end;
+
 procedure TDSpecCreatorForm.edtRuntimeBuildIdOnChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
@@ -621,6 +636,7 @@ begin
   mmoDescription.Text := FOpenFile.structure.metadata.description;
   edtProjectURL.Text := FOpenFile.structure.metadata.projectUrl;
   edtRepositoryURL.Text := FOpenFile.structure.metadata.repositoryUrl;
+  edtAuthor.Text := FOpenFile.structure.metadata.authors;
   cboLicense.Text := FOpenFile.structure.metadata.license;
   edtTags.Text := FOpenFile.structure.metadata.tags;
   cboTemplate.Text := '';
@@ -755,6 +771,7 @@ begin
   if SaveDialog.Execute then
   begin
     SaveDspecStructure(SaveDialog.Filename);
+    Caption := FSavefilename + ' - dspec Creator';
   end;
 end;
 
