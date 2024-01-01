@@ -44,6 +44,16 @@ type
   end;
 
   [JsonSerialize(jmAllPubProps)]
+  TDependency = class(TPersistent)
+  private
+    Fid: string;
+    Fversion: string;
+  public
+    property id: string read Fid write Fid;
+    property version: string read Fversion write Fversion;
+  end;
+
+  [JsonSerialize(jmAllPubProps)]
   TRuntime = class(TPersistent)
   private
     FbuildId: string;
@@ -99,6 +109,7 @@ type
     FsearchPaths: TArray<TSearchPath>;
     Fbuild: TArray<TBuild>;
     Fruntime: TArray<TRuntime>;
+    Fdependency: TArray<TDependency>;
   public
     destructor Destroy; override;
     property name: string read Fname write Fname;
@@ -106,6 +117,7 @@ type
     property searchPaths: TArray<TSearchPath> read FsearchPaths write FsearchPaths;
     property build: TArray<TBuild> read Fbuild write Fbuild;
     property runtime: TArray<TRuntime> read Fruntime write Fruntime;
+    property dependencies: TArray<TDependency> read Fdependency write Fdependency;
   end;
 
   [JsonSerialize(jmAllPubProps)]
@@ -139,6 +151,7 @@ begin
   TArray.FreeValues<TSearchPath>(FsearchPaths);
   TArray.FreeValues<TBuild>(Fbuild);
   TArray.FreeValues<TRuntime>(Fruntime);
+  TArray.FreeValues<TDependency>(Fdependency);
   inherited Destroy;
 end;
 
