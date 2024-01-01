@@ -395,6 +395,9 @@ var
   vPlatform : TTargetPlatform;
   compiler : string;
   platformString : string;
+  dpmPlatform: TDPMPlatform;
+  i: Integer;
+  platformsString : string;
 begin
   if clbCompilers.ItemIndex < 0 then
   begin
@@ -406,12 +409,23 @@ begin
 
   compiler := clbCompilers.Items[clbCompilers.ItemIndex];
   vPlatform := FOpenfile.GetPlatform(compiler);
+  platformsString := '';
+  for i := 0 to clbPlatforms.Count - 1 do
+  begin
+    if not clbPlatforms.Checked[i] then
+      continue;
+    platformString := clbPlatforms.Items[i];
+    dpmPlatform := StringToDPMPlatform(platformString);
 
-  platformString := clbPlatforms.Items[clbPlatforms.ItemIndex];
+    if not platformsString.IsEmpty then
+    begin
+      platformsString := platformsString + ', ' + DPMPlatformToString(dpmPlatform);
+    end
+    else
+      platformsString := DPMPlatformToString(dpmPlatform);
+  end;
 
-  StringToDPMPlatform(platformString);
-
-
+  vPlatform.platforms := platformsString;
 end;
 
 procedure TDSpecCreatorForm.edtAuthorChange(Sender: TObject);
