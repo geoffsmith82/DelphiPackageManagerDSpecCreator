@@ -27,7 +27,7 @@ uses
   DPM.Core.Sources.Types in 'Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Types.pas',
   DPM.Core.Utils.Enum in 'Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Enum.pas',
   DPM.Core.Utils.Config in 'Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Config.pas',
-  frmDependency in 'frmDependency.pas' {DependancyForm};
+  frmDependency in 'frmDependency.pas' {DependencyForm};
 
 {$R *.res}
 

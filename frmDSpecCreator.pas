@@ -18,6 +18,8 @@ uses
   Vcl.Menus,
   Vcl.WinXPanels,
   Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList,
   System.RegularExpressions,
   DPM.Core.Types,
   dspec.filehandler,
@@ -121,6 +123,7 @@ type
     lblDependencyId: TLabel;
     edtDependencyId: TEdit;
     edtDependencyVersion: TEdit;
+    ImageList1: TImageList;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
@@ -494,12 +497,12 @@ end;
 
 procedure TDSpecCreatorForm.LoadTemplates;
 var
-  node: TTreeNode;
-  nodeSource: TTreeNode;
-  nodeSearchPath: TTreeNode;
-  nodeBuild: TTreeNode;
-  nodeRuntime: TTreeNode;
-  nodeDependency: TTreeNode;
+  node: TTemplateTreeNode;
+  nodeSource: TTemplateTreeNode;
+  nodeSearchPath: TTemplateTreeNode;
+  nodeBuild: TTemplateTreeNode;
+  nodeRuntime: TTemplateTreeNode;
+  nodeDependency: TTemplateTreeNode;
   buildNode: TTemplateTreeNode;
   runtimeNode: TTemplateTreeNode;
   sourceNode: TTemplateTreeNode;
@@ -512,48 +515,70 @@ begin
   for i := 0 to High(FOpenFile.structure.templates) do
   begin
     cboTemplate.Items.Add(FOpenFile.structure.templates[i].name);
-    node := tvTemplates.Items.Add(nil, FOpenFile.structure.templates[i].name);
-    (node as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
-    nodeSource := tvTemplates.Items.AddChild(node, 'Source');
-    (nodeSource as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    node := tvTemplates.Items.Add(nil, FOpenFile.structure.templates[i].name) as TTemplateTreeNode;
+    node.Template := FOpenFile.structure.templates[i];
+    node.ImageIndex := 5;
+    node.SelectedIndex := 5;
+    nodeSource := tvTemplates.Items.AddChild(node, 'Source') as TTemplateTreeNode;
+    nodeSource.Template := FOpenFile.structure.templates[i];
+    nodeSource.ImageIndex := 2;
+    nodeSource.SelectedIndex := 2;
     for j := 0 to High(FOpenFile.structure.templates[i].source) do
     begin
       sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.structure.templates[i].source[j].src) as TTemplateTreeNode;
       sourceNode.source := FOpenFile.structure.templates[i].source[j];
       sourceNode.Template := FOpenFile.structure.templates[i];
+      sourceNode.ImageIndex := 2;
+      sourceNode.SelectedIndex := 2;
     end;
-    nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths');
-    (nodeSearchPath as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths') as TTemplateTreeNode;
+    nodeSearchPath.Template := FOpenFile.structure.templates[i];
+    nodeSearchPath.ImageIndex := 3;
+    nodeSearchPath.SelectedIndex := 3;
     for j := 0 to High(FOpenFile.structure.templates[i].searchPaths) do
     begin
       searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.structure.templates[i].searchPaths[j].path) as TTemplateTreeNode;
       searchPathNode.searchpath := FOpenFile.structure.templates[i].searchPaths[j];
       searchPathNode.Template := FOpenFile.structure.templates[i];
+      searchPathNode.ImageIndex := 3;
+      searchPathNode.SelectedIndex := 3;
     end;
-    nodeBuild := tvTemplates.Items.AddChild(node, 'Build');
-    (nodeBuild as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    nodeBuild := tvTemplates.Items.AddChild(node, 'Build') as TTemplateTreeNode;
+    nodeBuild.Template := FOpenFile.structure.templates[i];
+    nodeBuild.ImageIndex := 0;
+    nodeBuild.SelectedIndex := 0;
     for j := 0 to High(FOpenFile.structure.templates[i].build) do
     begin
       buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.structure.templates[i].build[j].id) as TTemplateTreeNode;
       buildNode.build := FOpenFile.structure.templates[i].build[j];
       buildNode.Template := FOpenFile.structure.templates[i];
+      buildNode.ImageIndex := 0;
+      buildNode.SelectedIndex := 0;
     end;
-    nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime');
-    (nodeRuntime as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime') as TTemplateTreeNode;
+    nodeRuntime.Template := FOpenFile.structure.templates[i];
+    nodeRuntime.ImageIndex := 1;
+    nodeRuntime.SelectedIndex := 1;
     for j := 0 to High(FOpenFile.structure.templates[i].runtime) do
     begin
       runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].buildId) as TTemplateTreeNode;
       runtimeNode.runtime := FOpenFile.structure.templates[i].runtime[j];
       runtimeNode.Template := FOpenFile.structure.templates[i];
+      runtimeNode.ImageIndex := 1;
+      runtimeNode.SelectedIndex := 1;
     end;
 
-    nodeDependency := tvTemplates.Items.AddChild(node, 'Dependencies');
-    (nodeDependency as TTemplateTreeNode).Template := FOpenFile.structure.templates[i];
+    nodeDependency := tvTemplates.Items.AddChild(node, 'Dependencies') as TTemplateTreeNode;
+    nodeDependency.Template := FOpenFile.structure.templates[i];
+    nodeDependency.ImageIndex := 4;
+    nodeDependency.SelectedIndex := 4;
     for j := 0 to High(FOpenFile.structure.templates[i].dependencies) do
     begin
       dependencyNode := tvTemplates.Items.AddChild(nodeDependency, FOpenFile.structure.templates[i].dependencies[j].id) as TTemplateTreeNode;
       dependencyNode.dependency := FOpenFile.structure.templates[i].dependencies[j];
       dependencyNode.Template := FOpenFile.structure.templates[i];
+      dependencyNode.ImageIndex := 4;
+      dependencyNode.SelectedIndex := 4;
     end;
 
     node.Expand(True);

@@ -178,7 +178,7 @@
         <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Enum.pas"/>
         <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Config.pas"/>
         <DCCReference Include="frmDependency.pas">
-            <Form>DependancyForm</Form>
+            <Form>DependencyForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <RcItem Include="Libs\DPM\Source\images\add_16px.png">
