@@ -21,6 +21,7 @@ type
     function GetTemplate(const templateName: string): TTemplate;
     function NewSource(const templateName: string; srcPath: string): TSource;
     function NewBuild(const templateName: string; BuildId: string): TBuild;
+    function NewDesign(const templateName, designSrc: string): TDesign;
     function NewDependency(const templateName: string; DependencyId: string): TDependency;
     function NewRuntime(const templateName: string; const BuildId: string): TRuntime;
     function NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
@@ -276,6 +277,27 @@ begin
   template.runtime := runtime;
 end;
 
+function TDSpecFile.NewDesign(const templateName: string; const designSrc: string): TDesign;
+var
+  design : TArray<TDesign>;
+  template : TTemplate;
+begin
+  Result := nil;
+  if designSrc.IsEmpty then
+    Exit;
+  if not DoesTemplateExist(templateName) then
+    raise Exception.Create('Template does not exist');
+
+  template := GetTemplate(templateName);
+
+  design := template.design;
+  SetLength(design, length(design) + 1);
+  design[High(design)] := TDesign.Create;
+  design[High(design)].src := designSrc;
+  Result := design[High(design)];
+  template.design := design;
+end;
+
 function TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
 var
   searchPaths : TArray<TSearchPath>;
@@ -340,6 +362,7 @@ begin
   json := TJson.ObjectToJsonObject(structure);
   try
     TFile.WriteAllText(Filename, json.Format);
+    LoadFromFile(filename);
   finally
     FreeAndNil(json);
   end;

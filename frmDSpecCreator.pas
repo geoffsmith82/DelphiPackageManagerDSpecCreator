@@ -31,6 +31,7 @@ type
   public
     Template: TTemplate;
     build: TBuild;
+    design: TDesign;
     runtime: TRuntime;
     source: TSource;
     searchpath: TSearchPath;
@@ -38,6 +39,7 @@ type
 
     function IsHeading: Boolean;
     function IsBuild: Boolean;
+    function IsDesign: Boolean;
     function IsRuntime: Boolean;
     function IsSource: Boolean;
     function IsSearchPath: Boolean;
@@ -124,12 +126,19 @@ type
     edtDependencyId: TEdit;
     edtDependencyVersion: TEdit;
     ImageList1: TImageList;
+    crdDesign: TCard;
+    lblDesignSrc: TLabel;
+    edtDesignSrc: TEdit;
+    lblDesignDest: TLabel;
+    edtDesignDest: TEdit;
+    chkDesignInstall: TCheckBox;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
     procedure cboTemplateChange(Sender: TObject);
     procedure chkCopyLocalClick(Sender: TObject);
+    procedure chkDesignInstallClick(Sender: TObject);
     procedure clbCompilersClick(Sender: TObject);
     procedure clbCompilersClickCheck(Sender: TObject);
     procedure clbPlatformsClickCheck(Sender: TObject);
@@ -137,6 +146,8 @@ type
     procedure edtBuildIdChange(Sender: TObject);
     procedure edtDependencyIdChange(Sender: TObject);
     procedure edtDependencyVersionChange(Sender: TObject);
+    procedure edtDesignDestChange(Sender: TObject);
+    procedure edtDesignSrcChange(Sender: TObject);
     procedure edtDestChange(Sender: TObject);
     procedure edtIdChange(Sender: TObject);
     procedure edtProjectChange(Sender: TObject);
@@ -165,6 +176,8 @@ type
     procedure PopupDeleteBuildItem(Sender: TObject);
     procedure PopupAddRuntimeItem(Sender: TObject);
     procedure PopupDeleteRuntimeItem(Sender: TObject);
+    procedure PopupAddDesignItem(Sender: TObject);
+    procedure PopupDeleteDesignItem(Sender: TObject);
     procedure PopupAddSourceItem(Sender: TObject);
     procedure PopupDeleteSourceItem(Sender: TObject);
     procedure PopupAddSearchPathItem(Sender: TObject);
@@ -177,6 +190,7 @@ type
     FTemplate : TTemplate;
     FMenuSource : TSource;
     FMenuRuntime : TRuntime;
+    FMenuDesign : TDesign;
     FMenuDependency : TDependency;
     FMenuSearchPath: TSearchPath;
     FMenuBuild: TBuild;
@@ -204,6 +218,7 @@ uses
   frmBuild,
   frmSource,
   frmRuntime,
+  frmDesign,
   frmSearchPath,
   frmOptions,
   frmDependency,
@@ -296,6 +311,14 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).runtime.copyLocal := chkCopyLocal.Checked;
+  end;
+end;
+
+procedure TDSpecCreatorForm.chkDesignInstallClick(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).design.install := chkDesignInstall.Checked;
   end;
 end;
 
@@ -430,7 +453,13 @@ begin
     if not clbPlatforms.Checked[i] then
       continue;
     platformString := clbPlatforms.Items[i];
+    if platformString = 'Linux' then
+      platformString := 'Linux64';
     dpmPlatform := StringToDPMPlatform(platformString);
+
+    if dpmPlatform = TDPMPlatform.UnknownPlatform then
+      continue;
+
 
     if not platformsString.IsEmpty then
     begin
@@ -462,7 +491,7 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).dependency.id := edtDependencyId.Text;
-    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
   end;
 end;
 
@@ -471,6 +500,37 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).dependency.version := edtDependencyVersion.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
+  end;
+end;
+
+procedure TDSpecCreatorForm.edtDesignDestChange(Sender: TObject);
+var
+  str : string;
+  compiler : TCompilerVersion;
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).design.dest := edtDesignDest.Text;
+
+    str := 'Possible Expanded Paths:' + System.sLineBreak;
+
+    for compiler := Low(TCompilerVersion) to High(TCompilerVersion) do
+    begin
+      if compiler = TCompilerVersion.UnknownVersion then
+        continue;
+      str := str  + System.sLineBreak + ReplaceVars(edtDesignDest.Text, compiler);
+    end;
+    edtDesignDest.Hint := str;
+  end;
+end;
+
+procedure TDSpecCreatorForm.edtDesignSrcChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).design.src := edtDesignSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDesignSrc.Text;
   end;
 end;
 
@@ -502,9 +562,11 @@ var
   nodeSearchPath: TTemplateTreeNode;
   nodeBuild: TTemplateTreeNode;
   nodeRuntime: TTemplateTreeNode;
+  nodeDesign: TTemplateTreeNode;
   nodeDependency: TTemplateTreeNode;
   buildNode: TTemplateTreeNode;
   runtimeNode: TTemplateTreeNode;
+  designNode: TTemplateTreeNode;
   sourceNode: TTemplateTreeNode;
   searchPathNode: TTemplateTreeNode;
   dependencyNode: TTemplateTreeNode;
@@ -554,6 +616,19 @@ begin
       buildNode.Template := FOpenFile.structure.templates[i];
       buildNode.ImageIndex := 0;
       buildNode.SelectedIndex := 0;
+    end;
+
+    nodeDesign := tvTemplates.Items.AddChild(node, 'Design') as TTemplateTreeNode;
+    nodeDesign.Template := FOpenFile.structure.templates[i];
+    nodeDesign.ImageIndex := 6;
+    nodeDesign.SelectedIndex := 6;
+    for j := 0 to High(FOpenFile.structure.templates[i].design) do
+    begin
+      designNode := tvTemplates.Items.AddChild(nodeDesign, FOpenFile.structure.templates[i].design[j].src) as TTemplateTreeNode;
+      designNode.design := FOpenFile.structure.templates[i].design[j];
+      designNode.Template := FOpenFile.structure.templates[i];
+      designNode.ImageIndex := 6;
+      designNode.SelectedIndex := 6;
     end;
     nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime') as TTemplateTreeNode;
     nodeRuntime.Template := FOpenFile.structure.templates[i];
@@ -741,6 +816,7 @@ procedure TDSpecCreatorForm.SaveDspecStructure(const filename: string);
 begin
   FOpenFile.SaveToFile(filename);
   FSavefilename := Filename;
+  Caption := FSavefilename + ' - dspec Creator';
 end;
 
 function TDSpecCreatorForm.SelectedPlatform: TTargetPlatform;
@@ -864,7 +940,6 @@ begin
   if SaveDialog.Execute then
   begin
     SaveDspecStructure(SaveDialog.Filename);
-    Caption := FSavefilename + ' - dspec Creator';
   end;
 end;
 
@@ -935,6 +1010,31 @@ begin
   LoadTemplates;
 end;
 
+procedure TDSpecCreatorForm.PopupAddDesignItem(Sender: TObject);
+var
+  designSrc : string;
+  DesignForm: TDesignForm;
+  design : TDesign;
+begin
+  DesignForm := TDesignForm.Create(nil);
+  try
+    DesignForm.edtDesignSrc.Text := 'default';
+
+    if DesignForm.ShowModal =  mrCancel then
+      Exit;
+    designSrc := DesignForm.edtDesignSrc.Text;
+    if designSrc.IsEmpty then
+      Exit;
+    design := FOpenFile.NewDesign(FTemplate.name, designSrc);
+    design.src := DesignForm.edtDesignSrc.Text;
+    design.dest := DesignForm.edtDesignDest.Text;
+    design.install := DesignForm.chkInstall.Checked;
+  finally
+    FreeAndNil(DesignForm);
+  end;
+  LoadTemplates;
+end;
+
 procedure TDSpecCreatorForm.PopupAddRuntimeItem(Sender: TObject);
 var
   runtimebuildId : string;
@@ -943,7 +1043,7 @@ var
 begin
   RuntimeForm := TRuntimeForm.Create(nil);
   try
-      RuntimeForm.edtRuntimeBuildId.Text := 'default';
+    RuntimeForm.edtRuntimeBuildId.Text := 'default';
 
     if RuntimeForm.ShowModal =  mrCancel then
       Exit;
@@ -1047,6 +1147,27 @@ begin
   LoadTemplates;
 end;
 
+procedure TDSpecCreatorForm.PopupDeleteDesignItem(Sender: TObject);
+var
+  designs : TArray<TDesign>;
+  designsNew : TArray<TDesign>;
+  i, j: Integer;
+begin
+  designs := FTemplate.design;
+  SetLength(designsNew, Length(designs) - 1);
+  j := 0;
+  for i := 0 to High(designs) do
+  begin
+    if designs[i].src <> FMenuDesign.src then
+    begin
+      designsNew[j] := designs[i];
+      Inc(j);
+    end;
+  end;
+  FTemplate.design := designsNew;
+  LoadTemplates;
+end;
+
 procedure TDSpecCreatorForm.PopupDeleteRuntimeItem(Sender: TObject);
 var
   runtimes : TArray<TRuntime>;
@@ -1128,6 +1249,11 @@ begin
     CardPanel.ActiveCard := crdBuild;
     CardPanel.Visible := False;
   end
+  else if (Node.Text = 'Design') and ((Node as TTemplateTreenode).IsHeading) then
+  begin
+    CardPanel.ActiveCard := crdDesign;
+    CardPanel.Visible := False;
+  end
   else if (Node.Text = 'Runtime') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel.ActiveCard := crdRuntime;
@@ -1162,6 +1288,13 @@ begin
         CardPanel.ActiveCard := crdBuild;
         edtBuildId.Text := (Node as TTemplateTreeNode).build.id;
         edtProject.Text := (Node as TTemplateTreeNode).build.project;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Design' then
+      begin
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdDesign;
+        edtDesignSrc.Text := (Node as TTemplateTreeNode).design.src;
+        edtDesignDest.Text := (Node as TTemplateTreeNode).design.dest;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Runtime' then
       begin
@@ -1232,6 +1365,18 @@ begin
       tvTemplates.PopupMenu.Items.Add(item);
       FMenuRuntime := (node as TTemplateTreeNode).runtime;
     end;
+    if node.IsDesign or ((node.Text='Design') and node.IsHeading) then
+    begin
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Add Design Item';
+      item.OnClick := PopupAddDesignItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Delete Design Item';
+      item.OnClick := PopupDeleteDesignItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      FMenuDesign := (node as TTemplateTreeNode).design;
+    end;
     if node.IsDependency or ((node.Text='Dependencies') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
@@ -1290,6 +1435,11 @@ end;
 function TTemplateTreeNode.IsDependency: Boolean;
 begin
   Result := (dependency <> nil);
+end;
+
+function TTemplateTreeNode.IsDesign: Boolean;
+begin
+  Result := (design <> nil);
 end;
 
 function TTemplateTreeNode.IsHeading: Boolean;

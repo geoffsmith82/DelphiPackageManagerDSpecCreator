@@ -26,6 +26,20 @@ type
   end;
 
   [JsonSerialize(jmAllPubProps)]
+  TDesign = class(TPersistent)
+  private
+    Fsrc: string;
+    Fdest: string;
+    Finstall: Boolean;
+  public
+    destructor Destroy; override;
+    property src: string read Fsrc write Fsrc;
+    property dest: string read Fdest write Fdest;
+    property install: Boolean read Finstall write Finstall;
+  end;
+
+
+  [JsonSerialize(jmAllPubProps)]
   TSearchPath = class(TPersistent)
   private
     Fpath: string;
@@ -109,6 +123,7 @@ type
     FsearchPaths: TArray<TSearchPath>;
     Fbuild: TArray<TBuild>;
     Fruntime: TArray<TRuntime>;
+    Fdesign: TArray<TDesign>;
     Fdependency: TArray<TDependency>;
   public
     destructor Destroy; override;
@@ -117,6 +132,7 @@ type
     property searchPaths: TArray<TSearchPath> read FsearchPaths write FsearchPaths;
     property build: TArray<TBuild> read Fbuild write Fbuild;
     property runtime: TArray<TRuntime> read Fruntime write Fruntime;
+    property design: TArray<TDesign> read Fdesign write Fdesign;
     property dependencies: TArray<TDependency> read Fdependency write Fdependency;
   end;
 
@@ -151,6 +167,7 @@ begin
   TArray.FreeValues<TSearchPath>(FsearchPaths);
   TArray.FreeValues<TBuild>(Fbuild);
   TArray.FreeValues<TRuntime>(Fruntime);
+  TArray.FreeValues<TDesign>(Fdesign);
   TArray.FreeValues<TDependency>(Fdependency);
   inherited Destroy;
 end;
@@ -169,12 +186,20 @@ begin
   inherited Destroy;
 end;
 
+{ TDesign }
+
+destructor TDesign.Destroy;
+begin
+  inherited;
+end;
+
 initialization
 
   RegisterClass(TSource);
   RegisterClass(TSearchPath);
   RegisterClass(TBuild);
   RegisterClass(TRuntime);
+  RegisterClass(TDesign);
   RegisterClass(TMetadata);
   RegisterClass(TTargetPlatform);
   RegisterClass(TTemplate);
