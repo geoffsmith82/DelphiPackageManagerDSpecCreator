@@ -646,13 +646,94 @@ object DSpecCreatorForm: TDSpecCreatorForm
         end
       end
     end
-    object tsDependencies: TTabSheet
-      Caption = 'Dependencies'
+    object tsGenerate: TTabSheet
+      Caption = 'Generate'
       ImageIndex = 3
+      object GridPanel1: TGridPanel
+        Left = 0
+        Top = 0
+        Width = 863
+        Height = 411
+        Align = alClient
+        Caption = 'GridPanel1'
+        ColumnCollection = <
+          item
+            Value = 100.000000000000000000
+          end>
+        ControlCollection = <
+          item
+            Column = 0
+            Control = Panel1
+            Row = 0
+          end
+          item
+            Column = 0
+            Control = Memo1
+            Row = 1
+          end>
+        RowCollection = <
+          item
+            Value = 16.666666666666670000
+          end
+          item
+            Value = 83.333333333333330000
+          end>
+        TabOrder = 0
+        ExplicitLeft = 288
+        ExplicitTop = 96
+        ExplicitWidth = 185
+        ExplicitHeight = 41
+        object Panel1: TPanel
+          Left = 1
+          Top = 1
+          Width = 861
+          Height = 68
+          Align = alClient
+          TabOrder = 0
+          ExplicitLeft = 240
+          ExplicitTop = 16
+          ExplicitWidth = 185
+          ExplicitHeight = 41
+          object Label2: TLabel
+            Left = 136
+            Top = 24
+            Width = 115
+            Height = 15
+            Caption = 'Package Output Path:'
+          end
+          object btnBuildPackages: TButton
+            Left = 16
+            Top = 22
+            Width = 97
+            Height = 25
+            Caption = 'Build Packages'
+            TabOrder = 0
+            OnClick = btnBuildPackagesClick
+          end
+          object edtPackageOutputPath: TEdit
+            Left = 257
+            Top = 21
+            Width = 354
+            Height = 23
+            TabOrder = 1
+            Text = 'D:\Programming\components\DPM\Packages'
+          end
+        end
+        object Memo1: TMemo
+          Left = 1
+          Top = 69
+          Width = 861
+          Height = 341
+          Align = alClient
+          ReadOnly = True
+          ScrollBars = ssBoth
+          TabOrder = 1
+        end
+      end
     end
   end
   object MainMenu: TMainMenu
-    Left = 12
+    Left = 44
     Top = 386
     object File1: TMenuItem
       Caption = '&File'
@@ -991,5 +1072,14 @@ object DSpecCreatorForm: TDSpecCreatorForm
       003FC4F3C7E30001007FFE07E7E7000100C0FF0FF7EF0001FFC0FF0FFFFF0001
       FFC0FF0FFFFF01FFFFC0FFFFFFFF83FF00000000000000000000000000000000
       000000000000}
+  end
+  object DosCommand: TDosCommand
+    InputToOutput = False
+    MaxTimeAfterBeginning = 0
+    MaxTimeAfterLastOutput = 0
+    OnNewLine = DosCommandNewLine
+    OnTerminated = DosCommandTerminated
+    Left = 620
+    Top = 98
   end
 end

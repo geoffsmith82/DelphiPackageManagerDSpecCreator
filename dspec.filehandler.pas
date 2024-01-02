@@ -12,6 +12,7 @@ type
   TDSpecFile = class
   private
     FLoaded : TDPMSpecFormat;
+    FFilename : string;
   public
     structure : TDPMSpecFormat;
     procedure NewTemplate(const templateName: string);
@@ -30,7 +31,9 @@ type
     procedure DeleteCompiler(const compiler: string);
     procedure LoadFromFile(const filename: string);
     procedure SaveToFile(const filename: string);
+    function WorkingDir: string;
     function IsModified: Boolean;
+    function AsString: string;
     constructor Create;
     destructor Destroy; override;
   end;
@@ -60,6 +63,18 @@ begin
   platforms[High(platforms)].compiler := compiler;
   structure.targetPlatforms := platforms;
   Result := platforms[High(platforms)];
+end;
+
+function TDSpecFile.AsString: string;
+var
+  json : TJSONObject;
+begin
+  json := TJson.ObjectToJsonObject(structure);
+  try
+    Result := json.Format;
+  finally
+    FreeAndNil(json);
+  end;
 end;
 
 constructor TDSpecFile.Create;
@@ -173,6 +188,7 @@ begin
   try
     structure := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
     FLoaded := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
+    FFilename := Filename;
   finally
     FreeAndNil(json);
   end;
@@ -366,6 +382,11 @@ begin
   finally
     FreeAndNil(json);
   end;
+end;
+
+function TDSpecFile.WorkingDir: string;
+begin
+  Result := TPath.GetDirectoryName(FFilename);
 end;
 
 end.

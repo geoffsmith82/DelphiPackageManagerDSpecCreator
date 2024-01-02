@@ -21,6 +21,7 @@ uses
   System.ImageList,
   Vcl.ImgList,
   System.RegularExpressions,
+  DosCommand,
   DPM.Core.Types,
   dspec.filehandler,
   dpm.dspec.format
@@ -112,7 +113,7 @@ type
     chkCopyLocal: TCheckBox;
     PopupMenu: TPopupMenu;
     BalloonHint1: TBalloonHint;
-    tsDependencies: TTabSheet;
+    tsGenerate: TTabSheet;
     lblCompilers: TLabel;
     lblPlatform: TLabel;
     lblTemplateView: TLabel;
@@ -132,8 +133,16 @@ type
     lblDesignDest: TLabel;
     edtDesignDest: TEdit;
     chkDesignInstall: TCheckBox;
+    DosCommand: TDosCommand;
+    GridPanel1: TGridPanel;
+    Panel1: TPanel;
+    btnBuildPackages: TButton;
+    Memo1: TMemo;
+    edtPackageOutputPath: TEdit;
+    Label2: TLabel;
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
+    procedure btnBuildPackagesClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
     procedure cboTemplateChange(Sender: TObject);
@@ -142,6 +151,8 @@ type
     procedure clbCompilersClick(Sender: TObject);
     procedure clbCompilersClickCheck(Sender: TObject);
     procedure clbPlatformsClickCheck(Sender: TObject);
+    procedure DosCommandNewLine(ASender: TObject; const ANewLine: string; AOutputType: TOutputType);
+    procedure DosCommandTerminated(Sender: TObject);
     procedure edtAuthorChange(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
     procedure edtDependencyIdChange(Sender: TObject);
@@ -186,6 +197,7 @@ type
     procedure PopupDeleteDependencyItem(Sender: TObject);
   private
     { Private declarations }
+    FtmpFilename : string;
     FOpenFile : TDSpecFile;
     FTemplate : TTemplate;
     FMenuSource : TSource;
@@ -214,6 +226,7 @@ implementation
 
 uses
   System.UITypes,
+  System.IOUtils,
   frmTemplates,
   frmBuild,
   frmSource,
@@ -262,6 +275,32 @@ begin
   end;
   FOpenfile.NewTemplate(templateName);
   LoadTemplates;
+end;
+
+procedure TDSpecCreatorForm.btnBuildPackagesClick(Sender: TObject);
+var
+  guid: TGUID;
+begin
+  guid := TGUID.NewGuid;
+  FtmpFilename := FOpenFile.WorkingDir;
+  FtmpFilename := TPath.Combine(FtmpFilename, guid.ToString);
+  FtmpFilename := ChangeFileExt(FtmpFilename, '.dspec');
+  TFile.WriteAllText(FtmpFilename, FOpenFile.AsString);
+  if DirectoryExists(edtPackageOutputPath.Text) then
+    DosCommand.CommandLine := 'dpm pack ' + FtmpFilename + ' -o=' + edtPackageOutputPath.Text;
+  DosCommand.Execute;
+end;
+
+procedure TDSpecCreatorForm.DosCommandNewLine(ASender: TObject; const ANewLine: string; AOutputType: TOutputType);
+begin
+  if AOutputType = otEntireLine then
+    Memo1.Lines.Add(ANewLine);
+end;
+
+procedure TDSpecCreatorForm.DosCommandTerminated(Sender: TObject);
+begin
+  TFile.Delete(FtmpFilename);
+  FtmpFilename := '';
 end;
 
 procedure TDSpecCreatorForm.btnDeleteTemplateClick(Sender: TObject);
@@ -779,6 +818,7 @@ begin
   FOpenFile := TDSpecFile.Create;
   LoadDspecStructure;
   FSavefilename := '';
+  FtmpFilename := '';
   Caption := 'Untitled - dspec Creator';
 end;
 
