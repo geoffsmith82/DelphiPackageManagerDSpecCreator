@@ -24,7 +24,7 @@ type
     function NewBuild(const templateName: string; BuildId: string): TBuild;
     function NewDesign(const templateName, designSrc: string): TDesign;
     function NewDependency(const templateName: string; DependencyId: string): TDependency;
-    function NewRuntime(const templateName: string; const BuildId: string): TRuntime;
+    function NewRuntime(const templateName: string; const runtimeSrc: string): TRuntime;
     function NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
     function GetPlatform(const compiler: string): TTargetPlatform;
     function AddCompiler(const compiler: string): TTargetPlatform;
@@ -272,13 +272,13 @@ begin
   template.dependencies := dependencies;
 end;
 
-function TDSpecFile.NewRuntime(const templateName: string; const BuildId: string): TRuntime;
+function TDSpecFile.NewRuntime(const templateName: string; const runtimeSrc: string): TRuntime;
 var
   runtime : TArray<TRuntime>;
   template : TTemplate;
 begin
   Result := nil;
-  if BuildId.IsEmpty then
+  if runtimeSrc.IsEmpty then
     Exit;
   if not DoesTemplateExist(templateName) then
     raise Exception.Create('Template does not exist');
@@ -288,7 +288,7 @@ begin
   runtime := template.runtime;
   SetLength(runtime, length(runtime) + 1);
   runtime[High(runtime)] := TRuntime.Create;
-  runtime[High(runtime)].buildId := BuildId;
+  runtime[High(runtime)].src := runtimeSrc;
   Result := runtime[High(runtime)];
   template.runtime := runtime;
 end;

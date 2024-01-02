@@ -16,19 +16,19 @@ object RuntimeForm: TRuntimeForm
     506
     206)
   TextHeight = 15
-  object lblRuntimeSrc: TLabel
-    Left = 50
+  object lblRuntimeDest: TLabel
+    Left = 29
     Top = 88
+    Width = 26
+    Height = 15
+    Caption = 'Dest:'
+  end
+  object lblRuntimeSrc: TLabel
+    Left = 36
+    Top = 48
     Width = 19
     Height = 15
     Caption = 'Src:'
-  end
-  object lblRuntimeBuildId: TLabel
-    Left = 29
-    Top = 48
-    Width = 40
-    Height = 15
-    Caption = 'BuildId:'
   end
   object btnCancel: TButton
     Left = 332
@@ -58,7 +58,7 @@ object RuntimeForm: TRuntimeForm
     Caption = 'Copy Local'
     TabOrder = 2
   end
-  object edtRuntimeSrc: TEdit
+  object edtRuntimeDest: TEdit
     Left = 75
     Top = 85
     Width = 413
@@ -68,7 +68,7 @@ object RuntimeForm: TRuntimeForm
     ShowHint = True
     TabOrder = 3
   end
-  object edtRuntimeBuildId: TEdit
+  object edtRuntimeSrc: TEdit
     Left = 75
     Top = 45
     Width = 413

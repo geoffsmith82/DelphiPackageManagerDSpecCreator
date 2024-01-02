@@ -487,30 +487,30 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Runtime'
           end
-          object lblRuntimeBuildId: TLabel
-            Left = 40
-            Top = 72
-            Width = 40
-            Height = 15
-            Caption = 'BuildId:'
-          end
           object lblRuntimeSrc: TLabel
             Left = 61
-            Top = 112
+            Top = 72
             Width = 19
             Height = 15
             Caption = 'Src:'
           end
-          object edtRuntimeBuildId: TEdit
+          object lblRuntimeDest: TLabel
+            Left = 54
+            Top = 112
+            Width = 26
+            Height = 15
+            Caption = 'Dest:'
+          end
+          object edtRuntimeSrc: TEdit
             Left = 86
             Top = 69
             Width = 413
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
-            OnChange = edtRuntimeBuildIdOnChange
+            OnChange = edtRuntimeSrcOnChange
           end
-          object edtRuntimeSrc: TEdit
+          object edtRuntimeDest: TEdit
             Left = 86
             Top = 109
             Width = 413
@@ -519,7 +519,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            OnChange = edtRuntimeSrcChange
+            OnChange = edtRuntimeDestChange
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -539,7 +539,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdDependencies'
           CardIndex = 4
           TabOrder = 4
-          ExplicitLeft = 0
           DesignSize = (
             524
             340)
@@ -588,10 +587,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdDesign'
           CardIndex = 5
           TabOrder = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           DesignSize = (
             524
             340)
@@ -679,10 +674,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Value = 83.333333333333330000
           end>
         TabOrder = 0
-        ExplicitLeft = 288
-        ExplicitTop = 96
-        ExplicitWidth = 185
-        ExplicitHeight = 41
         object Panel1: TPanel
           Left = 1
           Top = 1
@@ -690,10 +681,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Height = 68
           Align = alClient
           TabOrder = 0
-          ExplicitLeft = 240
-          ExplicitTop = 16
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           object Label2: TLabel
             Left = 136
             Top = 24

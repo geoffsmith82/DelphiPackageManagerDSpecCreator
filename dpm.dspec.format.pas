@@ -70,12 +70,12 @@ type
   [JsonSerialize(jmAllPubProps)]
   TRuntime = class(TPersistent)
   private
-    FbuildId: string;
     Fsrc: string;
+    Fdest: string;
     FcopyLocal: Boolean;
   public
-    property buildId: string read FbuildId write FbuildId;
     property src: string read Fsrc write Fsrc;
+    property dest: string read Fdest write Fdest;
     property copyLocal: Boolean read FcopyLocal write FcopyLocal;
   end;
 

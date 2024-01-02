@@ -106,10 +106,10 @@ type
     edtBuildId: TEdit;
     lblProject: TLabel;
     edtProject: TEdit;
-    lblRuntimeBuildId: TLabel;
-    edtRuntimeBuildId: TEdit;
     lblRuntimeSrc: TLabel;
     edtRuntimeSrc: TEdit;
+    lblRuntimeDest: TLabel;
+    edtRuntimeDest: TEdit;
     chkCopyLocal: TCheckBox;
     PopupMenu: TPopupMenu;
     BalloonHint1: TBalloonHint;
@@ -164,8 +164,8 @@ type
     procedure edtProjectChange(Sender: TObject);
     procedure edtProjectURLChange(Sender: TObject);
     procedure edtRepositoryURLChange(Sender: TObject);
-    procedure edtRuntimeBuildIdOnChange(Sender: TObject);
-    procedure edtRuntimeSrcChange(Sender: TObject);
+    procedure edtRuntimeSrcOnChange(Sender: TObject);
+    procedure edtRuntimeDestChange(Sender: TObject);
     procedure edtSearchPathChange(Sender: TObject);
     procedure edtSourceChange(Sender: TObject);
     procedure edtTagsChange(Sender: TObject);
@@ -675,7 +675,7 @@ begin
     nodeRuntime.SelectedIndex := 1;
     for j := 0 to High(FOpenFile.structure.templates[i].runtime) do
     begin
-      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].buildId) as TTemplateTreeNode;
+      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.structure.templates[i].runtime[j].src) as TTemplateTreeNode;
       runtimeNode.runtime := FOpenFile.structure.templates[i].runtime[j];
       runtimeNode.Template := FOpenFile.structure.templates[i];
       runtimeNode.ImageIndex := 1;
@@ -736,12 +736,12 @@ begin
   FOpenFile.structure.metadata.repositoryUrl := edtRepositoryURL.Text;
 end;
 
-procedure TDSpecCreatorForm.edtRuntimeBuildIdOnChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtRuntimeSrcOnChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).runtime.buildId := edtRuntimeBuildId.Text;
-    (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeBuildId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).runtime.src := edtRuntimeSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeSrc.Text;
   end;
 end;
 
@@ -750,14 +750,14 @@ begin
   Result := TClassReplacer.ReplaceVars(inputStr, compiler, FOpenFile.structure);
 end;
 
-procedure TDSpecCreatorForm.edtRuntimeSrcChange(Sender: TObject);
+procedure TDSpecCreatorForm.edtRuntimeDestChange(Sender: TObject);
 var
   str : string;
   compiler : TCompilerVersion;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).runtime.src := edtRuntimeSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).runtime.dest := edtRuntimeDest.Text;
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -765,9 +765,9 @@ begin
     begin
       if compiler = TCompilerVersion.UnknownVersion then
         continue;
-      str := str  + System.sLineBreak + ReplaceVars(edtRuntimeSrc.Text, compiler);
+      str := str  + System.sLineBreak + ReplaceVars(edtRuntimeDest.Text, compiler);
     end;
-    edtRuntimeSrc.Hint := str;
+    edtRuntimeDest.Hint := str;
   end;
 end;
 
@@ -1077,21 +1077,21 @@ end;
 
 procedure TDSpecCreatorForm.PopupAddRuntimeItem(Sender: TObject);
 var
-  runtimebuildId : string;
+  runtimeSrc : string;
   RuntimeForm: TRuntimeForm;
   runtime : TRuntime;
 begin
   RuntimeForm := TRuntimeForm.Create(nil);
   try
-    RuntimeForm.edtRuntimeBuildId.Text := 'default';
+    RuntimeForm.edtRuntimeSrc.Text := 'default';
 
     if RuntimeForm.ShowModal =  mrCancel then
       Exit;
-    runtimebuildId := RuntimeForm.edtRuntimeBuildId.Text;
-    if runtimebuildId.IsEmpty then
+    runtimeSrc := RuntimeForm.edtRuntimeSrc.Text;
+    if runtimeSrc.IsEmpty then
       Exit;
-    runtime := FOpenFile.NewRuntime(FTemplate.name, runtimebuildId);
-    runtime.src := RuntimeForm.edtRuntimeSrc.Text;
+    runtime := FOpenFile.NewRuntime(FTemplate.name, runtimeSrc);
+    runtime.dest := RuntimeForm.edtRuntimeDest.Text;
     runtime.copyLocal := RuntimeForm.chkCopyLocal.Checked;
   finally
     FreeAndNil(RuntimeForm);
@@ -1219,7 +1219,7 @@ begin
   j := 0;
   for i := 0 to High(runtimes) do
   begin
-    if runtimes[i].buildId <> FMenuRuntime.buildId then
+    if runtimes[i].src <> FMenuRuntime.src then
     begin
       runtimesNew[j] := runtimes[i];
       Inc(j);
@@ -1340,8 +1340,8 @@ begin
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdRuntime;
-        edtRuntimeBuildId.Text := (Node as TTemplateTreeNode).runtime.buildId;
         edtRuntimeSrc.Text := (Node as TTemplateTreeNode).runtime.src;
+        edtRuntimeDest.Text := (Node as TTemplateTreeNode).runtime.dest;
         chkCopyLocal.Checked := (Node as TTemplateTreeNode).runtime.copyLocal;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Dependencies' then
