@@ -133,13 +133,13 @@ type
     lblDesignDest: TLabel;
     edtDesignDest: TEdit;
     chkDesignInstall: TCheckBox;
-    DosCommand: TDosCommand;
     GridPanel1: TGridPanel;
     Panel1: TPanel;
     btnBuildPackages: TButton;
     Memo1: TMemo;
     edtPackageOutputPath: TEdit;
     Label2: TLabel;
+    procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnBuildPackagesClick(Sender: TObject);
@@ -199,6 +199,7 @@ type
     { Private declarations }
     FtmpFilename : string;
     FOpenFile : TDSpecFile;
+    FDosCommand : TDosCommand;
     FTemplate : TTemplate;
     FMenuSource : TSource;
     FMenuRuntime : TRuntime;
@@ -237,6 +238,8 @@ uses
   frmDependency,
   dpm.dspec.replacer
   ;
+
+
 
 procedure TDSpecCreatorForm.btnAddExcludeClick(Sender: TObject);
 var
@@ -287,8 +290,8 @@ begin
   FtmpFilename := ChangeFileExt(FtmpFilename, '.dspec');
   TFile.WriteAllText(FtmpFilename, FOpenFile.AsString);
   if DirectoryExists(edtPackageOutputPath.Text) then
-    DosCommand.CommandLine := 'dpm pack ' + FtmpFilename + ' -o=' + edtPackageOutputPath.Text;
-  DosCommand.Execute;
+    FDosCommand.CommandLine := 'dpm pack ' + FtmpFilename + ' -o=' + edtPackageOutputPath.Text;
+  FDosCommand.Execute;
 end;
 
 procedure TDSpecCreatorForm.DosCommandNewLine(ASender: TObject; const ANewLine: string; AOutputType: TOutputType);
@@ -816,10 +819,18 @@ end;
 procedure TDSpecCreatorForm.FormCreate(Sender: TObject);
 begin
   FOpenFile := TDSpecFile.Create;
+  FDosCommand := TDosCommand.Create(nil);
+  FDosCommand.OnNewLine := DosCommandNewLine;
+  FDosCommand.OnTerminated := DosCommandTerminated;
   LoadDspecStructure;
   FSavefilename := '';
   FtmpFilename := '';
   Caption := 'Untitled - dspec Creator';
+end;
+
+procedure TDSpecCreatorForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FDosCommand);
 end;
 
 procedure TDSpecCreatorForm.LoadDspecStructure;

@@ -11,8 +11,10 @@ object DSpecCreatorForm: TDSpecCreatorForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu
+  Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   object PageControl: TPageControl
     Left = 0
@@ -1059,14 +1061,5 @@ object DSpecCreatorForm: TDSpecCreatorForm
       003FC4F3C7E30001007FFE07E7E7000100C0FF0FF7EF0001FFC0FF0FFFFF0001
       FFC0FF0FFFFF01FFFFC0FFFFFFFF83FF00000000000000000000000000000000
       000000000000}
-  end
-  object DosCommand: TDosCommand
-    InputToOutput = False
-    MaxTimeAfterBeginning = 0
-    MaxTimeAfterLastOutput = 0
-    OnNewLine = DosCommandNewLine
-    OnTerminated = DosCommandTerminated
-    Left = 620
-    Top = 98
   end
 end
