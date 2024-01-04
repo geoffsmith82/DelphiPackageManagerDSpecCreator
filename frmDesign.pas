@@ -20,10 +20,10 @@ type
     btnCancel: TButton;
     btnOk: TButton;
     chkInstall: TCheckBox;
-    lblDesignDest: TLabel;
-    edtDesignDest: TEdit;
     lblDesignSrc: TLabel;
     edtDesignSrc: TEdit;
+    lblDesignBuildId: TLabel;
+    edtDesignBuildId: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private

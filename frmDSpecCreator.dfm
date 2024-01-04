@@ -76,7 +76,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Caption = 'Tags:'
       end
       object lblAuthor: TLabel
-        Left = 19
+        Left = 41
         Top = 194
         Width = 40
         Height = 15
@@ -194,7 +194,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Top = 48
         Width = 161
         Height = 329
-        ItemHeight = 15
+        ItemHeight = 17
         Items.Strings = (
           'XE2'
           'XE3'
@@ -230,7 +230,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Width = 161
         Height = 137
         DoubleBuffered = True
-        ItemHeight = 15
+        ItemHeight = 17
         Items.Strings = (
           'Win32'
           'Win64'
@@ -278,7 +278,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
       object tvTemplates: TTreeView
         Left = 3
         Top = 57
-        Width = 286
+        Width = 319
         Height = 265
         AutoExpand = True
         DoubleBuffered = True
@@ -297,24 +297,25 @@ object DSpecCreatorForm: TDSpecCreatorForm
         OnCreateNodeClass = tvTemplatesCreateNodeClass
       end
       object CardPanel: TCardPanel
-        Left = 312
+        Left = 328
         Top = 3
-        Width = 526
+        Width = 532
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ActiveCard = crdSource
-        Caption = 'CardPanel1'
+        ActiveCard = crdDesign
+        Caption = 'CardPanel'
         TabOrder = 3
         object crdSource: TCard
           Left = 1
           Top = 1
-          Width = 524
+          Width = 530
           Height = 340
           Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
+          ExplicitWidth = 524
           DesignSize = (
-            524
+            530
             340)
           object lblSrc: TLabel
             Left = 48
@@ -333,7 +334,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
           object edtSource: TEdit
             Left = 74
             Top = 45
-            Width = 370
+            Width = 376
             Height = 23
             CustomHint = BalloonHint1
             Anchors = [akLeft, akTop, akRight]
@@ -342,6 +343,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 0
             Text = 'edtSource'
             OnChange = edtSourceChange
+            ExplicitWidth = 370
           end
           object chkFlatten: TCheckBox
             Left = 74
@@ -354,7 +356,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
           object edtDest: TEdit
             Left = 73
             Top = 97
-            Width = 370
+            Width = 376
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
@@ -362,15 +364,17 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 2
             Text = 'Edit1'
             OnChange = edtDestChange
+            ExplicitWidth = 370
           end
           object lbExclude: TListBox
             Left = 74
             Top = 126
-            Width = 370
+            Width = 376
             Height = 97
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 15
             TabOrder = 3
+            ExplicitWidth = 370
           end
           object btnAddExclude: TButton
             Left = 192
@@ -393,11 +397,12 @@ object DSpecCreatorForm: TDSpecCreatorForm
         object crdSearchPaths: TCard
           Left = 1
           Top = 1
-          Width = 524
+          Width = 530
           Height = 340
           Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
+          ExplicitWidth = 524
           object lblSearchPaths: TLabel
             Left = 64
             Top = 32
@@ -418,13 +423,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
         object crdBuild: TCard
           Left = 1
           Top = 1
-          Width = 524
+          Width = 530
           Height = 340
           Caption = 'crdBuild'
           CardIndex = 2
           TabOrder = 2
+          ExplicitLeft = 17
+          ExplicitWidth = 524
           DesignSize = (
-            524
+            530
             340)
           object lblBuild: TLabel
             Left = 40
@@ -457,17 +464,18 @@ object DSpecCreatorForm: TDSpecCreatorForm
           object edtBuildId: TEdit
             Left = 96
             Top = 45
-            Width = 411
+            Width = 417
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtBuildIdChange
+            ExplicitWidth = 411
           end
           object edtProject: TEdit
             Left = 96
             Top = 74
-            Width = 411
+            Width = 417
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
@@ -475,11 +483,12 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtProjectChange
+            ExplicitWidth = 411
           end
           object edtConfiguration: TEdit
             Left = 96
             Top = 103
-            Width = 411
+            Width = 417
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
@@ -487,6 +496,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 2
             Text = 'edtConfiguration'
             OnChange = edtConfigurationChange
+            ExplicitWidth = 411
           end
           object chkBuildForDesign: TCheckBox
             Left = 96
@@ -511,13 +521,14 @@ object DSpecCreatorForm: TDSpecCreatorForm
           AlignWithMargins = True
           Left = 4
           Top = 4
-          Width = 518
+          Width = 524
           Height = 334
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
+          ExplicitLeft = 0
           DesignSize = (
-            518
+            524
             334)
           object lblRuntime: TLabel
             Left = 64
@@ -526,39 +537,41 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Runtime'
           end
+          object lblRuntimeBuildId: TLabel
+            Left = 37
+            Top = 72
+            Width = 43
+            Height = 15
+            Caption = 'Build Id:'
+          end
           object lblRuntimeSrc: TLabel
             Left = 61
-            Top = 72
+            Top = 112
             Width = 19
             Height = 15
             Caption = 'Src:'
           end
-          object lblRuntimeDest: TLabel
-            Left = 54
-            Top = 112
-            Width = 26
-            Height = 15
-            Caption = 'Dest:'
-          end
-          object edtRuntimeSrc: TEdit
+          object edtRuntimeBuildId: TEdit
             Left = 86
             Top = 69
-            Width = 413
+            Width = 419
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             OnChange = edtRuntimeSrcOnChange
+            ExplicitWidth = 413
           end
-          object edtRuntimeDest: TEdit
+          object edtRuntimeSrc: TEdit
             Left = 86
             Top = 109
-            Width = 413
+            Width = 419
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            OnChange = edtRuntimeDestChange
+            OnChange = edtRuntimeSrcChange
+            ExplicitWidth = 413
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -573,13 +586,14 @@ object DSpecCreatorForm: TDSpecCreatorForm
         object crdDependencies: TCard
           Left = 1
           Top = 1
-          Width = 524
+          Width = 530
           Height = 340
           Caption = 'crdDependencies'
           CardIndex = 4
           TabOrder = 4
+          ExplicitWidth = 524
           DesignSize = (
-            524
+            530
             340)
           object Label1: TLabel
             Left = 48
@@ -598,17 +612,18 @@ object DSpecCreatorForm: TDSpecCreatorForm
           object edtDependencyId: TEdit
             Left = 104
             Top = 53
-            Width = 411
+            Width = 417
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtDependencyIdChange
+            ExplicitWidth = 411
           end
           object edtDependencyVersion: TEdit
             Left = 104
             Top = 82
-            Width = 411
+            Width = 417
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
@@ -616,37 +631,39 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtDependencyVersionChange
+            ExplicitWidth = 411
           end
         end
         object crdDesign: TCard
           Left = 1
           Top = 1
-          Width = 524
+          Width = 530
           Height = 340
           Caption = 'crdDesign'
           CardIndex = 5
           TabOrder = 5
+          ExplicitWidth = 524
           DesignSize = (
-            524
+            530
             340)
-          object lblDesignSrc: TLabel
-            Left = 56
+          object lblDesignBuildId: TLabel
+            Left = 32
             Top = 56
+            Width = 43
+            Height = 15
+            Caption = 'Build Id:'
+          end
+          object lblDesignSrc: TLabel
+            Left = 49
+            Top = 108
             Width = 19
             Height = 15
             Caption = 'Src:'
           end
-          object lblDesignDest: TLabel
-            Left = 49
-            Top = 108
-            Width = 26
-            Height = 15
-            Caption = 'Dest:'
-          end
-          object edtDesignSrc: TEdit
+          object edtDesignBuildId: TEdit
             Left = 81
             Top = 53
-            Width = 370
+            Width = 376
             Height = 23
             CustomHint = BalloonHint1
             Anchors = [akLeft, akTop, akRight]
@@ -654,19 +671,21 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ShowHint = True
             TabOrder = 0
             Text = 'edtSource'
-            OnChange = edtDesignSrcChange
+            OnChange = edtDesignBuildIdChange
+            ExplicitWidth = 370
           end
-          object edtDesignDest: TEdit
+          object edtDesignSrc: TEdit
             Left = 81
             Top = 105
-            Width = 370
+            Width = 376
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
             Text = 'Edit1'
-            OnChange = edtDesignDestChange
+            OnChange = edtDesignSrcChange
+            ExplicitWidth = 370
           end
           object chkDesignInstall: TCheckBox
             Left = 82

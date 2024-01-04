@@ -16,19 +16,19 @@ object DesignForm: TDesignForm
     506
     206)
   TextHeight = 15
-  object lblDesignDest: TLabel
+  object lblDesignSrc: TLabel
     Left = 43
     Top = 88
-    Width = 26
-    Height = 15
-    Caption = 'Dest:'
-  end
-  object lblDesignSrc: TLabel
-    Left = 50
-    Top = 48
     Width = 19
     Height = 15
     Caption = 'Src:'
+  end
+  object lblDesignBuildId: TLabel
+    Left = 26
+    Top = 48
+    Width = 43
+    Height = 15
+    Caption = 'Build Id:'
   end
   object btnCancel: TButton
     Left = 332
@@ -58,7 +58,7 @@ object DesignForm: TDesignForm
     Caption = 'Install In IDE'
     TabOrder = 2
   end
-  object edtDesignDest: TEdit
+  object edtDesignSrc: TEdit
     Left = 75
     Top = 85
     Width = 413
@@ -68,7 +68,7 @@ object DesignForm: TDesignForm
     ShowHint = True
     TabOrder = 3
   end
-  object edtDesignSrc: TEdit
+  object edtDesignBuildId: TEdit
     Left = 75
     Top = 45
     Width = 413

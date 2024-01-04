@@ -28,13 +28,13 @@ type
   [JsonSerialize(jmAllPubProps)]
   TDesign = class(TPersistent)
   private
+    FbuildId: string;
     Fsrc: string;
-    Fdest: string;
     Finstall: Boolean;
   public
     destructor Destroy; override;
+    property buildId: string read FbuildId write FbuildId;
     property src: string read Fsrc write Fsrc;
-    property dest: string read Fdest write Fdest;
     property install: Boolean read Finstall write Finstall;
   end;
 
@@ -76,12 +76,12 @@ type
   [JsonSerialize(jmAllPubProps)]
   TRuntime = class(TPersistent)
   private
+    FBuildId: string;
     Fsrc: string;
-    Fdest: string;
     FcopyLocal: Boolean;
   public
+    property buildId: string read FbuildId write FBuildId;
     property src: string read Fsrc write Fsrc;
-    property dest: string read Fdest write Fdest;
     property copyLocal: Boolean read FcopyLocal write FcopyLocal;
   end;
 

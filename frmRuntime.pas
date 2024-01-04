@@ -20,10 +20,10 @@ type
     btnCancel: TButton;
     btnOk: TButton;
     chkCopyLocal: TCheckBox;
-    lblRuntimeDest: TLabel;
-    edtRuntimeDest: TEdit;
     lblRuntimeSrc: TLabel;
     edtRuntimeSrc: TEdit;
+    lblRuntimeBuildId: TLabel;
+    edtRuntimeBuildId: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
