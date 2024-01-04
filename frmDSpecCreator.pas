@@ -8,6 +8,8 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.JSON,
+  REST.Json,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -151,11 +153,13 @@ type
     lblConfiguration: TLabel;
     chkBuildForDesign: TCheckBox;
     chkDesignOnly: TCheckBox;
+    btnDuplicateTemplate: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnBuildPackagesClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
+    procedure btnDuplicateTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
     procedure cboTemplateChange(Sender: TObject);
     procedure chkBuildForDesignClick(Sender: TObject);
@@ -323,6 +327,32 @@ begin
     raise Exception.Create('Select Template to delete');
   templateName := (tvTemplates.Selected as TTemplateTreeNode).Template.name;
   FOpenFile.DeleteTemplate(templateName);
+  LoadTemplates;
+end;
+
+procedure TDSpecCreatorForm.btnDuplicateTemplateClick(Sender: TObject);
+var
+  newTemplate : TTemplate;
+  newTemplateName : string;
+  sourceTemplate : TTemplate;
+  json : TJSONObject;
+  templates : TArray<TTemplate>;
+begin
+  sourceTemplate := (tvTemplates.Selected as TTemplateTreeNode).Template;
+  json := TJson.ObjectToJsonObject(sourceTemplate);
+  try
+    templates := FOpenFile.structure.templates;
+    SetLength(templates, length(templates) + 1);
+    templates[High(templates)] := TJson.JsonToObject<TTemplate>(json);
+    newTemplateName := templates[High(templates)].name + Random(100).ToString;
+    if not FOpenFile.DoesTemplateExist(newTemplateName) then
+    begin
+      templates[High(templates)].name := newTemplateName;
+      FOpenFile.structure.templates := templates;
+    end;
+  finally
+    FreeAndNil(json);
+  end;
   LoadTemplates;
 end;
 

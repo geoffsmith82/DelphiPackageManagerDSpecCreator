@@ -15,7 +15,7 @@ type
     FFilename : string;
   public
     structure : TDPMSpecFormat;
-    procedure NewTemplate(const templateName: string);
+    function NewTemplate(const templateName: string): TTemplate;
     procedure DeleteTemplate(const templateName: string);
     procedure RenameTemplate(const originalName: string; const newName: string);
     function DoesTemplateExist(const templateName: string): Boolean;
@@ -217,7 +217,7 @@ begin
   end;
 end;
 
-procedure TDSpecFile.NewTemplate(const templateName: string);
+function TDSpecFile.NewTemplate(const templateName: string): TTemplate;
 var
   templates : TArray<TTemplate>;
 begin
@@ -228,6 +228,7 @@ begin
   templates[High(templates)] := TTemplate.Create;
   templates[High(templates)].name := templateName;
   structure.templates := templates;
+  Result := templates[High(templates)];
 end;
 
 function TDSpecFile.NewBuild(const templateName: string; BuildId: string): TBuild;

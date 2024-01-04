@@ -679,6 +679,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
           end
         end
       end
+      object btnDuplicateTemplate: TButton
+        Left = 200
+        Top = 328
+        Width = 122
+        Height = 25
+        Caption = 'Duplicate Template'
+        TabOrder = 4
+        OnClick = btnDuplicateTemplateClick
+      end
     end
     object tsGenerate: TTabSheet
       Caption = 'Generate'
