@@ -54,11 +54,13 @@ type
     Fproject: string;
     Fconfiguration: string;
     FbuildForDesign: Boolean;
+    FdesignOnly: Boolean;
   public
     property id: string read Fid write Fid;
     property project: string read Fproject write Fproject;
     property configuration: string read Fconfiguration write Fconfiguration;
     property buildForDesign: Boolean read FbuildForDesign write FbuildForDesign;
+    property designOnly: Boolean read FdesignOnly write FdesignOnly;
   end;
 
   [JsonSerialize(jmAllPubProps)]

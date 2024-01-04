@@ -447,6 +447,13 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Project:'
           end
+          object lblConfiguration: TLabel
+            Left = 3
+            Top = 106
+            Width = 77
+            Height = 15
+            Caption = 'Configuration:'
+          end
           object edtBuildId: TEdit
             Left = 96
             Top = 45
@@ -468,6 +475,36 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtProjectChange
+          end
+          object edtConfiguration: TEdit
+            Left = 96
+            Top = 103
+            Width = 411
+            Height = 23
+            Anchors = [akLeft, akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 2
+            Text = 'edtConfiguration'
+            OnChange = edtConfigurationChange
+          end
+          object chkBuildForDesign: TCheckBox
+            Left = 96
+            Top = 144
+            Width = 113
+            Height = 17
+            Caption = 'Build For Design'
+            TabOrder = 3
+            OnClick = chkBuildForDesignClick
+          end
+          object chkDesignOnly: TCheckBox
+            Left = 96
+            Top = 167
+            Width = 113
+            Height = 17
+            Caption = 'Design Only'
+            TabOrder = 4
+            OnClick = chkDesignOnlyClick
           end
         end
         object crdRuntime: TCard

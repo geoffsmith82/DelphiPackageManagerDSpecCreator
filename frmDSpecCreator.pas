@@ -45,6 +45,14 @@ type
     function IsSource: Boolean;
     function IsSearchPath: Boolean;
     function IsDependency: Boolean;
+
+    procedure DeleteBuild;
+    procedure DeleteSource;
+    procedure DeleteDesign;
+    procedure DeleteRuntime;
+    procedure DeleteSearchPath;
+    procedure DeleteDependency;
+
   end;
 
   TDSpecCreatorForm = class(TForm)
@@ -139,6 +147,10 @@ type
     Memo1: TMemo;
     edtPackageOutputPath: TEdit;
     Label2: TLabel;
+    edtConfiguration: TEdit;
+    lblConfiguration: TLabel;
+    chkBuildForDesign: TCheckBox;
+    chkDesignOnly: TCheckBox;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
@@ -146,8 +158,10 @@ type
     procedure btnDeleteTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
     procedure cboTemplateChange(Sender: TObject);
+    procedure chkBuildForDesignClick(Sender: TObject);
     procedure chkCopyLocalClick(Sender: TObject);
     procedure chkDesignInstallClick(Sender: TObject);
+    procedure chkDesignOnlyClick(Sender: TObject);
     procedure clbCompilersClick(Sender: TObject);
     procedure clbCompilersClickCheck(Sender: TObject);
     procedure clbPlatformsClickCheck(Sender: TObject);
@@ -155,6 +169,7 @@ type
     procedure DosCommandTerminated(Sender: TObject);
     procedure edtAuthorChange(Sender: TObject);
     procedure edtBuildIdChange(Sender: TObject);
+    procedure edtConfigurationChange(Sender: TObject);
     procedure edtDependencyIdChange(Sender: TObject);
     procedure edtDependencyVersionChange(Sender: TObject);
     procedure edtDesignDestChange(Sender: TObject);
@@ -201,12 +216,6 @@ type
     FOpenFile : TDSpecFile;
     FDosCommand : TDosCommand;
     FTemplate : TTemplate;
-    FMenuSource : TSource;
-    FMenuRuntime : TRuntime;
-    FMenuDesign : TDesign;
-    FMenuDependency : TDependency;
-    FMenuSearchPath: TSearchPath;
-    FMenuBuild: TBuild;
     FSavefilename : string;
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
@@ -348,6 +357,14 @@ begin
   cboTemplate.ItemIndex := cboTemplate.Items.IndexOf(templateName);
 end;
 
+procedure TDSpecCreatorForm.chkBuildForDesignClick(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).build.buildForDesign := chkBuildForDesign.Checked;
+  end;
+end;
+
 procedure TDSpecCreatorForm.chkCopyLocalClick(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
@@ -361,6 +378,14 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).design.install := chkDesignInstall.Checked;
+  end;
+end;
+
+procedure TDSpecCreatorForm.chkDesignOnlyClick(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).build.designOnly := chkDesignOnly.Checked;
   end;
 end;
 
@@ -525,6 +550,14 @@ begin
   begin
     (tvTemplates.Selected as TTemplateTreeNode).build.id := edtBuildId.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtBuildId.Text;
+  end;
+end;
+
+procedure TDSpecCreatorForm.edtConfigurationChange(Sender: TObject);
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).build.configuration := edtConfiguration.Text;
   end;
 end;
 
@@ -1157,131 +1190,40 @@ begin
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteBuildItem(Sender: TObject);
-var
-  build : TArray<TBuild>;
-  buildNew : TArray<TBuild>;
-  i, j: Integer;
 begin
-  build := FTemplate.build;
-  SetLength(buildNew, Length(build) - 1);
-  j := 0;
-  for i := 0 to High(build) do
-  begin
-    if build[i].id <> FMenuBuild.id then
-    begin
-      buildNew[j] := build[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.build := buildNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteBuild;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteDependencyItem(Sender: TObject);
-var
-  dependencies : TArray<TDependency>;
-  dependenciesNew : TArray<TDependency>;
-  i, j: Integer;
 begin
-  dependencies := FTemplate.dependencies;
-  SetLength(dependenciesNew, Length(dependencies) - 1);
-  j := 0;
-  for i := 0 to High(dependencies) do
-  begin
-    if dependencies[i].id <> FMenuDependency.id then
-    begin
-      dependenciesNew[j] := dependencies[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.dependencies := dependenciesNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteDependency;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteDesignItem(Sender: TObject);
-var
-  designs : TArray<TDesign>;
-  designsNew : TArray<TDesign>;
-  i, j: Integer;
 begin
-  designs := FTemplate.design;
-  SetLength(designsNew, Length(designs) - 1);
-  j := 0;
-  for i := 0 to High(designs) do
-  begin
-    if designs[i].src <> FMenuDesign.src then
-    begin
-      designsNew[j] := designs[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.design := designsNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteDesign;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteRuntimeItem(Sender: TObject);
-var
-  runtimes : TArray<TRuntime>;
-  runtimesNew : TArray<TRuntime>;
-  i, j: Integer;
 begin
-  runtimes := FTemplate.runtime;
-  SetLength(runtimesNew, Length(runtimes) - 1);
-  j := 0;
-  for i := 0 to High(runtimes) do
-  begin
-    if runtimes[i].src <> FMenuRuntime.src then
-    begin
-      runtimesNew[j] := runtimes[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.runtime := runtimesNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteRuntime;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteSearchPathItem(Sender: TObject);
-var
-  searchpath : TArray<TSearchPath>;
-  searchpathNew : TArray<TSearchPath>;
-  i, j : Integer;
 begin
-  searchpath := FTemplate.searchPaths;
-  SetLength(searchpathNew, Length(searchpath) - 1);
-  j := 0;
-  for i := 0 to High(searchpath) do
-  begin
-    if searchpath[i].path <> FMenuSearchPath.path then
-    begin
-      searchpathNew[j] := searchpath[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.searchPaths := searchpathNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteSearchPath;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.PopupDeleteSourceItem(Sender: TObject);
-var
-  source : TArray<TSource>;
-  sourceNew : TArray<TSource>;
-  i, j : Integer;
 begin
-  source := FTemplate.source;
-  SetLength(sourceNew, Length(source) - 1);
-  j := 0;
-  for i := 0 to High(source) do
-  begin
-    if source[i].src <> FMenuSource.src then
-    begin
-      sourceNew[j] := source[i];
-      Inc(j);
-    end;
-  end;
-  FTemplate.source := sourceNew;
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteSource;
   LoadTemplates;
 end;
-
 
 procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
@@ -1402,7 +1344,6 @@ begin
       item.Caption := 'Delete Build Item';
       item.OnClick := PopupDeleteBuildItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuBuild := (node as TTemplateTreeNode).build;
     end;
     if node.IsRuntime or ((node.Text='Runtime') and node.IsHeading) then
     begin
@@ -1414,7 +1355,6 @@ begin
       item.Caption := 'Delete Runtime Item';
       item.OnClick := PopupDeleteRuntimeItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuRuntime := (node as TTemplateTreeNode).runtime;
     end;
     if node.IsDesign or ((node.Text='Design') and node.IsHeading) then
     begin
@@ -1426,7 +1366,6 @@ begin
       item.Caption := 'Delete Design Item';
       item.OnClick := PopupDeleteDesignItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuDesign := (node as TTemplateTreeNode).design;
     end;
     if node.IsDependency or ((node.Text='Dependencies') and node.IsHeading) then
     begin
@@ -1438,7 +1377,6 @@ begin
       item.Caption := 'Delete Dependency Item';
       item.OnClick := PopupDeleteDependencyItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuDependency := (node as TTemplateTreeNode).dependency;
     end;
     if node.IsSource or ((node.Text='Source') and node.IsHeading) then
     begin
@@ -1450,7 +1388,6 @@ begin
       item.Caption := 'Delete Source Item';
       item.OnClick := PopupDeleteSourceItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuSource := (node as TTemplateTreeNode).source;
     end;
     if node.IsSearchPath or ((node.Text='SearchPaths') and node.IsHeading) then
     begin
@@ -1462,7 +1399,6 @@ begin
       item.Caption := 'Delete SearchPath Item';
       item.OnClick := PopupDeleteSearchPathItem;
       tvTemplates.PopupMenu.Items.Add(item);
-      FMenuSearchPath := (node as TTemplateTreeNode).searchpath;
     end;
 
     tvTemplates.PopupMenu.Popup(localPos.X, localPos.Y);
@@ -1477,6 +1413,126 @@ begin
 end;
 
 { TTemplateTreeNode }
+
+procedure TTemplateTreeNode.DeleteBuild;
+var
+  lbuild : TArray<TBuild>;
+  buildNew : TArray<TBuild>;
+  i, j: Integer;
+begin
+  lbuild := template.build;
+  SetLength(buildNew, Length(lbuild) - 1);
+  j := 0;
+  for i := 0 to High(lbuild) do
+  begin
+    if lbuild[i].id <> build.id then
+    begin
+      buildNew[j] := lbuild[i];
+      Inc(j);
+    end;
+  end;
+  template.build := buildNew;
+end;
+
+procedure TTemplateTreeNode.DeleteDependency;
+var
+  dependencies : TArray<TDependency>;
+  dependenciesNew : TArray<TDependency>;
+  i, j: Integer;
+begin
+  dependencies := template.dependencies;
+  SetLength(dependenciesNew, Length(dependencies) - 1);
+  j := 0;
+  for i := 0 to High(dependencies) do
+  begin
+    if dependencies[i].id <> dependency.id then
+    begin
+      dependenciesNew[j] := dependencies[i];
+      Inc(j);
+    end;
+  end;
+  template.dependencies := dependenciesNew;
+end;
+
+procedure TTemplateTreeNode.DeleteDesign;
+var
+  designs : TArray<TDesign>;
+  designsNew : TArray<TDesign>;
+  i, j: Integer;
+begin
+  designs := template.design;
+  SetLength(designsNew, Length(designs) - 1);
+  j := 0;
+  for i := 0 to High(designs) do
+  begin
+    if designs[i].src <> design.src then
+    begin
+      designsNew[j] := designs[i];
+      Inc(j);
+    end;
+  end;
+  template.design := designsNew;
+end;
+
+procedure TTemplateTreeNode.DeleteRuntime;
+var
+  runtimes : TArray<TRuntime>;
+  runtimesNew : TArray<TRuntime>;
+  i, j: Integer;
+begin
+  runtimes := template.runtime;
+  SetLength(runtimesNew, Length(runtimes) - 1);
+  j := 0;
+  for i := 0 to High(runtimes) do
+  begin
+    if runtimes[i].src <> runtime.src then
+    begin
+      runtimesNew[j] := runtimes[i];
+      Inc(j);
+    end;
+  end;
+  template.runtime := runtimesNew;
+end;
+
+procedure TTemplateTreeNode.DeleteSearchPath;
+var
+  lsearchpath : TArray<TSearchPath>;
+  searchpathNew : TArray<TSearchPath>;
+  i, j : Integer;
+begin
+  lsearchpath := template.searchPaths;
+  SetLength(searchpathNew, Length(lsearchpath) - 1);
+  j := 0;
+  for i := 0 to High(lsearchpath) do
+  begin
+    if lsearchpath[i].path <> searchpath.path  then
+    begin
+      searchpathNew[j] := lsearchpath[i];
+      Inc(j);
+    end;
+  end;
+  template.searchPaths := searchpathNew;
+end;
+
+procedure TTemplateTreeNode.DeleteSource;
+var
+  lsource : TArray<TSource>;
+  sourceNew : TArray<TSource>;
+  i, j : Integer;
+begin
+  lsource := template.source;
+  SetLength(sourceNew, Length(lsource) - 1);
+  j := 0;
+  for i := 0 to High(lsource) do
+  begin
+    if lsource[i].src <> source.src then
+    begin
+      sourceNew[j] := lsource[i];
+      Inc(j);
+    end;
+  end;
+  template.source := sourceNew;
+end;
 
 function TTemplateTreeNode.IsBuild: Boolean;
 begin
