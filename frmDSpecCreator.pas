@@ -220,6 +220,8 @@ type
     procedure PopupDeleteSearchPathItem(Sender: TObject);
     procedure PopupAddDependencyItem(Sender: TObject);
     procedure PopupDeleteDependencyItem(Sender: TObject);
+    procedure tvTemplatesEdited(Sender: TObject; Node: TTreeNode; var S: string);
+    procedure tvTemplatesEditing(Sender: TObject; Node: TTreeNode; var AllowEdit: Boolean);
   private
     { Private declarations }
     FtmpFilename : string;
@@ -1340,6 +1342,9 @@ begin
         CardPanel.ActiveCard := crdBuild;
         edtBuildId.Text := (Node as TTemplateTreeNode).build.id;
         edtProject.Text := (Node as TTemplateTreeNode).build.project;
+        edtConfiguration.Text := (Node as TTemplateTreeNode).build.configuration;
+        chkBuildForDesign.Checked := (Node as TTemplateTreeNode).build.buildForDesign;
+        chkDesignOnly.Checked := (Node as TTemplateTreeNode).build.DesignOnly;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Design' then
       begin
@@ -1382,6 +1387,13 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     node := tvTemplates.Selected as TTemplateTreeNode;
+    if node.TemplateHeading then
+    begin
+      node.EditText;
+      Handled := True;
+    end;
+
+
     tvTemplates.PopupMenu.Items.Clear;
     node := tvTemplates.GetNodeAt(MousePos.X, MousePos.Y) as TTemplateTreeNode;
 
@@ -1469,6 +1481,17 @@ end;
 procedure TDSpecCreatorForm.tvTemplatesCreateNodeClass(Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
 begin
   NodeClass := TTemplateTreeNode;
+end;
+
+procedure TDSpecCreatorForm.tvTemplatesEdited(Sender: TObject; Node: TTreeNode; var S: string);
+begin
+  FOpenFile.RenameTemplate(Node.Text, s);
+  edtTemplateName.Text := s;
+end;
+
+procedure TDSpecCreatorForm.tvTemplatesEditing(Sender: TObject; Node: TTreeNode; var AllowEdit: Boolean);
+begin
+   AllowEdit := (Node as TTemplateTreenode).TemplateHeading;
 end;
 
 { TTemplateTreeNode }

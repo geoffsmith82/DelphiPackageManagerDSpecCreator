@@ -287,14 +287,14 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Indent = 19
         ParentDoubleBuffered = False
         PopupMenu = PopupMenu
-        ReadOnly = True
         RightClickSelect = True
-        RowSelect = True
         TabOrder = 2
         OnChange = tvTemplatesChange
         OnCollapsing = tvTemplatesCollapsing
         OnContextPopup = tvTemplatesContextPopup
         OnCreateNodeClass = tvTemplatesCreateNodeClass
+        OnEdited = tvTemplatesEdited
+        OnEditing = tvTemplatesEditing
       end
       object CardPanel: TCardPanel
         Left = 328
