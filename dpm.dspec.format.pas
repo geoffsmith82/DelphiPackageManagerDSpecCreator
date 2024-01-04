@@ -52,9 +52,13 @@ type
   private
     Fid: string;
     Fproject: string;
+    Fconfiguration: string;
+    FbuildForDesign: Boolean;
   public
     property id: string read Fid write Fid;
     property project: string read Fproject write Fproject;
+    property configuration: string read Fconfiguration write Fconfiguration;
+    property buildForDesign: Boolean read FbuildForDesign write FbuildForDesign;
   end;
 
   [JsonSerialize(jmAllPubProps)]
@@ -85,6 +89,7 @@ type
     Fid: string;
     Fversion: string;
     Fdescription: string;
+    Fowners: string;
     Fauthors: string;
     FprojectUrl: string;
     FrepositoryUrl: string;
@@ -95,6 +100,7 @@ type
     property id: string read Fid write Fid;
     property version: string read Fversion write Fversion;
     property description: string read Fdescription write Fdescription;
+    property owners: string read Fowners write Fowners;
     property authors: string read Fauthors write Fauthors;
     property projectUrl: string read FprojectUrl write FprojectUrl;
     property repositoryUrl: string read FrepositoryUrl write FrepositoryUrl;
