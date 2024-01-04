@@ -678,6 +678,34 @@ object DSpecCreatorForm: TDSpecCreatorForm
             OnClick = chkDesignInstallClick
           end
         end
+        object crdTemplates: TCard
+          Left = 1
+          Top = 1
+          Width = 530
+          Height = 340
+          Caption = 'crdTemplates'
+          CardIndex = 6
+          TabOrder = 6
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 185
+          ExplicitHeight = 41
+          object lblTemplateName: TLabel
+            Left = 72
+            Top = 40
+            Width = 83
+            Height = 15
+            Caption = 'Template Name'
+          end
+          object edtTemplateName: TEdit
+            Left = 72
+            Top = 61
+            Width = 401
+            Height = 23
+            TabOrder = 0
+            OnChange = edtTemplateNameChange
+          end
+        end
       end
       object btnDuplicateTemplate: TButton
         Left = 200

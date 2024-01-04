@@ -31,7 +31,9 @@ uses
 
 type
   TTemplateTreeNode = class (TTreeNode)
+  private
   public
+    TemplateHeading: Boolean;
     Template: TTemplate;
     build: TBuild;
     design: TDesign;
@@ -154,6 +156,9 @@ type
     chkBuildForDesign: TCheckBox;
     chkDesignOnly: TCheckBox;
     btnDuplicateTemplate: TButton;
+    crdTemplates: TCard;
+    edtTemplateName: TEdit;
+    lblTemplateName: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
@@ -188,6 +193,7 @@ type
     procedure edtSearchPathChange(Sender: TObject);
     procedure edtSourceChange(Sender: TObject);
     procedure edtTagsChange(Sender: TObject);
+    procedure edtTemplateNameChange(Sender: TObject);
     procedure edtVersionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miExitClick(Sender: TObject);
@@ -686,6 +692,7 @@ begin
     node.Template := FOpenFile.structure.templates[i];
     node.ImageIndex := 5;
     node.SelectedIndex := 5;
+    node.TemplateHeading := True;
     nodeSource := tvTemplates.Items.AddChild(node, 'Source') as TTemplateTreeNode;
     nodeSource.Template := FOpenFile.structure.templates[i];
     nodeSource.ImageIndex := 2;
@@ -872,6 +879,23 @@ end;
 procedure TDSpecCreatorForm.edtTagsChange(Sender: TObject);
 begin
   FOpenFile.structure.metadata.tags := edtTags.Text;
+end;
+
+procedure TDSpecCreatorForm.edtTemplateNameChange(Sender: TObject);
+var
+ templateName : string;
+begin
+  if Assigned(tvTemplates.Selected) then
+  begin
+    templateName := (tvTemplates.Selected as TTemplateTreeNode).Template.name;
+    if SameText(templateName, edtTemplateName.Text) then
+      exit;
+
+    (tvTemplates.Selected as TTemplateTreeNode).Template.name := edtTemplateName.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtTemplateName.Text;
+    FOpenFile.RenameTemplate(templateName, edtTemplateName.Text);
+  end;
+  LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.edtVersionChange(Sender: TObject);
@@ -1286,6 +1310,12 @@ begin
   begin
     CardPanel.ActiveCard := crdDependencies;
     CardPanel.Visible := False;
+  end
+  else if ((Node as TTemplateTreenode).TemplateHeading) then
+  begin
+    CardPanel.Visible := True;
+    CardPanel.ActiveCard := crdTemplates;
+    edtTemplateName.Text := (Node as TTemplateTreeNode).Template.name;
   end
   else
   begin
