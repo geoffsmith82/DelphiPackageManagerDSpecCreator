@@ -18,6 +18,7 @@ type
     function NewTemplate(const templateName: string): TTemplate;
     procedure DeleteTemplate(const templateName: string);
     procedure RenameTemplate(const originalName: string; const newName: string);
+    function DuplicateTemplate(const template: TTemplate; const newTemplateName: string): TTemplate;
     function DoesTemplateExist(const templateName: string): Boolean;
     function GetTemplate(const templateName: string): TTemplate;
     function NewSource(const templateName: string; srcPath: string): TSource;
@@ -153,6 +154,30 @@ begin
       Result := True;
       Exit;
     end;
+  end;
+end;
+
+function TDSpecFile.DuplicateTemplate(const template: TTemplate; const newTemplateName: string): TTemplate;
+var
+  sourceTemplate : TTemplate;
+  json : TJSONObject;
+  templates : TArray<TTemplate>;
+begin
+  Result := nil;
+  sourceTemplate := template;
+  json := TJson.ObjectToJsonObject(sourceTemplate);
+  try
+    templates := structure.templates;
+    SetLength(templates, length(templates) + 1);
+    templates[High(templates)] := TJson.JsonToObject<TTemplate>(json);
+    if not DoesTemplateExist(newTemplateName) then
+    begin
+      templates[High(templates)].name := newTemplateName;
+      structure.templates := templates;
+    end;
+    Result := templates[High(templates)];
+  finally
+    FreeAndNil(json);
   end;
 end;
 

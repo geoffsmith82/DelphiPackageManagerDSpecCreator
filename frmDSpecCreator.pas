@@ -8,8 +8,6 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
-  System.JSON,
-  REST.Json,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -342,23 +340,12 @@ procedure TDSpecCreatorForm.btnDuplicateTemplateClick(Sender: TObject);
 var
   newTemplateName : string;
   sourceTemplate : TTemplate;
-  json : TJSONObject;
-  templates : TArray<TTemplate>;
 begin
   sourceTemplate := (tvTemplates.Selected as TTemplateTreeNode).Template;
-  json := TJson.ObjectToJsonObject(sourceTemplate);
-  try
-    templates := FOpenFile.structure.templates;
-    SetLength(templates, length(templates) + 1);
-    templates[High(templates)] := TJson.JsonToObject<TTemplate>(json);
-    newTemplateName := templates[High(templates)].name + Random(100).ToString;
-    if not FOpenFile.DoesTemplateExist(newTemplateName) then
-    begin
-      templates[High(templates)].name := newTemplateName;
-      FOpenFile.structure.templates := templates;
-    end;
-  finally
-    FreeAndNil(json);
+  newTemplateName := sourceTemplate.name + Random(100).ToString;
+  if not FOpenFile.DoesTemplateExist(newTemplateName) then
+  begin
+    FOpenFile.DuplicateTemplate(sourceTemplate, newTemplateName);
   end;
   LoadTemplates;
 end;
