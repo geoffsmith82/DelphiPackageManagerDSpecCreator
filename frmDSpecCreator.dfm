@@ -813,6 +813,18 @@ object DSpecCreatorForm: TDSpecCreatorForm
         end
       end
     end
+    object tsLogging: TTabSheet
+      Caption = 'Logging'
+      ImageIndex = 4
+      object Memo2: TMemo
+        Left = 0
+        Top = 0
+        Width = 863
+        Height = 411
+        Align = alClient
+        TabOrder = 0
+      end
+    end
   end
   object MainMenu: TMainMenu
     Left = 44

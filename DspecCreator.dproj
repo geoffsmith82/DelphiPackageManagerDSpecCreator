@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Application</AppType>
@@ -123,7 +123,7 @@
         <DPMCompiler>12.0</DPMCompiler>
         <DPMCache Condition="'$(DPMCache)' == ''">$(APPDATA)\.dpm\packages</DPMCache>
         <DPM>$(DPMCache)\$(DPMCompiler)\$(Platform)</DPM>
-        <DPMSearch Condition="'$(Platform)'=='Win32'">$(DPM)\VSoft.Uri\0.3.2\lib;$(DPM)\VSoft.SemanticVersion\0.2.5\lib;$(DPM)\VSoft.JsonDataObjects\0.2.1\lib;$(DPM)\VSoft.DOSCommand\2023.8.0\lib;$(DPM)\Spring4D.Extensions\2.0.1\lib;$(DPM)\Spring4D.Core\2.0.1\lib;$(DPM)\Spring4D.Base\2.0.1\lib;</DPMSearch>
+        <DPMSearch Condition="'$(Platform)'=='Win32'">$(DPM)\Gabr42.OmniThreadLibrary\3.7.9\lib;$(DPM)\VSoft.Uri\0.3.2\lib;$(DPM)\VSoft.SemanticVersion\0.2.5\lib;$(DPM)\VSoft.JsonDataObjects\0.2.1\lib;$(DPM)\VSoft.HttpClient\0.11.0-beta.10\lib;$(DPM)\VSoft.DOSCommand\2023.8.0\lib;$(DPM)\VSoft.CancellationToken\0.1.2\lib;$(DPM)\VSoft.Awaitable\0.5.0\lib;$(DPM)\VSoft.AntPatterns\0.1.7\lib;$(DPM)\Spring4D.Extensions\2.0.1\lib;$(DPM)\Spring4D.Core\2.0.1\lib;$(DPM)\Spring4D.Base\2.0.1\lib;</DPMSearch>
         <DPMSearch Condition="'$(Platform)'=='Win64'">$(DPM)\VSoft.Uri\0.3.2\lib;$(DPM)\VSoft.SemanticVersion\0.2.5\lib;$(DPM)\VSoft.JsonDataObjects\0.2.1\lib;$(DPM)\VSoft.DOSCommand\2023.8.0\lib;$(DPM)\Spring4D.Extensions\2.0.1\lib;$(DPM)\Spring4D.Core\2.0.1\lib;$(DPM)\Spring4D.Base\2.0.1\lib;</DPMSearch>
     </PropertyGroup>
     <ItemGroup>
@@ -134,9 +134,6 @@
             <Form>DSpecCreatorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="dpm.dspec.format.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Types.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas"/>
         <DCCReference Include="dspec.filehandler.pas"/>
         <DCCReference Include="dpm.dspec.replacer.pas"/>
         <DCCReference Include="frmTemplates.pas">
@@ -163,21 +160,6 @@
             <Form>OptionsForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.AddInOptionsFrame.pas">
-            <Form>DPMOptionsFrame</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Interfaces.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Logging\DPM.Core.Logging.pas"/>
-        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.Types.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Constants.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.System.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Classes.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Types.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Enum.pas"/>
-        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Config.pas"/>
         <DCCReference Include="frmDependency.pas">
             <Form>DependencyForm</Form>
             <FormType>dfm</FormType>
@@ -186,6 +168,107 @@
             <Form>DesignForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Types.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.TargetPlatform.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Init.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\DPM.Core.Constants.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Cache\DPM.Core.Cache.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Cache\DPM.Core.Cache.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.EnvironmentProvider.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.Factory.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.MSBuild.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Classes.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Configuration\DPM.Core.Configuration.Manager.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Context.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Graph.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Resolution.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Resolver.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Dependency\DPM.Core.Dependency.Version.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Logging\DPM.Core.Logging.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Base.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Cache.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Common.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Config.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Install.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.List.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Pack.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Push.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Restore.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Search.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Sources.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Spec.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.UnInstall.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Dependency.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Installer.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.InstallerContext.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Metadata.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.SearchResults.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.Archive.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.Archive.Reader.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.Archive.Writer.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.IdValidator.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Packaging\DPM.Core.Packaging.Writer.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Project\DPM.Core.Project.Configuration.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Project\DPM.Core.Project.Editor.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Project\DPM.Core.Project.GroupProjReader.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Project\DPM.Core.Project.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Base.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Directory.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Factory.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Http.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Repository\DPM.Core.Repository.Manager.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Manager.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.Types.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.BPLEntry.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.BuildEntry.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Dependency.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.DependencyGroup.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.FileEntry.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.MetaData.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Node.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Reader.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.SearchPath.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.SearchPathGroup.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.TargetPlatform.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Template.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.TemplateBase.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Spec\DPM.Core.Spec.Writer.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Config.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Directory.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Enum.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Numbers.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Path.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Process.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Strings.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.System.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.XML.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Xml\DPM.Core.MSXML.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Xml\DPM.Core.XML.NodeBase.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Icon.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.BOM.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Compiler\DPM.Core.Compiler.ProjectSettings.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Utils\DPM.Core.Utils.Files.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.Installer.Interfaces.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Options\DPM.Core.Options.Info.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Sources\DPM.Core.Sources.ServiceIndex.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.ListItem.pas"/>
+        <DCCReference Include="Libs\DPM\Source\Core\Package\DPM.Core.Package.PackageLatestVersionInfo.pas"/>
+        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.AddInOptionsFrame.pas">
+            <Form>DPMOptionsFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas"/>
+        <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.Types.pas"/>
         <RcItem Include="Libs\DPM\Source\images\add_16px.png">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>ADD_PACKAGE_16</ResourceId>
@@ -302,7 +385,17 @@
             <PackageReference id="Spring4D.Extensions" platform="Win32" version="2.0.1">
                 <PackageReference id="Spring4D.Base" platform="Win32" version="2.0.1" range="2.0.1"/>
             </PackageReference>
+            <PackageReference id="VSoft.AntPatterns" platform="Win32" version="0.1.7"/>
+            <PackageReference id="VSoft.Awaitable" platform="Win32" version="0.5.0">
+                <PackageReference id="Gabr42.OmniThreadLibrary" platform="Win32" version="3.7.9" range="[3.7.9,]"/>
+                <PackageReference id="VSoft.CancellationToken" platform="Win32" version="0.1.2" range="0.1.2"/>
+            </PackageReference>
+            <PackageReference id="VSoft.CancellationToken" platform="Win32" version="0.1.2"/>
             <PackageReference id="VSoft.DOSCommand" platform="Win32" version="2023.8.0"/>
+            <PackageReference id="VSoft.HttpClient" platform="Win32" version="0.11.0-beta.10">
+                <PackageReference id="VSoft.CancellationToken" platform="Win32" version="0.1.2" range="0.1.2"/>
+                <PackageReference id="VSoft.Uri" platform="Win32" version="0.3.2" range="0.3.2"/>
+            </PackageReference>
             <PackageReference id="VSoft.JsonDataObjects" platform="Win32" version="0.2.1"/>
             <PackageReference id="VSoft.SemanticVersion" platform="Win32" version="0.2.5"/>
             <PackageReference id="VSoft.Uri" platform="Win32" version="0.3.2"/>

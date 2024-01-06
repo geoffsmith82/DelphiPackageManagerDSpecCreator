@@ -4,6 +4,10 @@ interface
 
 uses
   System.JSON,
+  DPM.Core.Logging,
+  DPM.Core.Spec.Interfaces,
+  DPM.Core.Spec.Reader,
+  DPM.Core.Spec.Writer,
   dpm.dspec.format
   ;
 
@@ -12,30 +16,33 @@ type
   TDSpecFile = class
   private
     FLoaded : TDPMSpecFormat;
+    FLogger: ILogger;
+    FReader: IPackageSpecReader;
     FFilename : string;
-  public
     structure : TDPMSpecFormat;
-    function NewTemplate(const templateName: string): TTemplate;
+  public
+    spec : IPackageSpec;
+    function NewTemplate(const templateName: string): ISpecTemplate;
     procedure DeleteTemplate(const templateName: string);
     procedure RenameTemplate(const originalName: string; const newName: string);
-    function DuplicateTemplate(const template: TTemplate; const newTemplateName: string): TTemplate;
+    function DuplicateTemplate(const sourceTemplate: ISpecTemplate; const newTemplateName: string): ISpecTemplate;
     function DoesTemplateExist(const templateName: string): Boolean;
-    function GetTemplate(const templateName: string): TTemplate;
-    function NewSource(const templateName: string; srcPath: string): TSource;
-    function NewBuild(const templateName: string; BuildId: string): TBuild;
-    function NewDesign(const templateName, designSrc: string): TDesign;
-    function NewDependency(const templateName: string; DependencyId: string): TDependency;
-    function NewRuntime(const templateName: string; const runtimeBuildId: string): TRuntime;
-    function NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
-    function GetPlatform(const compiler: string): TTargetPlatform;
-    function AddCompiler(const compiler: string): TTargetPlatform;
+    function GetTemplate(const templateName: string): ISpecTemplate;
+    function NewSource(const templateName: string; srcPath: string): ISpecFileEntry;
+    function NewBuild(const templateName: string; BuildId: string): ISpecBuildEntry;
+    function NewDesign(const templateName, designSrc: string): ISpecBPLEntry;
+    function NewDependency(const templateName: string; DependencyId: string): ISpecDependency;
+    function NewRuntime(const templateName: string; const runtimeBuildId: string): ISpecBPLEntry;
+    function NewSearchPath(const templateName: string; const SearchPathId: string): ISpecSearchPath;
+    function GetPlatform(const compiler: string): ISpecTargetPlatform;
+    function AddCompiler(const compiler: string): ISpecTargetPlatform;
     procedure DeleteCompiler(const compiler: string);
     procedure LoadFromFile(const filename: string);
     procedure SaveToFile(const filename: string);
     function WorkingDir: string;
     function IsModified: Boolean;
     function AsString: string;
-    constructor Create;
+    constructor Create(logger: ILogger);
     destructor Destroy; override;
   end;
 
@@ -47,23 +54,33 @@ uses
   System.Classes,
   System.SysUtils,
   System.JSON.Writers,
-  REST.Json
+  REST.Json,
+  DPM.Core.Spec,
+  DPM.Core.Spec.Template,
+  DPM.Core.Spec.TargetPlatform,
+  DPM.Core.Types
   ;
 
 { TDSpecFile }
 
-function TDSpecFile.AddCompiler(const compiler: string): TTargetPlatform;
+function TDSpecFile.AddCompiler(const compiler: string): ISpecTargetPlatform;
 var
-  platforms : TArray<TTargetPlatform>;
+//  platforms : TArray<TTargetPlatform>;
+  vplatform : ISpecTargetPlatform;
 begin
   if Assigned(GetPlatform(compiler)) then
     raise Exception.Create('Platform already exists in file');
-  platforms := structure.targetPlatforms;
-  SetLength(platforms, Length(platforms) + 1);
-  platforms[High(platforms)] := TTargetPlatform.Create;
-  platforms[High(platforms)].compiler := compiler;
-  structure.targetPlatforms := platforms;
-  Result := platforms[High(platforms)];
+//  platforms := structure.targetPlatforms;
+//  SetLength(platforms, Length(platforms) + 1);
+//  platforms[High(platforms)] := TTargetPlatform.Create;
+//  platforms[High(platforms)].compiler := compiler;
+//  structure.targetPlatforms := platforms;
+//  Result := platforms[High(platforms)];
+
+  vplatform := TSpecTargetPlatform.Create(FLogger);
+  vplatform.Compiler := StringToCompilerVersion(compiler);
+
+  spec.TargetPlatforms.Add(vplatform);
 end;
 
 function TDSpecFile.AsString: string;
@@ -78,10 +95,12 @@ begin
   end;
 end;
 
-constructor TDSpecFile.Create;
+constructor TDSpecFile.Create(logger: ILogger);
 begin
   structure := TDPMSpecFormat.Create;
   FLoaded := TDPMSpecFormat.Create;
+  FLogger := logger;
+  spec := TSpec.Create(FLogger, '');
 end;
 
 procedure TDSpecFile.DeleteTemplate(const templateName: string);
@@ -112,6 +131,8 @@ begin
   end;
 
   structure.templates := templateNew;
+
+  spec.DeleteTemplate(templateName);
 end;
 
 procedure TDSpecFile.DeleteCompiler(const compiler: string);
@@ -157,14 +178,14 @@ begin
   end;
 end;
 
-function TDSpecFile.DuplicateTemplate(const template: TTemplate; const newTemplateName: string): TTemplate;
+function TDSpecFile.DuplicateTemplate(const sourceTemplate: ISpecTemplate; const newTemplateName: string): ISpecTemplate;
 var
-  sourceTemplate : TTemplate;
   json : TJSONObject;
-  templates : TArray<TTemplate>;
 begin
+  { TODO : Complete this method }
+
+{  sourceTemplate
   Result := nil;
-  sourceTemplate := template;
   json := TJson.ObjectToJsonObject(sourceTemplate);
   try
     templates := structure.templates;
@@ -178,44 +199,21 @@ begin
     Result := templates[High(templates)];
   finally
     FreeAndNil(json);
-  end;
+  end; }
 end;
 
-function TDSpecFile.GetTemplate(const templateName: string): TTemplate;
+function TDSpecFile.GetTemplate(const templateName: string): ISpecTemplate;
 var
   i : Integer;
 begin
   Result := nil;
-  for i := 0 to High(structure.templates) do
+  for i := 0 to spec.templates.Count - 1 do
   begin
-    if structure.templates[i].name = templateName then
+    if spec.templates[i].name = templateName then
     begin
-      Result := structure.templates[i];
+      Result := spec.templates[i];
       Exit;
     end;
-  end;
-end;
-
-function TDSpecFile.IsModified: Boolean;
-begin
-  Result := TJSON.ObjectToJsonObject(structure).Format <> TJson.ObjectToJsonObject(FLoaded).Format;
-end;
-
-procedure TDSpecFile.LoadFromFile(const filename: string);
-var
-  json : TJSONObject;
-begin
-  json := TJSONObject.ParseJSONValue(TFile.ReadAllText(Filename)) as TJSONObject;
-  if not Assigned(json) then
-  begin
-    raise Exception.Create('Failed to load ' + filename);
-  end;
-  try
-    structure := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
-    FLoaded := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
-    FFilename := Filename;
-  finally
-    FreeAndNil(json);
   end;
 end;
 
@@ -240,27 +238,23 @@ begin
       structure.targetPlatforms[i].template := newName;
     end;
   end;
+
+//
+  spec.RenameTemplate(originalName, newName);
 end;
 
-function TDSpecFile.NewTemplate(const templateName: string): TTemplate;
-var
-  templates : TArray<TTemplate>;
+function TDSpecFile.NewTemplate(const templateName: string): ISpecTemplate;
 begin
   Result := nil;
   if templateName.IsEmpty then
     Exit;
-  templates := structure.templates;
-  SetLength(templates, length(templates) + 1);
-  templates[High(templates)] := TTemplate.Create;
-  templates[High(templates)].name := templateName;
-  structure.templates := templates;
-  Result := templates[High(templates)];
+
+  Result := spec.NewTemplate(templateName);
 end;
 
-function TDSpecFile.NewBuild(const templateName: string; BuildId: string): TBuild;
+function TDSpecFile.NewBuild(const templateName: string; BuildId: string): ISpecBuildEntry;
 var
-  builds : TArray<TBuild>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if BuildId.IsEmpty then
@@ -270,18 +264,12 @@ begin
 
   template := GetTemplate(templateName);
 
-  builds := template.build;
-  SetLength(builds, length(builds) + 1);
-  builds[High(builds)] := TBuild.Create;
-  builds[High(builds)].id := BuildId;
-  Result := builds[High(builds)];
-  template.build := builds;
+  Result := template.NewBuildEntryById(BuildId);
 end;
 
-function TDSpecFile.NewDependency(const templateName: string; DependencyId: string): TDependency;
+function TDSpecFile.NewDependency(const templateName: string; DependencyId: string): ISpecDependency;
 var
-  dependencies : TArray<TDependency>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if DependencyId.IsEmpty then
@@ -290,19 +278,12 @@ begin
     raise Exception.Create('Template does not exist');
 
   template := GetTemplate(templateName);
-
-  dependencies := template.dependencies;
-  SetLength(dependencies, length(dependencies) + 1);
-  dependencies[High(dependencies)] := TDependency.Create;
-  dependencies[High(dependencies)].id := DependencyId;
-  Result := dependencies[High(dependencies)];
-  template.dependencies := dependencies;
+  Result := template.NewDependencyById(DependencyId);
 end;
 
-function TDSpecFile.NewRuntime(const templateName: string; const runtimeBuildId: string): TRuntime;
+function TDSpecFile.NewRuntime(const templateName: string; const runtimeBuildId: string): ISpecBPLEntry;
 var
-  runtime : TArray<TRuntime>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if runtimeBuildId.IsEmpty then
@@ -311,19 +292,12 @@ begin
     raise Exception.Create('Template does not exist');
 
   template := GetTemplate(templateName);
-
-  runtime := template.runtime;
-  SetLength(runtime, length(runtime) + 1);
-  runtime[High(runtime)] := TRuntime.Create;
-  runtime[High(runtime)].buildId := runtimeBuildId;
-  Result := runtime[High(runtime)];
-  template.runtime := runtime;
+  Result := template.NewRuntimeBplBySrc(runtimeBuildId);
 end;
 
-function TDSpecFile.NewDesign(const templateName: string; const designSrc: string): TDesign;
+function TDSpecFile.NewDesign(const templateName: string; const designSrc: string): ISpecBPLEntry;
 var
-  design : TArray<TDesign>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if designSrc.IsEmpty then
@@ -333,18 +307,12 @@ begin
 
   template := GetTemplate(templateName);
 
-  design := template.design;
-  SetLength(design, length(design) + 1);
-  design[High(design)] := TDesign.Create;
-  design[High(design)].src := designSrc;
-  Result := design[High(design)];
-  template.design := design;
+  Result := template.NewDesignBplBySrc(designSrc);
 end;
 
-function TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string): TSearchPath;
+function TDSpecFile.NewSearchPath(const templateName: string; const SearchPathId: string): ISpecSearchPath;
 var
-  searchPaths : TArray<TSearchPath>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if SearchPathId.IsEmpty then
@@ -354,18 +322,12 @@ begin
 
   template := GetTemplate(templateName);
 
-  searchPaths := template.searchPaths;
-  SetLength(searchPaths, length(searchPaths) + 1);
-  searchPaths[High(searchPaths)] := TSearchPath.Create;
-  searchPaths[High(searchPaths)].path := SearchPathId;
-  Result := searchPaths[High(searchPaths)];
-  template.searchPaths := searchPaths;
+  Result := template.NewSearchPath(SearchPathId);
 end;
 
-function TDSpecFile.NewSource(const templateName: string; srcPath: string): TSource;
+function TDSpecFile.NewSource(const templateName: string; srcPath: string): ISpecFileEntry;
 var
-  sources : TArray<TSource>;
-  template : TTemplate;
+  template : ISpecTemplate;
 begin
   Result := nil;
   if srcPath.IsEmpty then
@@ -375,36 +337,62 @@ begin
 
   template := GetTemplate(templateName);
 
-  sources := template.source;
-  SetLength(sources, length(sources) + 1);
-  sources[High(sources)] := TSource.Create;
-  sources[High(sources)].src := srcPath;
-  Result := sources[High(sources)];
-  template.source := sources;
+  Result := template.NewSource(srcPath);
 end;
 
-function TDSpecFile.GetPlatform(const compiler: string): TTargetPlatform;
+function TDSpecFile.GetPlatform(const compiler: string): ISpecTargetPlatform;
 var
   i: Integer;
 begin
   Result := nil;
-  for i := 0 to length(structure.targetPlatforms) - 1 do
+  for i := 0 to spec.targetPlatforms.Count - 1 do
   begin
-    if structure.targetPlatforms[i].compiler = compiler then
+    if spec.targetPlatforms[i].compiler = StringToCompilerVersion(compiler) then
     begin
-      Result := structure.targetPlatforms[i];
+      Result := spec.targetPlatforms[i];
       Exit;
     end;
+  end;
+end;
+
+function TDSpecFile.IsModified: Boolean;
+begin
+  Result := TJSON.ObjectToJsonObject(structure).Format <> TJson.ObjectToJsonObject(FLoaded).Format;
+end;
+
+procedure TDSpecFile.LoadFromFile(const filename: string);
+var
+  json : TJSONObject;
+begin
+  FReader := TPackageSpecReader.Create(FLogger);
+  spec := FReader.ReadSpec(filename);
+  //spec.MetaData.
+  json := TJSONObject.ParseJSONValue(TFile.ReadAllText(Filename)) as TJSONObject;
+  try
+    if not Assigned(json) then
+    begin
+      raise Exception.Create('Failed to load ' + filename);
+    end;
+
+//    structure := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
+//    FLoaded := TJson.JsonToObject<TDPMSpecFormat>(json as TJSONObject);
+    FFilename := Filename;
+  finally
+    FreeAndNil(json);
   end;
 end;
 
 procedure TDSpecFile.SaveToFile(const filename: string);
 var
   json : TJSONObject;
+  writer : TPackageSpecWriter;
 begin
+  writer := TPackageSpecWriter.Create(FLogger, spec);
+  writer.SaveToFile(filename);
+
   json := TJson.ObjectToJsonObject(structure);
   try
-    TFile.WriteAllText(Filename, json.Format);
+//    TFile.WriteAllText(Filename, json.Format);
     LoadFromFile(filename);
   finally
     FreeAndNil(json);
