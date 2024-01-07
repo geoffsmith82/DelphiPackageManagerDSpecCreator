@@ -57,19 +57,27 @@ type
     design: ISpecBPLEntry;
     runtime: ISpecBPLEntry;
     source: ISpecFileEntry;
+    fileEntry: ISpecFileEntry;
+    libEntry: ISpecFileEntry;
     searchpath: ISpecSearchPath;
     dependency: ISpecDependency;
+
+    function CommonFileEntry: ISpecFileEntry;
 
     function IsHeading: Boolean;
     function IsBuild: Boolean;
     function IsDesign: Boolean;
     function IsRuntime: Boolean;
     function IsSource: Boolean;
+    function IsFileEntry: Boolean;
+    function IsLibEntry: Boolean;
     function IsSearchPath: Boolean;
     function IsDependency: Boolean;
 
     procedure DeleteBuild;
     procedure DeleteSource;
+    procedure DeleteFileEntry;
+    procedure DeleteLibEntry;
     procedure DeleteDesign;
     procedure DeleteRuntime;
     procedure DeleteSearchPath;
@@ -237,6 +245,10 @@ type
     procedure PopupDeleteDesignItem(Sender: TObject);
     procedure PopupAddSourceItem(Sender: TObject);
     procedure PopupDeleteSourceItem(Sender: TObject);
+    procedure PopupAddFileItem(Sender: TObject);
+    procedure PopupDeleteFileItem(Sender: TObject);
+    procedure PopupAddLibItem(Sender: TObject);
+    procedure PopupDeleteLibItem(Sender: TObject);
     procedure PopupAddSearchPathItem(Sender: TObject);
     procedure PopupDeleteSearchPathItem(Sender: TObject);
     procedure PopupAddDependencyItem(Sender: TObject);
@@ -288,28 +300,38 @@ procedure TDSpecCreatorForm.btnDeleteExcludeClick(Sender: TObject);
 var
   exclude : string;
   itemToDelete: Integer;
+  entry: ISpecFileEntry;
 begin
   if lbExclude.ItemIndex < 0 then
     Exit;
 
   if Assigned(tvTemplates.Selected) then
   begin
+    entry := (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry;
+    if not Assigned(entry) then
+      Exit;
+
     exclude := lbExclude.Items[lbExclude.ItemIndex];
     lbExclude.DeleteSelected;
-    itemToDelete := (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.IndexOf(exclude);
-    (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.Delete(itemToDelete);
+    itemToDelete := entry.Exclude.IndexOf(exclude);
+    entry.Exclude.Delete(itemToDelete);
   end;
 end;
 
 procedure TDSpecCreatorForm.btnAddExcludeClick(Sender: TObject);
 var
   src : string;
+  entry: ISpecFileEntry;
 begin
   Src := InputBox('Add Exclude','Exclude to Add','');
 
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.Add(src);
+    entry := (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry;
+    if not Assigned(entry) then
+      Exit;
+
+    entry.Exclude.Add(src);
     lbExclude.Items.Add(src);
   end;
 end;
@@ -348,6 +370,7 @@ begin
     FDosCommand.CommandLine := 'dpm pack ' + FtmpFilename + ' -o=' + edtPackageOutputPath.Text;
   FDosCommand.Execute;
 end;
+
 
 procedure TDSpecCreatorForm.DosCommandNewLine(ASender: TObject; const ANewLine: string; AOutputType: TOutputType);
 begin
@@ -692,7 +715,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).source.Destination := edtDest.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry.Destination := edtDest.Text;
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -710,6 +733,8 @@ procedure TDSpecCreatorForm.LoadTemplates;
 var
   node: TTemplateTreeNode;
   nodeSource: TTemplateTreeNode;
+  nodeFile: TTemplateTreeNode;
+  nodeLib: TTemplateTreeNode;
   nodeSearchPath: TTemplateTreeNode;
   nodeBuild: TTemplateTreeNode;
   nodeRuntime: TTemplateTreeNode;
@@ -719,6 +744,8 @@ var
   runtimeNode: TTemplateTreeNode;
   designNode: TTemplateTreeNode;
   sourceNode: TTemplateTreeNode;
+  fileNode: TTemplateTreeNode;
+  libNode: TTemplateTreeNode;
   searchPathNode: TTemplateTreeNode;
   dependencyNode: TTemplateTreeNode;
   i, j : Integer;
@@ -745,6 +772,34 @@ begin
       sourceNode.ImageIndex := 2;
       sourceNode.SelectedIndex := 2;
     end;
+
+    nodeFile := tvTemplates.Items.AddChild(node, 'Files') as TTemplateTreeNode;
+    nodeFile.Template := FOpenFile.spec.templates[i];
+    nodeFile.ImageIndex := 2;
+    nodeFile.SelectedIndex := 2;
+    for j := 0 to FOpenFile.spec.templates[i].Files.Count - 1 do
+    begin
+      fileNode := tvTemplates.Items.AddChild(nodeFile, FOpenFile.spec.templates[i].Files[j].Source) as TTemplateTreeNode;
+      fileNode.fileEntry := FOpenFile.spec.templates[i].Files[j];
+      fileNode.Template := FOpenFile.spec.templates[i];
+      fileNode.ImageIndex := 2;
+      fileNode.SelectedIndex := 2;
+    end;
+
+    nodeLib := tvTemplates.Items.AddChild(node, 'Lib') as TTemplateTreeNode;
+    nodeLib.Template := FOpenFile.spec.templates[i];
+    nodeLib.ImageIndex := 2;
+    nodeLib.SelectedIndex := 2;
+    for j := 0 to FOpenFile.spec.templates[i].LibFiles.Count - 1 do
+    begin
+      libNode := tvTemplates.Items.AddChild(nodeLib, FOpenFile.spec.templates[i].LibFiles[j].Source) as TTemplateTreeNode;
+      libNode.libEntry := FOpenFile.spec.templates[i].LibFiles[j];
+      libNode.Template := FOpenFile.spec.templates[i];
+      libNode.ImageIndex := 2;
+      libNode.SelectedIndex := 2;
+    end;
+
+
     nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths') as TTemplateTreeNode;
     nodeSearchPath.Template := FOpenFile.spec.templates[i];
     nodeSearchPath.ImageIndex := 3;
@@ -900,7 +955,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).source.Source := edtSource.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry.Source := edtSource.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtSource.Text;
 
 
@@ -1286,6 +1341,55 @@ begin
   LoadTemplates;
 end;
 
+
+procedure TDSpecCreatorForm.PopupAddFileItem(Sender: TObject);
+var
+  SourceSrc : string;
+  FileForm: TSourceForm;
+  FileEntry : ISpecFileEntry;
+begin
+  FileForm := TSourceForm.Create(nil);
+  try
+      FileForm.edtSource.Text := 'default';
+
+    if FileForm.ShowModal =  mrCancel then
+      Exit;
+    SourceSrc := FileForm.edtSource.Text;
+    if SourceSrc.IsEmpty then
+      Exit;
+    FileEntry := FOpenFile.NewFile(FTemplate.name, SourceSrc);
+    FileEntry.flatten := FileForm.chkFlatten.Checked;
+    FileEntry.Destination := FileForm.edtDest.Text;
+  finally
+    FreeAndNil(FileForm);
+  end;
+  LoadTemplates;
+end;
+
+procedure TDSpecCreatorForm.PopupAddLibItem(Sender: TObject);
+var
+  SourceSrc : string;
+  LibForm: TSourceForm;
+  LibEntry : ISpecFileEntry;
+begin
+  LibForm := TSourceForm.Create(nil);
+  try
+      LibForm.edtSource.Text := 'default';
+
+    if LibForm.ShowModal =  mrCancel then
+      Exit;
+    SourceSrc := LibForm.edtSource.Text;
+    if SourceSrc.IsEmpty then
+      Exit;
+    LibEntry := FOpenFile.NewLib(FTemplate.name, SourceSrc);
+    LibEntry.flatten := LibForm.chkFlatten.Checked;
+    LibEntry.Destination := LibForm.edtDest.Text;
+  finally
+    FreeAndNil(LibForm);
+  end;
+  LoadTemplates;
+end;
+
 procedure TDSpecCreatorForm.PopupDeleteBuildItem(Sender: TObject);
 begin
   (tvTemplates.Selected as TTemplateTreeNode).DeleteBuild;
@@ -1322,6 +1426,18 @@ begin
   LoadTemplates;
 end;
 
+procedure TDSpecCreatorForm.PopupDeleteFileItem(Sender: TObject);
+begin
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteFileEntry;
+  LoadTemplates;
+end;
+
+procedure TDSpecCreatorForm.PopupDeleteLibItem(Sender: TObject);
+begin
+  (tvTemplates.Selected as TTemplateTreeNode).DeleteLibEntry;
+  LoadTemplates;
+end;
+
 procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 begin
   if (node.Text = 'SearchPaths') and ((Node as TTemplateTreenode).IsHeading) then
@@ -1330,6 +1446,16 @@ begin
     CardPanel.Visible := False;
   end
   else if (node.Text = 'Source') and ((Node as TTemplateTreenode).IsHeading) then
+  begin
+    CardPanel.ActiveCard := crdSource;
+    CardPanel.Visible := False;
+  end
+  else if (node.Text = 'Files') and ((Node as TTemplateTreenode).IsHeading) then
+  begin
+    CardPanel.ActiveCard := crdSource;
+    CardPanel.Visible := False;
+  end
+  else if (node.Text = 'Lib') and ((Node as TTemplateTreenode).IsHeading) then
   begin
     CardPanel.ActiveCard := crdSource;
     CardPanel.Visible := False;
@@ -1381,6 +1507,32 @@ begin
         for var j := 0 to (Node as TTemplateTreeNode).source.Exclude.Count - 1 do
         begin
           lbExclude.Items.Add((Node as TTemplateTreeNode).source.Exclude[j]);
+        end;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Files' then
+      begin
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdSource;
+        edtSource.Text := (Node as TTemplateTreeNode).fileEntry.Source;
+        chkFlatten.Checked := (Node as TTemplateTreeNode).fileEntry.flatten;
+        edtDest.Text := (Node as TTemplateTreeNode).fileEntry.Destination;
+        lbExclude.Clear;
+        for var j := 0 to (Node as TTemplateTreeNode).fileEntry.Exclude.Count - 1 do
+        begin
+          lbExclude.Items.Add((Node as TTemplateTreeNode).fileEntry.Exclude[j]);
+        end;
+      end;
+      if (Node.Parent as TTemplateTreeNode).Text = 'Lib' then
+      begin
+        CardPanel.Visible := True;
+        CardPanel.ActiveCard := crdSource;
+        edtSource.Text := (Node as TTemplateTreeNode).libEntry.Source;
+        chkFlatten.Checked := (Node as TTemplateTreeNode).libEntry.flatten;
+        edtDest.Text := (Node as TTemplateTreeNode).libEntry.Destination;
+        lbExclude.Clear;
+        for var j := 0 to (Node as TTemplateTreeNode).libEntry.Exclude.Count - 1 do
+        begin
+          lbExclude.Items.Add((Node as TTemplateTreeNode).libEntry.Exclude[j]);
         end;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Build' then
@@ -1510,6 +1662,28 @@ begin
       item.OnClick := PopupDeleteSourceItem;
       tvTemplates.PopupMenu.Items.Add(item);
     end;
+    if node.IsFileEntry or ((node.Text='Files') and node.IsHeading) then
+    begin
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Add File Item';
+      item.OnClick := PopupAddFileItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Delete File Item';
+      item.OnClick := PopupDeleteFileItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+    end;
+    if node.IsFileEntry or ((node.Text='Lib') and node.IsHeading) then
+    begin
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Add Library Item';
+      item.OnClick := PopupAddLibItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+      item := TMenuItem.Create(PopupMenu);
+      item.Caption := 'Delete Library Item';
+      item.OnClick := PopupDeleteLibItem;
+      tvTemplates.PopupMenu.Items.Add(item);
+    end;
     if node.IsSearchPath or ((node.Text='SearchPaths') and node.IsHeading) then
     begin
       item := TMenuItem.Create(PopupMenu);
@@ -1546,6 +1720,19 @@ end;
 
 { TTemplateTreeNode }
 
+function TTemplateTreeNode.CommonFileEntry: ISpecFileEntry;
+begin
+  if IsSource then
+    Result := source
+  else if IsFileEntry then
+    Result := fileEntry
+  else if IsLibEntry then
+    Result := libEntry
+  else
+    Result := nil;
+
+end;
+
 procedure TTemplateTreeNode.DeleteBuild;
 begin
   Template.DeleteBuildEntryById(Build.Id);
@@ -1559,6 +1746,16 @@ end;
 procedure TTemplateTreeNode.DeleteDesign;
 begin
   Template.DeleteDesignBplBySrc(design.Source);
+end;
+
+procedure TTemplateTreeNode.DeleteFileEntry;
+begin
+  Template.DeleteFiles(fileEntry.Source);
+end;
+
+procedure TTemplateTreeNode.DeleteLibEntry;
+begin
+  Template.DeleteLib(LibEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteRuntime;
@@ -1591,9 +1788,19 @@ begin
   Result := (design <> nil);
 end;
 
+function TTemplateTreeNode.IsFileEntry: Boolean;
+begin
+  Result := (fileEntry <> nil);
+end;
+
 function TTemplateTreeNode.IsHeading: Boolean;
 begin
   Result := (build = nil) and (runtime = nil) and (source = nil) and (searchpath = nil);
+end;
+
+function TTemplateTreeNode.IsLibEntry: Boolean;
+begin
+  Result := (libEntry <> nil);
 end;
 
 function TTemplateTreeNode.IsRuntime: Boolean;

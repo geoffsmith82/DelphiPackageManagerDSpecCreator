@@ -27,6 +27,8 @@ type
     function DoesTemplateExist(const templateName: string): Boolean;
     function GetTemplate(const templateName: string): ISpecTemplate;
     function NewSource(const templateName: string; srcPath: string): ISpecFileEntry;
+    function NewFile(const templateName: string; srcPath: string): ISpecFileEntry;
+    function NewLib(const templateName: string; srcPath: string): ISpecFileEntry;
     function NewBuild(const templateName: string; BuildId: string): ISpecBuildEntry;
     function NewDesign(const templateName, designSrc: string): ISpecBPLEntry;
     function NewDependency(const templateName: string; DependencyId: string): ISpecDependency;
@@ -238,6 +240,36 @@ begin
   template := GetTemplate(templateName);
 
   Result := template.NewSource(srcPath);
+end;
+
+function TDSpecFile.NewFile(const templateName: string; srcPath: string): ISpecFileEntry;
+var
+  template : ISpecTemplate;
+begin
+  Result := nil;
+  if srcPath.IsEmpty then
+    Exit;
+  if not DoesTemplateExist(templateName) then
+    raise Exception.Create('Template does not exist');
+
+  template := GetTemplate(templateName);
+
+  Result := template.NewFiles(srcPath);
+end;
+
+function TDSpecFile.NewLib(const templateName: string; srcPath: string): ISpecFileEntry;
+var
+  template : ISpecTemplate;
+begin
+  Result := nil;
+  if srcPath.IsEmpty then
+    Exit;
+  if not DoesTemplateExist(templateName) then
+    raise Exception.Create('Template does not exist');
+
+  template := GetTemplate(templateName);
+
+  Result := template.NewLib(srcPath);
 end;
 
 function TDSpecFile.GetPlatform(const compiler: string): ISpecTargetPlatform;
