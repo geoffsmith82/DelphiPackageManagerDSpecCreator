@@ -475,51 +475,50 @@ begin
     cboTemplate.ItemIndex := -1;
     Exit;
   end;
-{ TODO : Complete this method }
-{
-  if vplatform.platforms.Contains('Win32') then
+
+  if vplatform.PlatformContains('Win32') then
   begin
     j := clbPlatforms.Items.IndexOf('Win32');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('Win64') then
+  if vplatform.PlatformContains('Win64') then
   begin
     j := clbPlatforms.Items.IndexOf('Win64');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('Android32') then
+  if vplatform.PlatformContains('Android32') then
   begin
     j := clbPlatforms.Items.IndexOf('Android');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('Android') then
+  if vplatform.PlatformContains('Android') then
   begin
     j := clbPlatforms.Items.IndexOf('Android');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('Android64') then
+  if vplatform.PlatformContains('Android64') then
   begin
     j := clbPlatforms.Items.IndexOf('Android64');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('iOS64') then
+  if vplatform.PlatformContains('iOS64') then
   begin
     j := clbPlatforms.Items.IndexOf('iOS64');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
-  if vplatform.platforms.Contains('OSX64') then
+  if vplatform.PlatformContains('OSX64') then
   begin
     j := clbPlatforms.Items.IndexOf('OSX64');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
   end;
- }
+
   cboTemplate.Clear;
   LoadTemplates;
 
@@ -551,8 +550,9 @@ var
   compiler : string;
   platformString : string;
   dpmPlatform: TDPMPlatform;
-  i: Integer;
-  platformsString : string;
+  i, j: Integer;
+  platformCount: Integer;
+  newPlatforms: TArray<TDPMPlatform>;
 begin
   if clbCompilers.ItemIndex < 0 then
   begin
@@ -561,11 +561,25 @@ begin
   if clbPlatforms.ItemIndex < 0 then
     Exit;
 
-{ TODO : Complete this method }
-{
   compiler := clbCompilers.Items[clbCompilers.ItemIndex];
   vPlatform := FOpenfile.GetPlatform(compiler);
-  platformsString := '';
+  platformCount := 0;
+  for i := 0 to clbPlatforms.Count - 1 do
+  begin
+    if clbPlatforms.Checked[i] then
+    begin
+      platformString := clbPlatforms.Items[i];
+      if platformString = 'Linux' then
+        platformString := 'Linux64';
+      dpmPlatform := StringToDPMPlatform(platformString);
+      if dpmPlatform = TDPMPlatform.UnknownPlatform then
+        continue;
+      Inc(platformCount);
+    end;
+  end;
+
+  SetLength(newPlatforms, platformCount);
+  j := 0;
   for i := 0 to clbPlatforms.Count - 1 do
   begin
     if not clbPlatforms.Checked[i] then
@@ -577,17 +591,11 @@ begin
 
     if dpmPlatform = TDPMPlatform.UnknownPlatform then
       continue;
-
-
-    if not platformsString.IsEmpty then
-    begin
-      platformsString := platformsString + ', ' + DPMPlatformToString(dpmPlatform);
-    end
-    else
-      platformsString := DPMPlatformToString(dpmPlatform);
+    newPlatforms[j] := dpmPlatform;
+    Inc(j);
   end;
 
-  vPlatform.platforms := platformsString; }
+  vPlatform.platforms := newPlatforms;
 end;
 
 procedure TDSpecCreatorForm.edtAuthorChange(Sender: TObject);
