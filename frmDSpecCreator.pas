@@ -633,8 +633,11 @@ procedure TDSpecCreatorForm.edtDependencyVersionChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).dependency.version := TVersionRange.Parse(edtDependencyVersion.Text);
-    (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
+    if length(edtDependencyVersion.Text) > 0 then
+    begin
+      (tvTemplates.Selected as TTemplateTreeNode).dependency.version := TVersionRange.Parse(edtDependencyVersion.Text);
+      (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
+    end;
   end;
 end;
 
@@ -937,6 +940,7 @@ begin
   FSavefilename := '';
   FtmpFilename := '';
   PageControl.ActivePage := tsInfo;
+  edtDependencyVersion.Text := '';
   Caption := 'Untitled - dspec Creator';
 end;
 
@@ -1166,7 +1170,8 @@ begin
     if dependancyId.IsEmpty then
       Exit;
     dependency := FOpenFile.NewDependency(FTemplate.name, dependancyId);
-    dependency.version := TVersionRange.Parse(DependencyForm.edtVersion.Text);
+    if length(DependencyForm.edtVersion.Text) > 0 then
+      dependency.version := TVersionRange.Parse(DependencyForm.edtVersion.Text);
   finally
     FreeAndNil(DependencyForm);
   end;
@@ -1390,7 +1395,10 @@ begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDependencies;
         edtDependencyId.Text := (Node as TTemplateTreeNode).dependency.id;
-        edtDependencyVersion.Text := (Node as TTemplateTreeNode).dependency.version.ToString;
+        if not (Node as TTemplateTreeNode).dependency.version.IsEmpty then
+          edtDependencyVersion.Text := (Node as TTemplateTreeNode).dependency.version.ToString
+        else
+          edtDependencyVersion.Text := '';
       end;
     end;
   end;
