@@ -58,6 +58,7 @@ type
     Panel1: TPanel;
     btnCancel: TButton;
     btnOk: TButton;
+    procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -83,11 +84,18 @@ begin
   FIDEOptions := TFakeIDE.Create;
 end;
 
+procedure TOptionsForm.btnCancelClick(Sender: TObject);
+begin
+  Close;
+  Self.ModalResult := mrCancel;
+end;
+
 procedure TOptionsForm.btnOkClick(Sender: TObject);
 begin
   if DPMOptionsFrame.Validate then
   begin
     DPMOptionsFrame.SaveSettings;
+    Close;
     Self.ModalResult := mrOK;
   end;
 end;

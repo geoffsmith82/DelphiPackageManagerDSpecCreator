@@ -936,6 +936,7 @@ begin
   LoadDspecStructure;
   FSavefilename := '';
   FtmpFilename := '';
+  PageControl.ActivePage := tsInfo;
   Caption := 'Untitled - dspec Creator';
 end;
 

@@ -156,6 +156,7 @@ object OptionsForm: TOptionsForm
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 0
+      OnClick = btnCancelClick
     end
     object btnOk: TButton
       Left = 764
