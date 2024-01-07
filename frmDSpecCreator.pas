@@ -1089,7 +1089,7 @@ procedure TDSpecCreatorForm.miOptionsClick(Sender: TObject);
 var
   OptionsForm : TOptionsForm;
 begin
-  OptionsForm := TOptionsForm.Create(nil);
+  OptionsForm := TOptionsForm.Create(nil, FLogger);
   try
     OptionsForm.ShowModal;
   finally

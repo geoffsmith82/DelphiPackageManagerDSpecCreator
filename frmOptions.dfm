@@ -10,6 +10,7 @@ object OptionsForm: TOptionsForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OnCreate = FormCreate
   TextHeight = 15
   inline DPMOptionsFrame1: TDPMOptionsFrame
     Left = 0
