@@ -392,6 +392,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 25
             Caption = 'Delete Exclude'
             TabOrder = 5
+            OnClick = btnDeleteExcludeClick
           end
         end
         object crdSearchPaths: TCard

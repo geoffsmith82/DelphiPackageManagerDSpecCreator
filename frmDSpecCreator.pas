@@ -183,6 +183,7 @@ type
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
     procedure btnBuildPackagesClick(Sender: TObject);
+    procedure btnDeleteExcludeClick(Sender: TObject);
     procedure btnDeleteTemplateClick(Sender: TObject);
     procedure btnDuplicateTemplateClick(Sender: TObject);
     procedure cboLicenseChange(Sender: TObject);
@@ -283,24 +284,34 @@ uses
   ;
 
 
+procedure TDSpecCreatorForm.btnDeleteExcludeClick(Sender: TObject);
+var
+  exclude : string;
+  itemToDelete: Integer;
+begin
+  if lbExclude.ItemIndex < 0 then
+    Exit;
+
+  if Assigned(tvTemplates.Selected) then
+  begin
+    exclude := lbExclude.Items[lbExclude.ItemIndex];
+    lbExclude.DeleteSelected;
+    itemToDelete := (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.IndexOf(exclude);
+    (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.Delete(itemToDelete);
+  end;
+end;
 
 procedure TDSpecCreatorForm.btnAddExcludeClick(Sender: TObject);
 var
   src : string;
-//  templateSource : TArray<TSource>;
 begin
-  { TODO : Complete this method }
-//  Src := InputBox('','','');
-//
-//  templateSource := FTemplate.SourceFiles;
-//
-//  SetLength(templateSource, length(templateSource) + 1);
-//  templateSource[length(templateSource) - 1] := TSource.Create;
-//  templateSource[length(templateSource) - 1].src := src;
-//  FTemplate.source := templateSource;
+  Src := InputBox('Add Exclude','Exclude to Add','');
 
-
-  LoadTemplates;
+  if Assigned(tvTemplates.Selected) then
+  begin
+    (tvTemplates.Selected as TTemplateTreeNode).source.Exclude.Add(src);
+    lbExclude.Items.Add(src);
+  end;
 end;
 
 procedure TDSpecCreatorForm.btnAddTemplateClick(Sender: TObject);
@@ -366,6 +377,9 @@ var
   newTemplateName : string;
   sourceTemplate : ISpecTemplate;
 begin
+  if not Assigned(tvTemplates.Selected) then
+    Exit;
+
   sourceTemplate := (tvTemplates.Selected as TTemplateTreeNode).Template;
   newTemplateName := sourceTemplate.name + Random(100).ToString;
   if not FOpenFile.DoesTemplateExist(newTemplateName) then
@@ -917,7 +931,6 @@ begin
     if SameText(templateName, edtTemplateName.Text) then
       exit;
 
-//    (tvTemplates.Selected as TTemplateTreeNode).Template.name := edtTemplateName.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtTemplateName.Text;
     FOpenFile.RenameTemplate(templateName, edtTemplateName.Text);
   end;
@@ -1364,6 +1377,11 @@ begin
         edtSource.Text := (Node as TTemplateTreeNode).source.Source;
         chkFlatten.Checked := (Node as TTemplateTreeNode).source.flatten;
         edtDest.Text := (Node as TTemplateTreeNode).source.Destination;
+        lbExclude.Clear;
+        for var j := 0 to (Node as TTemplateTreeNode).source.Exclude.Count - 1 do
+        begin
+          lbExclude.Items.Add((Node as TTemplateTreeNode).source.Exclude[j]);
+        end;
       end;
       if (Node.Parent as TTemplateTreeNode).Text = 'Build' then
       begin
