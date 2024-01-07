@@ -11,20 +11,23 @@ object OptionsForm: TOptionsForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OnCreate = FormCreate
+  OnShow = FormShow
   TextHeight = 15
-  inline DPMOptionsFrame1: TDPMOptionsFrame
+  inline DPMOptionsFrame: TDPMOptionsFrame
     Left = 0
     Top = 0
     Width = 859
-    Height = 504
-    Align = alTop
+    Height = 463
+    Align = alClient
     TabOrder = 0
     ExplicitWidth = 859
     inherited pgOptions: TPageControl
       Width = 859
+      Height = 463
       ExplicitWidth = 859
       inherited tsSources: TTabSheet
         ExplicitWidth = 851
+        ExplicitHeight = 429
         inherited Panel1: TPanel
           Width = 851
           StyleElements = [seFont, seClient, seBorder]
@@ -56,6 +59,7 @@ object OptionsForm: TOptionsForm
           end
         end
         inherited Panel2: TPanel
+          Top = 218
           Width = 851
           StyleElements = [seFont, seClient, seBorder]
           ExplicitWidth = 851
@@ -92,16 +96,20 @@ object OptionsForm: TOptionsForm
         end
         inherited Panel3: TPanel
           Width = 851
+          Height = 129
           StyleElements = [seFont, seClient, seBorder]
           ExplicitWidth = 851
           inherited lvSources: TListView
             Width = 851
+            Height = 129
             ExplicitWidth = 851
           end
         end
       end
       inherited tsIDEOptions: TTabSheet
+        ExplicitWidth = 851
         inherited pnlIDEOptions: TPanel
+          Width = 851
           StyleElements = [seFont, seClient, seBorder]
           inherited Label4: TLabel
             StyleElements = [seFont, seClient, seBorder]
@@ -119,13 +127,45 @@ object OptionsForm: TOptionsForm
             StyleElements = [seFont, seClient, seBorder]
           end
           inherited spAutoCloseDelay: TSpinEdit
+            Height = 24
             StyleElements = [seFont, seClient, seBorder]
+            ExplicitHeight = 24
           end
           inherited cboLogLevel: TComboBox
             StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 463
+    Width = 859
+    Height = 41
+    Align = alBottom
+    TabOrder = 1
+    ExplicitLeft = 688
+    ExplicitTop = 432
+    ExplicitWidth = 185
+    object btnCancel: TButton
+      Left = 656
+      Top = 6
+      Width = 75
+      Height = 25
+      Cancel = True
+      Caption = 'Cancel'
+      TabOrder = 0
+    end
+    object btnOk: TButton
+      Left = 764
+      Top = 6
+      Width = 75
+      Height = 25
+      Caption = 'Ok'
+      Default = True
+      TabOrder = 1
+      OnClick = btnOkClick
     end
   end
 end

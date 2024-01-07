@@ -12,6 +12,8 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
   DPM.Core.Types,
   DPM.Core.Logging,
   DPM.IDE.AddInOptionsFrame,
@@ -52,8 +54,13 @@ type
   end;
 
   TOptionsForm = class(TForm)
-    DPMOptionsFrame1: TDPMOptionsFrame;
+    DPMOptionsFrame: TDPMOptionsFrame;
+    Panel1: TPanel;
+    btnCancel: TButton;
+    btnOk: TButton;
+    procedure btnOkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     FConfigManager : IConfigurationManager;
@@ -76,11 +83,25 @@ begin
   FIDEOptions := TFakeIDE.Create;
 end;
 
+procedure TOptionsForm.btnOkClick(Sender: TObject);
+begin
+  if DPMOptionsFrame.Validate then
+  begin
+    DPMOptionsFrame.SaveSettings;
+    Self.ModalResult := mrOK;
+  end;
+end;
+
 procedure TOptionsForm.FormCreate(Sender: TObject);
 begin
   FConfigManager := TConfigurationManager.Create(FLogger);
-  DPMOptionsFrame1.Configure(FConfigManager, FIDEOptions, FLogger, '');
-  DPMOptionsFrame1.LoadSettings;
+  DPMOptionsFrame.Configure(FConfigManager, FIDEOptions, FLogger, '');
+  DPMOptionsFrame.LoadSettings;
+end;
+
+procedure TOptionsForm.FormShow(Sender: TObject);
+begin
+  DPMOptionsFrame.tsIDEOptions.Visible := False;
 end;
 
 { TFakeIDE }
