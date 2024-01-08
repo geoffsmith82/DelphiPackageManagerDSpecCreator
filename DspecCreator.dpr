@@ -111,7 +111,9 @@ uses
   DPM.Core.Package.PackageLatestVersionInfo in 'Libs\DPM\Source\Core\Package\DPM.Core.Package.PackageLatestVersionInfo.pas',
   DPM.IDE.AddInOptionsFrame in 'Libs\DPM\Source\IDE\DPM.IDE.AddInOptionsFrame.pas' {DPMOptionsFrame: TFrame},
   DPM.IDE.Options in 'Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas',
-  DPM.IDE.Types in 'Libs\DPM\Source\IDE\DPM.IDE.Types.pas';
+  DPM.IDE.Types in 'Libs\DPM\Source\IDE\DPM.IDE.Types.pas',
+  DPM.Creator.Logger in 'DPM.Creator.Logger.pas',
+  DPM.Creator.TemplateTreeNode in 'DPM.Creator.TemplateTreeNode.pas';
 
 {$R *.res}
 

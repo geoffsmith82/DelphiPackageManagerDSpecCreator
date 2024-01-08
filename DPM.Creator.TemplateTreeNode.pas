@@ -3,6 +3,8 @@ unit DPM.Creator.TemplateTreeNode;
 interface
 
 uses
+  System.Classes,
+  System.SysUtils,
   Vcl.ComCtrls,
   DPM.Core.Spec.Interfaces;
 
@@ -18,19 +20,21 @@ type
   TTemplateTreeNode = class (TTreeNode)
   public
     NodeType : TNodeType;
+    OnNewText : string;
+    OnNewClick : TNotifyEvent;
+    OnDeleteText : string;
+    OnDeleteClick : TNotifyEvent;
+
     TemplateHeading: Boolean;
     Template: ISpecTemplate;
     build: ISpecBuildEntry;
     design: ISpecBPLEntry;
     runtime: ISpecBPLEntry;
-    source: ISpecFileEntry;
     fileEntry: ISpecFileEntry;
-    libEntry: ISpecFileEntry;
     searchpath: ISpecSearchPath;
     dependency: ISpecDependency;
 
-    function CommonFileEntry: ISpecFileEntry;
-
+    function CategoryNode: TTemplateTreeNode;
     function IsHeading: Boolean;
     function IsBuild: Boolean;
     function IsBuildHeading: Boolean;
@@ -64,14 +68,14 @@ implementation
 
 { TTemplateTreeNode }
 
-function TTemplateTreeNode.CommonFileEntry: ISpecFileEntry;
+function TTemplateTreeNode.CategoryNode: TTemplateTreeNode;
 begin
-  case NodeType of
-    ntSource: Result := source;
-    ntFile: Result := fileEntry;
-    ntLib: Result := libEntry;
-    else Result := nil;
-  end;
+  if IsHeading then
+    Result := Self
+  else if (Parent as TTemplateTreeNode).IsHeading then
+    Result := (Parent as TTemplateTreeNode)
+  else if (Parent as TTemplateTreeNode).IsHeading then
+    Result := (Parent.Parent as TTemplateTreeNode)
 end;
 
 procedure TTemplateTreeNode.DeleteBuild;
@@ -91,12 +95,17 @@ end;
 
 procedure TTemplateTreeNode.DeleteFileEntry;
 begin
+  if not IsFileEntry  then
+    raise Exception.Create('Node is not of type File');
+
   Template.DeleteFiles(fileEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteLibEntry;
 begin
-  Template.DeleteLib(LibEntry.Source);
+  if not IsLibEntry  then
+    raise Exception.Create('Node is not of type File');
+  Template.DeleteLib(fileEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteRuntime;
@@ -111,7 +120,9 @@ end;
 
 procedure TTemplateTreeNode.DeleteSource;
 begin
-  Template.DeleteSource(source.Source);
+  if not IsSource  then
+    raise Exception.Create('Node is not of type File');
+  Template.DeleteSource(fileEntry.Source);
 end;
 
 function TTemplateTreeNode.IsBuild: Boolean;
@@ -156,7 +167,9 @@ end;
 
 function TTemplateTreeNode.IsHeading: Boolean;
 begin
-  Result := (build = nil) and (runtime = nil) and (source = nil) and (searchpath = nil);
+  Result := NodeType in [ntTemplateHeading, ntBuildHeading, ntDesignHeading, ntRuntimeHeading,
+               ntSourceHeading, ntFileHeading, ntLibHeading, ntSeachPathHeading,
+               ntDependencyHeading];
 end;
 
 function TTemplateTreeNode.IsLibEntry: Boolean;

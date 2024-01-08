@@ -212,6 +212,12 @@ type
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
     function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
+    function AddRootTemplateNode(template: ISpecTemplate): TTemplateTreeNode;
+    procedure AddFileEntryNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecFileEntry>; NodeName: string);
+    procedure AddSearchPathNodes(node: TTemplateTreeNode; template: ISpecTemplate);
+    procedure AddBuildNode(node: TTemplateTreeNode; template: ISpecTemplate);
+    procedure AddBPLNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecBPLEntry>; nodeName: string);
+    procedure AddDependencyNode(node: TTemplateTreeNode; template: ISpecTemplate);
   public
     { Public declarations }
     procedure LoadDspecStructure;
@@ -254,7 +260,7 @@ begin
 
   if Assigned(tvTemplates.Selected) then
   begin
-    entry := (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry;
+    entry := (tvTemplates.Selected as TTemplateTreeNode).FileEntry;
     if not Assigned(entry) then
       Exit;
 
@@ -274,7 +280,7 @@ begin
 
   if Assigned(tvTemplates.Selected) then
   begin
-    entry := (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry;
+    entry := (tvTemplates.Selected as TTemplateTreeNode).FileEntry;
     if not Assigned(entry) then
       Exit;
 
@@ -300,7 +306,7 @@ begin
   finally
     FreeAndNil(TemplateForm);
   end;
-  FOpenfile.NewTemplate(templateName);
+  FOpenfile.spec.NewTemplate(templateName);
   LoadTemplates;
 end;
 
@@ -662,7 +668,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry.Destination := edtDest.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).FileEntry.Destination := edtDest.Text;
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -676,139 +682,258 @@ begin
   end;
 end;
 
+
+function TDSpecCreatorForm.AddRootTemplateNode(template: ISpecTemplate): TTemplateTreeNode;
+begin
+  cboTemplate.Items.Add(template.name);
+  Result := tvTemplates.Items.Add(nil, template.name) as TTemplateTreeNode;
+  Result.NodeType := ntTemplateHeading;
+  Result.Template := template;
+  Result.ImageIndex := 5;
+  Result.SelectedIndex := 5;
+  Result.TemplateHeading := True;
+end;
+
+
+procedure TDSpecCreatorForm.AddFileEntryNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecFileEntry>; NodeName: string);
+var
+  nodeSource: TTemplateTreeNode;
+  sourceNode: TTemplateTreeNode;
+  j: Integer;
+  iconIndex : Integer;
+  lNodeType : TNodeType;
+  lOnNewText : string;
+  lOnDeleteText : string;
+  lOnNewClick : TNotifyEvent;
+  lOnDeleteClick : TNotifyEvent;
+begin
+  lOnNewClick := nil;
+  lOnDeleteClick := nil;
+  if NodeName = 'Source' then
+  begin
+    iconIndex := 2;
+    lNodeType := ntSourceHeading;
+    lOnNewText := 'Add Source Item';
+    lOnNewClick := PopupAddSourceItem;
+    lOnDeleteText := 'Delete Source Item';
+    lOnDeleteClick := PopupDeleteSourceItem;
+  end
+  else if NodeName = 'Files' then
+  begin
+    iconIndex := 2;
+    lNodeType := ntFileHeading;
+    lOnNewText := 'Add File Item';
+    lOnNewClick := PopupAddFileItem;
+    lOnDeleteText := 'Delete File Item';
+    lOnDeleteClick := PopupDeleteFileItem;
+  end
+  else if NodeName = 'Lib' then
+  begin
+    iconIndex := 2;
+    lNodeType := ntLibHeading;
+    lOnNewText := 'Add Library Item';
+    lOnNewClick := PopupAddLibItem;
+    lOnDeleteText := 'Delete Library Item';
+    lOnDeleteClick := PopupDeleteLibItem;
+  end
+  else
+    raise Exception.Create('nodeName must be either Source, Files or Lib. Was [' + NodeName + ']');
+
+  nodeSource := tvTemplates.Items.AddChild(node, NodeName) as TTemplateTreeNode;
+  nodeSource.Template := template;
+  nodeSource.NodeType := lNodeType;
+  nodeSource.ImageIndex := iconIndex;
+  nodeSource.SelectedIndex := iconIndex;
+  nodeSource.OnNewText := lOnNewText;
+  nodeSource.OnNewClick := lOnNewClick;
+  nodeSource.OnDeleteText := lOnDeleteText;
+  nodeSource.OnDeleteClick := lOnDeleteClick;
+  for j := 0 to fileList.Count - 1 do
+  begin
+    sourceNode := tvTemplates.Items.AddChild(nodeSource, fileList[j].Source) as TTemplateTreeNode;
+    sourceNode.fileEntry := fileList[j];
+    if NodeName = 'Source' then
+    begin
+      sourceNode.NodeType := ntSource;
+    end
+    else if NodeName = 'Files' then
+    begin
+      sourceNode.NodeType := ntFile;
+    end
+    else if NodeName = 'Lib' then
+    begin
+      sourceNode.NodeType := ntLib;
+    end;
+    sourceNode.Template := template;
+    sourceNode.ImageIndex := iconIndex;
+    sourceNode.SelectedIndex := iconIndex;
+  end;
+end;
+
+procedure TDSpecCreatorForm.AddSearchPathNodes(node: TTemplateTreeNode; template: ISpecTemplate);
+var
+  nodeSearchPath: TTemplateTreeNode;
+  searchPathNode: TTemplateTreeNode;
+  j: Integer;
+begin
+  nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths') as TTemplateTreeNode;
+  nodeSearchPath.Template := template;
+  nodeSearchPath.ImageIndex := 3;
+  nodeSearchPath.SelectedIndex := 3;
+  nodeSearchPath.NodeType := ntSeachPathHeading;
+  nodeSearchPath.OnNewText := 'Add SearchPath Item';
+  nodeSearchPath.OnNewClick := PopupAddSearchPathItem;
+  nodeSearchPath.OnDeleteText := 'Delete SearchPath Item';
+  nodeSearchPath.OnDeleteClick := PopupDeleteSearchPathItem;
+
+  for j := 0 to template.searchPaths.Count - 1 do
+  begin
+    searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, template.searchPaths[j].path) as TTemplateTreeNode;
+    searchPathNode.searchpath := template.searchPaths[j];
+    searchPathNode.Template := template;
+    searchPathNode.NodeType := ntSeachPath;
+    searchPathNode.ImageIndex := 3;
+    searchPathNode.SelectedIndex := 3;
+  end;
+end;
+
+procedure TDSpecCreatorForm.AddBuildNode(node: TTemplateTreeNode; template: ISpecTemplate);
+var
+  nodeBuild: TTemplateTreeNode;
+  buildNode: TTemplateTreeNode;
+  j: Integer;
+begin
+  nodeBuild := tvTemplates.Items.AddChild(node, 'Build') as TTemplateTreeNode;
+  nodeBuild.Template := template;
+  nodeBuild.ImageIndex := 0;
+  nodeBuild.SelectedIndex := 0;
+  nodeBuild.NodeType := ntBuildHeading;
+  nodeBuild.OnNewText := 'Add Build Item';
+  nodeBuild.OnNewClick := PopupAddBuildItem;
+  nodeBuild.OnDeleteText := 'Delete Source Item';
+  nodeBuild.OnDeleteClick := PopupDeleteBuildItem;
+  for j := 0 to template.BuildEntries.Count - 1 do
+  begin
+    buildNode := tvTemplates.Items.AddChild(nodeBuild, template.BuildEntries[j].id) as TTemplateTreeNode;
+    buildNode.build := template.BuildEntries[j];
+    buildNode.Template := template;
+    buildNode.ImageIndex := 0;
+    buildNode.SelectedIndex := 0;
+    buildNode.NodeType := ntBuild;
+  end;
+end;
+
+
+procedure TDSpecCreatorForm.AddBPLNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecBPLEntry>; nodeName: string);
+var
+  nodeDesign: TTemplateTreeNode;
+  designNode: TTemplateTreeNode;
+  j: Integer;
+  iconIndex : Integer;
+  lNodeType : TNodeType;
+  lOnNewText : string;
+  lOnDeleteText : string;
+  lOnNewClick : TNotifyEvent;
+  lOnDeleteClick : TNotifyEvent;
+begin
+  if nodeName = 'Design' then
+  begin
+    iconIndex := 6;
+    lNodeType := ntDesignHeading;
+    lOnNewText := 'Add Design Item';
+    lOnNewClick := PopupAddDesignItem;
+    lOnDeleteText := 'Delete Design Item';
+    lOnDeleteClick := PopupDeleteDesignItem;
+  end
+  else if nodeName = 'Runtime'  then
+  begin
+    iconIndex := 1;
+    lNodeType := ntRuntimeHeading;
+    lOnNewText := 'Add Runtime Item';
+    lOnNewClick := PopupAddRuntimeItem;
+    lOnDeleteText := 'Delete Runtime Item';
+    lOnDeleteClick := PopupDeleteRuntimeItem;
+  end
+  else
+    raise Exception.Create('Nodetype must be either Design or Runtime - was [' + nodeName + ']');
+
+
+  nodeDesign := tvTemplates.Items.AddChild(node, nodeName) as TTemplateTreeNode;
+  nodeDesign.Template := template;
+  nodeDesign.ImageIndex := iconIndex;
+  nodeDesign.SelectedIndex := iconIndex;
+  nodeDesign.OnNewText := lOnNewText;
+  nodeDesign.OnNewClick := lOnNewClick;
+  nodeDesign.OnDeleteText := lOnDeleteText;
+  nodeDesign.OnDeleteClick := lOnDeleteClick;
+  for j := 0 to fileList.Count - 1 do
+  begin
+    designNode := tvTemplates.Items.AddChild(nodeDesign, fileList[j].BuildId) as TTemplateTreeNode;
+    if nodeName = 'Design' then
+    begin
+      designNode.design := fileList[j];
+      designNode.NodeType := ntDesign;
+    end
+    else if nodeName = 'Runtime'  then
+    begin
+      designNode.runtime := fileList[j];
+      designNode.NodeType := ntRuntime;
+    end;
+    designNode.Template := template;
+    designNode.ImageIndex := iconIndex;
+    designNode.SelectedIndex := iconIndex;
+  end;
+end;
+
+procedure TDSpecCreatorForm.AddDependencyNode(node: TTemplateTreeNode; template: ISpecTemplate);
+var
+  nodeDependency: TTemplateTreeNode;
+  dependencyNode: TTemplateTreeNode;
+  j: Integer;
+begin
+  nodeDependency := tvTemplates.Items.AddChild(node, 'Dependencies') as TTemplateTreeNode;
+  nodeDependency.Template := template;
+  nodeDependency.ImageIndex := 4;
+  nodeDependency.SelectedIndex := 4;
+  nodeDependency.NodeType := ntDependencyHeading;
+  nodeDependency.OnNewText := 'Add Dependency Item';
+  nodeDependency.OnNewClick := PopupAddDependencyItem;
+  nodeDependency.OnDeleteText := 'Delete Dependency Item';
+  nodeDependency.OnDeleteClick := PopupDeleteDependencyItem;
+
+  for j := 0 to template.dependencies.Count - 1 do
+  begin
+    dependencyNode := tvTemplates.Items.AddChild(nodeDependency, template.dependencies[j].id) as TTemplateTreeNode;
+    dependencyNode.dependency := template.dependencies[j];
+    dependencyNode.Template := template;
+    dependencyNode.ImageIndex := 4;
+    dependencyNode.SelectedIndex := 4;
+    dependencyNode.NodeType := ntDependency;
+  end;
+end;
+
+
 procedure TDSpecCreatorForm.LoadTemplates;
 var
   node: TTemplateTreeNode;
-  nodeSource: TTemplateTreeNode;
-  nodeFile: TTemplateTreeNode;
-  nodeLib: TTemplateTreeNode;
-  nodeSearchPath: TTemplateTreeNode;
-  nodeBuild: TTemplateTreeNode;
-  nodeRuntime: TTemplateTreeNode;
-  nodeDesign: TTemplateTreeNode;
-  nodeDependency: TTemplateTreeNode;
-  buildNode: TTemplateTreeNode;
-  runtimeNode: TTemplateTreeNode;
-  designNode: TTemplateTreeNode;
-  sourceNode: TTemplateTreeNode;
-  fileNode: TTemplateTreeNode;
-  libNode: TTemplateTreeNode;
-  searchPathNode: TTemplateTreeNode;
-  dependencyNode: TTemplateTreeNode;
-  i, j : Integer;
+  i : Integer;
+  template: ISpecTemplate;
 begin
   tvTemplates.Items.Clear;
   cboTemplate.Clear;
   for i := 0 to FOpenFile.spec.templates.Count - 1 do
   begin
-    cboTemplate.Items.Add(FOpenFile.spec.templates[i].name);
-    node := tvTemplates.Items.Add(nil, FOpenFile.spec.templates[i].name) as TTemplateTreeNode;
-    node.Template := FOpenFile.spec.templates[i];
-    node.ImageIndex := 5;
-    node.SelectedIndex := 5;
-    node.TemplateHeading := True;
-    nodeSource := tvTemplates.Items.AddChild(node, 'Source') as TTemplateTreeNode;
-    nodeSource.Template := FOpenFile.spec.templates[i];
-    nodeSource.ImageIndex := 2;
-    nodeSource.SelectedIndex := 2;
-    for j := 0 to FOpenFile.spec.templates[i].SourceFiles.Count - 1 do
-    begin
-      sourceNode := tvTemplates.Items.AddChild(nodeSource, FOpenFile.spec.templates[i].SourceFiles[j].Source) as TTemplateTreeNode;
-      sourceNode.source := FOpenFile.spec.templates[i].SourceFiles[j];
-      sourceNode.Template := FOpenFile.spec.templates[i];
-      sourceNode.ImageIndex := 2;
-      sourceNode.SelectedIndex := 2;
-    end;
+    template := FOpenFile.spec.templates[i];
+    node := AddRootTemplateNode(template);
 
-    nodeFile := tvTemplates.Items.AddChild(node, 'Files') as TTemplateTreeNode;
-    nodeFile.Template := FOpenFile.spec.templates[i];
-    nodeFile.ImageIndex := 2;
-    nodeFile.SelectedIndex := 2;
-    for j := 0 to FOpenFile.spec.templates[i].Files.Count - 1 do
-    begin
-      fileNode := tvTemplates.Items.AddChild(nodeFile, FOpenFile.spec.templates[i].Files[j].Source) as TTemplateTreeNode;
-      fileNode.fileEntry := FOpenFile.spec.templates[i].Files[j];
-      fileNode.Template := FOpenFile.spec.templates[i];
-      fileNode.ImageIndex := 2;
-      fileNode.SelectedIndex := 2;
-    end;
-
-    nodeLib := tvTemplates.Items.AddChild(node, 'Lib') as TTemplateTreeNode;
-    nodeLib.Template := FOpenFile.spec.templates[i];
-    nodeLib.ImageIndex := 2;
-    nodeLib.SelectedIndex := 2;
-    for j := 0 to FOpenFile.spec.templates[i].LibFiles.Count - 1 do
-    begin
-      libNode := tvTemplates.Items.AddChild(nodeLib, FOpenFile.spec.templates[i].LibFiles[j].Source) as TTemplateTreeNode;
-      libNode.libEntry := FOpenFile.spec.templates[i].LibFiles[j];
-      libNode.Template := FOpenFile.spec.templates[i];
-      libNode.ImageIndex := 2;
-      libNode.SelectedIndex := 2;
-    end;
-
-
-    nodeSearchPath := tvTemplates.Items.AddChild(node, 'SearchPaths') as TTemplateTreeNode;
-    nodeSearchPath.Template := FOpenFile.spec.templates[i];
-    nodeSearchPath.ImageIndex := 3;
-    nodeSearchPath.SelectedIndex := 3;
-    for j := 0 to FOpenFile.spec.templates[i].searchPaths.Count - 1 do
-    begin
-      searchPathNode := tvTemplates.Items.AddChild(nodeSearchPath, FOpenFile.spec.templates[i].searchPaths[j].path) as TTemplateTreeNode;
-      searchPathNode.searchpath := FOpenFile.spec.templates[i].searchPaths[j];
-      searchPathNode.Template := FOpenFile.spec.templates[i];
-      searchPathNode.ImageIndex := 3;
-      searchPathNode.SelectedIndex := 3;
-    end;
-    nodeBuild := tvTemplates.Items.AddChild(node, 'Build') as TTemplateTreeNode;
-    nodeBuild.Template := FOpenFile.spec.templates[i];
-    nodeBuild.ImageIndex := 0;
-    nodeBuild.SelectedIndex := 0;
-    for j := 0 to FOpenFile.spec.templates[i].BuildEntries.Count - 1 do
-    begin
-      buildNode := tvTemplates.Items.AddChild(nodeBuild, FOpenFile.spec.templates[i].BuildEntries[j].id) as TTemplateTreeNode;
-      buildNode.build := FOpenFile.spec.templates[i].BuildEntries[j];
-      buildNode.Template := FOpenFile.spec.templates[i];
-      buildNode.ImageIndex := 0;
-      buildNode.SelectedIndex := 0;
-    end;
-
-    nodeDesign := tvTemplates.Items.AddChild(node, 'Design') as TTemplateTreeNode;
-    nodeDesign.Template := FOpenFile.spec.templates[i];
-    nodeDesign.ImageIndex := 6;
-    nodeDesign.SelectedIndex := 6;
-    for j := 0 to FOpenFile.spec.templates[i].DesignFiles.Count - 1 do
-    begin
-      designNode := tvTemplates.Items.AddChild(nodeDesign, FOpenFile.spec.templates[i].BuildEntries[j].Id) as TTemplateTreeNode;
-      designNode.design := FOpenFile.spec.templates[i].DesignFiles[j];
-      designNode.Template := FOpenFile.spec.templates[i];
-      designNode.ImageIndex := 6;
-      designNode.SelectedIndex := 6;
-    end;
-    nodeRuntime := tvTemplates.Items.AddChild(node, 'Runtime') as TTemplateTreeNode;
-    nodeRuntime.Template := FOpenFile.spec.templates[i];
-    nodeRuntime.ImageIndex := 1;
-    nodeRuntime.SelectedIndex := 1;
-    for j := 0 to FOpenFile.spec.templates[i].RuntimeFiles.Count - 1 do
-    begin
-      runtimeNode := tvTemplates.Items.AddChild(nodeRuntime, FOpenFile.spec.templates[i].RuntimeFiles[j].Source) as TTemplateTreeNode;
-      runtimeNode.runtime := FOpenFile.spec.templates[i].RuntimeFiles[j];
-      runtimeNode.Template := FOpenFile.spec.templates[i];
-      runtimeNode.ImageIndex := 1;
-      runtimeNode.SelectedIndex := 1;
-    end;
-
-    nodeDependency := tvTemplates.Items.AddChild(node, 'Dependencies') as TTemplateTreeNode;
-    nodeDependency.Template := FOpenFile.spec.templates[i];
-    nodeDependency.ImageIndex := 4;
-    nodeDependency.SelectedIndex := 4;
-    for j := 0 to FOpenFile.spec.templates[i].dependencies.Count - 1 do
-    begin
-      dependencyNode := tvTemplates.Items.AddChild(nodeDependency, FOpenFile.spec.templates[i].dependencies[j].id) as TTemplateTreeNode;
-      dependencyNode.dependency := FOpenFile.spec.templates[i].dependencies[j];
-      dependencyNode.Template := FOpenFile.spec.templates[i];
-      dependencyNode.ImageIndex := 4;
-      dependencyNode.SelectedIndex := 4;
-    end;
+    AddFileEntryNode(node, template, template.SourceFiles, 'Source');
+    AddFileEntryNode(node, template, template.Files, 'Files');
+    AddFileEntryNode(node, template, template.LibFiles, 'Lib');
+    AddSearchPathNodes(node, template);
+    AddBuildNode(node, template);
+    AddBPLNode(node, template, template.DesignFiles, 'Design');
+    AddBPLNode(node, template, template.RuntimeFiles, 'Runtime');
+    AddDependencyNode(node, template);
 
     node.Expand(True);
   end;
@@ -856,7 +981,7 @@ begin
   if Assigned(tvTemplates.Selected) then
   begin
     (tvTemplates.Selected as TTemplateTreeNode).runtime.Source := edtRuntimeSrc.Text;
-    (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeBuildId.Text;
   end;
 end;
 
@@ -902,7 +1027,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).CommonFileEntry.Source := edtSource.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).FileEntry.Source := edtSource.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtSource.Text;
 
 
@@ -926,22 +1051,25 @@ end;
 procedure TDSpecCreatorForm.edtTemplateNameChange(Sender: TObject);
 var
  templateName : string;
+ template : ISpecTemplate;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    templateName := (tvTemplates.Selected as TTemplateTreeNode).Template.name;
+    template := (tvTemplates.Selected as TTemplateTreeNode).Template;
+    templateName := Template.name;
     if SameText(templateName, edtTemplateName.Text) then
       exit;
 
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtTemplateName.Text;
-    FOpenFile.RenameTemplate(templateName, edtTemplateName.Text);
+    FOpenFile.spec.RenameTemplate(templateName, edtTemplateName.Text);
   end;
   LoadTemplates;
 end;
 
 procedure TDSpecCreatorForm.edtVersionChange(Sender: TObject);
 begin
-  FOpenFile.spec.metadata.version := TPackageVersion.Parse(edtVersion.Text);
+  if length(edtVersion.Text) > 0 then
+    FOpenFile.spec.metadata.version := TPackageVersion.Parse(edtVersion.Text);
 end;
 
 procedure TDSpecCreatorForm.FormCreate(Sender: TObject);
@@ -1161,7 +1289,7 @@ begin
     buildId := BuildForm.edtBuildId.Text;
     if buildId.IsEmpty then
       Exit;
-    build := FOpenFile.NewBuild(FTemplate.name, buildId);
+    build := FTemplate.NewBuildEntryById(buildId);
     build.project := BuildForm.edtProject.Text;
   finally
     FreeAndNil(BuildForm);
@@ -1184,7 +1312,7 @@ begin
     dependancyId := DependencyForm.edtDependencyId.Text;
     if dependancyId.IsEmpty then
       Exit;
-    dependency := FOpenFile.NewDependency(FTemplate.name, dependancyId);
+    dependency := FTemplate.NewDependencyById(dependancyId);
     if length(DependencyForm.edtVersion.Text) > 0 then
       dependency.version := TVersionRange.Parse(DependencyForm.edtVersion.Text);
   finally
@@ -1208,7 +1336,7 @@ begin
     designBuidId := DesignForm.edtDesignBuildId.Text;
     if designBuidId.IsEmpty then
       Exit;
-    design := FOpenFile.NewDesign(FTemplate.name, designBuidId);
+    design := FTemplate.NewDesignBplBySrc(DesignForm.edtDesignSrc.Text);
     design.buildId := DesignForm.edtDesignBuildId.Text;
     design.Source := DesignForm.edtDesignSrc.Text;
     design.install := DesignForm.chkInstall.Checked;
@@ -1233,8 +1361,9 @@ begin
     runtimeBuildId := RuntimeForm.edtRuntimeBuildId.Text;
     if runtimeBuildId.IsEmpty then
       Exit;
-    runtime := FOpenFile.NewRuntime(FTemplate.name, runtimeBuildId);
+    runtime := FTemplate.NewRuntimeBplBySrc(RuntimeForm.edtRuntimeSrc.Text);
     runtime.Source := RuntimeForm.edtRuntimeSrc.Text;
+    runtime.BuildId := runtimeBuildId;
     runtime.copyLocal := RuntimeForm.chkCopyLocal.Checked;
   finally
     FreeAndNil(RuntimeForm);
@@ -1257,7 +1386,7 @@ begin
     searchPathStr := SearchPathForm.edtSearchPath.Text;
     if searchPathStr.IsEmpty then
       Exit;
-    searchPath := FOpenFile.NewSearchPath(FTemplate.name, searchPathStr);
+    searchPath := FTemplate.NewSearchPath(searchPathStr);
   finally
     FreeAndNil(SearchPathForm);
   end;
@@ -1279,7 +1408,8 @@ begin
     SourceSrc := SourceForm.edtSource.Text;
     if SourceSrc.IsEmpty then
       Exit;
-    source := FOpenFile.NewSource(FTemplate.name, SourceSrc);
+
+    source := FTemplate.NewSource(SourceSrc);
     source.flatten := SourceForm.chkFlatten.Checked;
     source.Destination := SourceForm.edtDest.Text;
   finally
@@ -1304,7 +1434,7 @@ begin
     SourceSrc := FileForm.edtSource.Text;
     if SourceSrc.IsEmpty then
       Exit;
-    FileEntry := FOpenFile.NewFile(FTemplate.name, SourceSrc);
+    FileEntry := FTemplate.NewFiles(SourceSrc);
     FileEntry.flatten := FileForm.chkFlatten.Checked;
     FileEntry.Destination := FileForm.edtDest.Text;
   finally
@@ -1328,7 +1458,7 @@ begin
     SourceSrc := LibForm.edtSource.Text;
     if SourceSrc.IsEmpty then
       Exit;
-    LibEntry := FOpenFile.NewLib(FTemplate.name, SourceSrc);
+    LibEntry := FTemplate.NewLib(SourceSrc);
     LibEntry.flatten := LibForm.chkFlatten.Checked;
     LibEntry.Destination := LibForm.edtDest.Text;
   finally
@@ -1386,134 +1516,138 @@ begin
 end;
 
 procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
+var
+  lNode: TTemplateTreeNode;
 begin
-  if (node.Text = 'SearchPaths') and ((Node as TTemplateTreenode).IsHeading) then
+  lNode := Node as TTemplateTreeNode;
+  if lNode.IsSearchPathHeading then
   begin
     CardPanel.ActiveCard := crdSearchPaths;
     CardPanel.Visible := False;
   end
-  else if (node.Text = 'Source') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsSourceHeading then
   begin
     CardPanel.ActiveCard := crdSource;
     CardPanel.Visible := False;
   end
-  else if (node.Text = 'Files') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsFileEntryHeading then
   begin
     CardPanel.ActiveCard := crdSource;
     CardPanel.Visible := False;
   end
-  else if (node.Text = 'Lib') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsLibEntryHeading then
   begin
     CardPanel.ActiveCard := crdSource;
     CardPanel.Visible := False;
   end
-  else if (Node.Text = 'Build') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsBuildHeading then
   begin
     CardPanel.ActiveCard := crdBuild;
     CardPanel.Visible := False;
+
   end
-  else if (Node.Text = 'Design') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsDesignHeading then
   begin
     CardPanel.ActiveCard := crdDesign;
     CardPanel.Visible := False;
   end
-  else if (Node.Text = 'Runtime') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsRuntimeHeading then
   begin
     CardPanel.ActiveCard := crdRuntime;
     CardPanel.Visible := False;
   end
-  else if (Node.Text = 'Dependencies') and ((Node as TTemplateTreenode).IsHeading) then
+  else if lNode.IsDependencyHeading then
   begin
     CardPanel.ActiveCard := crdDependencies;
     CardPanel.Visible := False;
   end
-  else if ((Node as TTemplateTreenode).TemplateHeading) then
+  else if (lNode.TemplateHeading) then
   begin
     CardPanel.Visible := True;
     CardPanel.ActiveCard := crdTemplates;
-    edtTemplateName.Text := (Node as TTemplateTreeNode).Template.name;
+    edtTemplateName.Text := lNode.Template.name;
   end
   else
   begin
-    if (Node.Parent <> nil) then
+    if (lNode.Parent <> nil) then
     begin
-      if (Node.Parent as TTemplateTreeNode).Text = 'SearchPaths' then
+      if lNode.Parent.Text = 'SearchPaths' then
       begin
-        edtSearchPath.Text := (Node as TTemplateTreeNode).searchpath.path;
+        edtSearchPath.Text := lNode.searchpath.path;
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSearchPaths;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Source' then
+      if lNode.Parent.Text = 'Source' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSource;
-        edtSource.Text := (Node as TTemplateTreeNode).source.Source;
-        chkFlatten.Checked := (Node as TTemplateTreeNode).source.flatten;
-        edtDest.Text := (Node as TTemplateTreeNode).source.Destination;
+        edtSource.Text := lNode.fileEntry.Source;
+        chkFlatten.Checked := lNode.fileEntry.flatten;
+        edtDest.Text := lNode.fileEntry.Destination;
         lbExclude.Clear;
-        for var j := 0 to (Node as TTemplateTreeNode).source.Exclude.Count - 1 do
+        for var j := 0 to lNode.fileEntry.Exclude.Count - 1 do
         begin
-          lbExclude.Items.Add((Node as TTemplateTreeNode).source.Exclude[j]);
+          lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
         end;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Files' then
+      if lNode.Parent.Text = 'Files' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSource;
-        edtSource.Text := (Node as TTemplateTreeNode).fileEntry.Source;
-        chkFlatten.Checked := (Node as TTemplateTreeNode).fileEntry.flatten;
-        edtDest.Text := (Node as TTemplateTreeNode).fileEntry.Destination;
+        edtSource.Text := lNode.fileEntry.Source;
+        chkFlatten.Checked := lNode.fileEntry.flatten;
+        edtDest.Text := lNode.fileEntry.Destination;
         lbExclude.Clear;
-        for var j := 0 to (Node as TTemplateTreeNode).fileEntry.Exclude.Count - 1 do
+        for var j := 0 to lNode.fileEntry.Exclude.Count - 1 do
         begin
-          lbExclude.Items.Add((Node as TTemplateTreeNode).fileEntry.Exclude[j]);
+          lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
         end;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Lib' then
+      if lNode.Parent.Text = 'Lib' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSource;
-        edtSource.Text := (Node as TTemplateTreeNode).libEntry.Source;
-        chkFlatten.Checked := (Node as TTemplateTreeNode).libEntry.flatten;
-        edtDest.Text := (Node as TTemplateTreeNode).libEntry.Destination;
+        edtSource.Text := lNode.fileEntry.Source;
+        chkFlatten.Checked := lNode.fileEntry.flatten;
+        edtDest.Text := lNode.fileEntry.Destination;
         lbExclude.Clear;
-        for var j := 0 to (Node as TTemplateTreeNode).libEntry.Exclude.Count - 1 do
+        for var j := 0 to lNode.fileEntry.Exclude.Count - 1 do
         begin
-          lbExclude.Items.Add((Node as TTemplateTreeNode).libEntry.Exclude[j]);
+          lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
         end;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Build' then
+      if lNode.Parent.Text = 'Build' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdBuild;
-        edtBuildId.Text := (Node as TTemplateTreeNode).build.id;
-        edtProject.Text := (Node as TTemplateTreeNode).build.project;
-        edtConfiguration.Text := (Node as TTemplateTreeNode).build.Config;
-        chkBuildForDesign.Checked := (Node as TTemplateTreeNode).build.buildForDesign;
-        chkDesignOnly.Checked := (Node as TTemplateTreeNode).build.DesignOnly;
+        edtBuildId.Text := lNode.build.id;
+        edtProject.Text := lNode.build.project;
+        edtConfiguration.Text := lNode.build.Config;
+        chkBuildForDesign.Checked := lNode.build.buildForDesign;
+        chkDesignOnly.Checked := lNode.build.DesignOnly;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Design' then
+      if lNode.Parent.Text = 'Design' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDesign;
-        edtDesignBuildId.Text := (Node as TTemplateTreeNode).design.buildId;
-        edtDesignSrc.Text := (Node as TTemplateTreeNode).design.Source;
+        edtDesignBuildId.Text := lNode.design.buildId;
+        edtDesignSrc.Text := lNode.design.Source;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Runtime' then
+      if lNode.Parent.Text = 'Runtime' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdRuntime;
-        edtRuntimeBuildId.Text := (Node as TTemplateTreeNode).runtime.buildId;
-        edtRuntimeSrc.Text := (Node as TTemplateTreeNode).runtime.Source;
-        chkCopyLocal.Checked := (Node as TTemplateTreeNode).runtime.copyLocal;
+        edtRuntimeBuildId.Text := lNode.runtime.buildId;
+        edtRuntimeSrc.Text := lNode.runtime.Source;
+        chkCopyLocal.Checked := lNode.runtime.copyLocal;
       end;
-      if (Node.Parent as TTemplateTreeNode).Text = 'Dependencies' then
+      if lNode.Parent.Text = 'Dependencies' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDependencies;
-        edtDependencyId.Text := (Node as TTemplateTreeNode).dependency.id;
-        if not (Node as TTemplateTreeNode).dependency.version.IsEmpty then
-          edtDependencyVersion.Text := (Node as TTemplateTreeNode).dependency.version.ToString
+        edtDependencyId.Text := lNode.dependency.id;
+        if not lNode.dependency.version.IsEmpty then
+          edtDependencyVersion.Text := lNode.dependency.version.ToString
         else
           edtDependencyVersion.Text := '';
       end;
@@ -1531,6 +1665,7 @@ var
   item : TMenuItem;
   localPos : TPoint;
   node : TTemplateTreeNode;
+  categoryNode : TTemplateTreeNode;
 begin
   localPos := tvTemplates.ClientToScreen(MousePos);
   if Assigned(tvTemplates.Selected) then
@@ -1542,106 +1677,23 @@ begin
       Handled := True;
     end;
 
-
     tvTemplates.PopupMenu.Items.Clear;
     node := tvTemplates.GetNodeAt(MousePos.X, MousePos.Y) as TTemplateTreeNode;
+    FTemplate := nil;
 
     if Assigned(node.Template) then
-      FTemplate := node.Template
-    else if Assigned(node.Parent) and Assigned((node.Parent as TTemplateTreeNode).Template) then
-      FTemplate := (node.Parent as TTemplateTreeNode).Template
-    else if Assigned(node.Parent.Parent) and Assigned((node.Parent.Parent as TTemplateTreeNode).Template) then
-      FTemplate := (node.Parent.Parent as TTemplateTreeNode).Template;
+      FTemplate := node.Template;
 
-    if node.IsBuild or ((node.Text='Build') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Build Item';
-      item.OnClick := PopupAddBuildItem;
-      tvTemplates.PopupMenu.Items.Add(item);
+    categoryNode := node.CategoryNode;
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := categoryNode.OnNewText;
+    item.OnClick := categoryNode.OnNewClick;
+    tvTemplates.PopupMenu.Items.Add(item);
 
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Build Item';
-      item.OnClick := PopupDeleteBuildItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsRuntime or ((node.Text='Runtime') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Runtime Item';
-      item.OnClick := PopupAddRuntimeItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Runtime Item';
-      item.OnClick := PopupDeleteRuntimeItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsDesign or ((node.Text='Design') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Design Item';
-      item.OnClick := PopupAddDesignItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Design Item';
-      item.OnClick := PopupDeleteDesignItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsDependency or ((node.Text='Dependencies') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Dependency Item';
-      item.OnClick := PopupAddDependencyItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Dependency Item';
-      item.OnClick := PopupDeleteDependencyItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsSource or ((node.Text='Source') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Source Item';
-      item.OnClick := PopupAddSourceItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Source Item';
-      item.OnClick := PopupDeleteSourceItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsFileEntry or ((node.Text='Files') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add File Item';
-      item.OnClick := PopupAddFileItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete File Item';
-      item.OnClick := PopupDeleteFileItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsFileEntry or ((node.Text='Lib') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add Library Item';
-      item.OnClick := PopupAddLibItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete Library Item';
-      item.OnClick := PopupDeleteLibItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
-    if node.IsSearchPath or ((node.Text='SearchPaths') and node.IsHeading) then
-    begin
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Add SearchPath Item';
-      item.OnClick := PopupAddSearchPathItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-      item := TMenuItem.Create(PopupMenu);
-      item.Caption := 'Delete SearchPath Item';
-      item.OnClick := PopupDeleteSearchPathItem;
-      tvTemplates.PopupMenu.Items.Add(item);
-    end;
+    item := TMenuItem.Create(PopupMenu);
+    item.Caption := categoryNode.OnDeleteText;
+    item.OnClick := categoryNode.OnDeleteClick;
+    tvTemplates.PopupMenu.Items.Add(item);
 
     tvTemplates.PopupMenu.Popup(localPos.X, localPos.Y);
 
@@ -1656,7 +1708,7 @@ end;
 
 procedure TDSpecCreatorForm.tvTemplatesEdited(Sender: TObject; Node: TTreeNode; var S: string);
 begin
-  FOpenFile.RenameTemplate(Node.Text, s);
+  FOpenFile.spec.RenameTemplate(Node.Text, s);
   edtTemplateName.Text := s;
 end;
 

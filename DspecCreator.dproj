@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Application</AppType>
@@ -269,6 +269,8 @@
         </DCCReference>
         <DCCReference Include="Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas"/>
         <DCCReference Include="Libs\DPM\Source\IDE\DPM.IDE.Types.pas"/>
+        <DCCReference Include="DPM.Creator.Logger.pas"/>
+        <DCCReference Include="DPM.Creator.TemplateTreeNode.pas"/>
         <RcItem Include="Libs\DPM\Source\images\add_16px.png">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>ADD_PACKAGE_16</ResourceId>
