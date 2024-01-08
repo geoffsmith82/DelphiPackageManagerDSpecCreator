@@ -408,7 +408,7 @@ procedure TDSpecCreatorForm.chkCopyLocalClick(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).runtime.copyLocal := chkCopyLocal.Checked;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.copyLocal := chkCopyLocal.Checked;
   end;
 end;
 
@@ -416,7 +416,7 @@ procedure TDSpecCreatorForm.chkDesignInstallClick(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).design.Install := chkDesignInstall.Checked;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.Install := chkDesignInstall.Checked;
   end;
 end;
 
@@ -638,7 +638,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).design.Source := edtDesignSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.Source := edtDesignSrc.Text;
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -656,7 +656,7 @@ procedure TDSpecCreatorForm.edtDesignBuildIdChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).design.buildId := edtDesignBuildId.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.buildId := edtDesignBuildId.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtDesignBuildId.Text;
   end;
 end;
@@ -869,14 +869,13 @@ begin
   for j := 0 to fileList.Count - 1 do
   begin
     designNode := tvTemplates.Items.AddChild(nodeDesign, fileList[j].BuildId) as TTemplateTreeNode;
+    designNode.bplEntry := fileList[j];
     if nodeName = 'Design' then
     begin
-      designNode.design := fileList[j];
       designNode.NodeType := ntDesign;
     end
     else if nodeName = 'Runtime'  then
     begin
-      designNode.runtime := fileList[j];
       designNode.NodeType := ntRuntime;
     end;
     designNode.Template := template;
@@ -980,7 +979,7 @@ procedure TDSpecCreatorForm.edtRuntimeSrcOnChange(Sender: TObject);
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).runtime.Source := edtRuntimeSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.Source := edtRuntimeSrc.Text;
     (tvTemplates.Selected as TTemplateTreeNode).Text := edtRuntimeBuildId.Text;
   end;
 end;
@@ -997,7 +996,7 @@ var
 begin
   if Assigned(tvTemplates.Selected) then
   begin
-    (tvTemplates.Selected as TTemplateTreeNode).runtime.Source := edtRuntimeSrc.Text;
+    (tvTemplates.Selected as TTemplateTreeNode).bplEntry.Source := edtRuntimeSrc.Text;
 
     str := 'Possible Expanded Paths:' + System.sLineBreak;
 
@@ -1630,16 +1629,16 @@ begin
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDesign;
-        edtDesignBuildId.Text := lNode.design.buildId;
-        edtDesignSrc.Text := lNode.design.Source;
+        edtDesignBuildId.Text := lNode.bplEntry.buildId;
+        edtDesignSrc.Text := lNode.bplEntry.Source;
       end;
       if lNode.Parent.Text = 'Runtime' then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdRuntime;
-        edtRuntimeBuildId.Text := lNode.runtime.buildId;
-        edtRuntimeSrc.Text := lNode.runtime.Source;
-        chkCopyLocal.Checked := lNode.runtime.copyLocal;
+        edtRuntimeBuildId.Text := lNode.bplEntry.buildId;
+        edtRuntimeSrc.Text := lNode.bplEntry.Source;
+        chkCopyLocal.Checked := lNode.bplEntry.copyLocal;
       end;
       if lNode.Parent.Text = 'Dependencies' then
       begin

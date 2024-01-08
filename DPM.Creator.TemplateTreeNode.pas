@@ -28,8 +28,7 @@ type
     TemplateHeading: Boolean;
     Template: ISpecTemplate;
     build: ISpecBuildEntry;
-    design: ISpecBPLEntry;
-    runtime: ISpecBPLEntry;
+    bplEntry: ISpecBPLEntry;
     fileEntry: ISpecFileEntry;
     searchpath: ISpecSearchPath;
     dependency: ISpecDependency;
@@ -90,7 +89,10 @@ end;
 
 procedure TTemplateTreeNode.DeleteDesign;
 begin
-  Template.DeleteDesignBplBySrc(design.Source);
+  if not IsDesign  then
+    raise Exception.Create('Node is not of type Design');
+
+  Template.DeleteDesignBplBySrc(bplEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteFileEntry;
@@ -104,13 +106,15 @@ end;
 procedure TTemplateTreeNode.DeleteLibEntry;
 begin
   if not IsLibEntry  then
-    raise Exception.Create('Node is not of type File');
+    raise Exception.Create('Node is not of type Lib');
   Template.DeleteLib(fileEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteRuntime;
 begin
-  Template.DeleteRuntimeBplBySrc(runtime.Source);
+  if not IsRuntime  then
+    raise Exception.Create('Node is not of type Runtime');
+  Template.DeleteRuntimeBplBySrc(bplEntry.Source);
 end;
 
 procedure TTemplateTreeNode.DeleteSearchPath;
@@ -121,7 +125,7 @@ end;
 procedure TTemplateTreeNode.DeleteSource;
 begin
   if not IsSource  then
-    raise Exception.Create('Node is not of type File');
+    raise Exception.Create('Node is not of type Source');
   Template.DeleteSource(fileEntry.Source);
 end;
 
