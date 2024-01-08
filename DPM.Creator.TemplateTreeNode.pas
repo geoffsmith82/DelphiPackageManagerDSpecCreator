@@ -7,8 +7,17 @@ uses
   DPM.Core.Spec.Interfaces;
 
 type
+   TNodeType = (ntTemplateHeading, ntBuildHeading, ntDesignHeading, ntRuntimeHeading,
+               ntSourceHeading, ntFileHeading, ntLibHeading, ntSeachPathHeading,
+               ntDependencyHeading,
+               ntBuild, ntDesign, ntRuntime,
+               ntSource, ntFile, ntLib, ntSeachPath,
+               ntDependency );
+
+
   TTemplateTreeNode = class (TTreeNode)
   public
+    NodeType : TNodeType;
     TemplateHeading: Boolean;
     Template: ISpecTemplate;
     build: ISpecBuildEntry;
@@ -24,13 +33,21 @@ type
 
     function IsHeading: Boolean;
     function IsBuild: Boolean;
+    function IsBuildHeading: Boolean;
     function IsDesign: Boolean;
+    function IsDesignHeading: Boolean;
     function IsRuntime: Boolean;
+    function IsRuntimeHeading: Boolean;
     function IsSource: Boolean;
+    function IsSourceHeading: Boolean;
     function IsFileEntry: Boolean;
+    function IsFileEntryHeading: Boolean;
     function IsLibEntry: Boolean;
+    function IsLibEntryHeading: Boolean;
     function IsSearchPath: Boolean;
+    function IsSearchPathHeading: Boolean;
     function IsDependency: Boolean;
+    function IsDependencyHeading: Boolean;
 
     procedure DeleteBuild;
     procedure DeleteSource;
@@ -49,15 +66,12 @@ implementation
 
 function TTemplateTreeNode.CommonFileEntry: ISpecFileEntry;
 begin
-  if IsSource then
-    Result := source
-  else if IsFileEntry then
-    Result := fileEntry
-  else if IsLibEntry then
-    Result := libEntry
-  else
-    Result := nil;
-
+  case NodeType of
+    ntSource: Result := source;
+    ntFile: Result := fileEntry;
+    ntLib: Result := libEntry;
+    else Result := nil;
+  end;
 end;
 
 procedure TTemplateTreeNode.DeleteBuild;
@@ -102,22 +116,42 @@ end;
 
 function TTemplateTreeNode.IsBuild: Boolean;
 begin
-  Result := (build <> nil);
+  Result := NodeType = ntBuild;
+end;
+
+function TTemplateTreeNode.IsBuildHeading: Boolean;
+begin
+  Result := NodeType = ntBuildHeading;
 end;
 
 function TTemplateTreeNode.IsDependency: Boolean;
 begin
-  Result := (dependency <> nil);
+  Result := NodeType = ntDependency;
+end;
+
+function TTemplateTreeNode.IsDependencyHeading: Boolean;
+begin
+  Result := NodeType = ntDependencyHeading;
 end;
 
 function TTemplateTreeNode.IsDesign: Boolean;
 begin
-  Result := (design <> nil);
+  Result := NodeType = ntDesign;
+end;
+
+function TTemplateTreeNode.IsDesignHeading: Boolean;
+begin
+  Result := NodeType = ntDesignHeading;
 end;
 
 function TTemplateTreeNode.IsFileEntry: Boolean;
 begin
-  Result := (fileEntry <> nil);
+  Result := NodeType = ntFile;
+end;
+
+function TTemplateTreeNode.IsFileEntryHeading: Boolean;
+begin
+  Result := NodeType = ntFileHeading;
 end;
 
 function TTemplateTreeNode.IsHeading: Boolean;
@@ -127,22 +161,42 @@ end;
 
 function TTemplateTreeNode.IsLibEntry: Boolean;
 begin
-  Result := (libEntry <> nil);
+  Result := NodeType = ntLib;
+end;
+
+function TTemplateTreeNode.IsLibEntryHeading: Boolean;
+begin
+  Result := NodeType = ntLibHeading;
 end;
 
 function TTemplateTreeNode.IsRuntime: Boolean;
 begin
-  Result := (runtime <> nil);
+  Result := NodeType = ntRuntime;
+end;
+
+function TTemplateTreeNode.IsRuntimeHeading: Boolean;
+begin
+  Result := NodeType = ntRuntimeHeading;
 end;
 
 function TTemplateTreeNode.IsSearchPath: Boolean;
 begin
-  Result := (searchpath <> nil);
+  Result := NodeType = ntSeachPath;
+end;
+
+function TTemplateTreeNode.IsSearchPathHeading: Boolean;
+begin
+  Result := NodeType = ntSeachPathHeading;
 end;
 
 function TTemplateTreeNode.IsSource: Boolean;
 begin
-  Result := (source <> nil);
+  Result := NodeType = ntSource;
+end;
+
+function TTemplateTreeNode.IsSourceHeading: Boolean;
+begin
+  Result := NodeType = ntSourceHeading;
 end;
 
 end.

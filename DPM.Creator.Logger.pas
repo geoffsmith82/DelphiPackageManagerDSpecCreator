@@ -59,7 +59,7 @@ end;
 
 procedure TDSpecLogger.Information(const data: string; const important: boolean);
 begin
-
+  strList.Add('INFORMATION: ' + data);
 end;
 
 procedure TDSpecLogger.NewLine;
