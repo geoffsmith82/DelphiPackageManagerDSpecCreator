@@ -113,7 +113,8 @@ uses
   DPM.IDE.Options in 'Libs\DPM\Source\IDE\Options\DPM.IDE.Options.pas',
   DPM.IDE.Types in 'Libs\DPM\Source\IDE\DPM.IDE.Types.pas',
   DPM.Creator.Logger in 'DPM.Creator.Logger.pas',
-  DPM.Creator.TemplateTreeNode in 'DPM.Creator.TemplateTreeNode.pas';
+  DPM.Creator.TemplateTreeNode in 'DPM.Creator.TemplateTreeNode.pas',
+  DPM.Creator.FakeIDEOptions in 'DPM.Creator.FakeIDEOptions.pas';
 
 {$R *.res}
 
