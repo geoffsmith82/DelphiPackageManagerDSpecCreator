@@ -21,70 +21,16 @@ uses
   System.ImageList,
   Vcl.ImgList,
   System.RegularExpressions,
+  Spring.Collections,
   DosCommand,
   DPM.Core.Types,
   DPM.Core.Logging,
-  dspec.filehandler,
-  DPM.Core.Spec.Interfaces
+  DPM.Core.Spec.Interfaces,
+  DPM.Creator.TemplateTreeNode,
+  dspec.filehandler
   ;
 
 type
-  TDSpecLogger = class(TInterfacedObject, ILogger)
-  private
-    strList : TStrings;
-    FVerbosity : TVerbosity;
-  public
-    procedure Debug(const data : string);
-    procedure Verbose(const data : string; const important : boolean = false);
-    procedure Information(const data : string; const important : boolean = false);
-    procedure Warning(const data : string; const important : boolean = false);
-    procedure Error(const data : string);
-    procedure Success(const data : string; const important : boolean = false);
-    procedure Clear; //not implemented in the console logger.
-    procedure NewLine;
-
-    function GetVerbosity : TVerbosity;
-    procedure SetVerbosity(const value : TVerbosity);
-    constructor Create(sl: TStrings);
-  end;
-
-
-  TTemplateTreeNode = class (TTreeNode)
-  public
-    TemplateHeading: Boolean;
-    Template: ISpecTemplate;
-    build: ISpecBuildEntry;
-    design: ISpecBPLEntry;
-    runtime: ISpecBPLEntry;
-    source: ISpecFileEntry;
-    fileEntry: ISpecFileEntry;
-    libEntry: ISpecFileEntry;
-    searchpath: ISpecSearchPath;
-    dependency: ISpecDependency;
-
-    function CommonFileEntry: ISpecFileEntry;
-
-    function IsHeading: Boolean;
-    function IsBuild: Boolean;
-    function IsDesign: Boolean;
-    function IsRuntime: Boolean;
-    function IsSource: Boolean;
-    function IsFileEntry: Boolean;
-    function IsLibEntry: Boolean;
-    function IsSearchPath: Boolean;
-    function IsDependency: Boolean;
-
-    procedure DeleteBuild;
-    procedure DeleteSource;
-    procedure DeleteFileEntry;
-    procedure DeleteLibEntry;
-    procedure DeleteDesign;
-    procedure DeleteRuntime;
-    procedure DeleteSearchPath;
-    procedure DeleteDependency;
-
-  end;
-
   TDSpecCreatorForm = class(TForm)
     PageControl: TPageControl;
     tsInfo: TTabSheet;
@@ -292,7 +238,8 @@ uses
   frmOptions,
   frmDependency,
   dpm.dspec.replacer,
-  DPM.Core.Dependency.Version
+  DPM.Core.Dependency.Version,
+  DPM.Creator.Logger
   ;
 
 
@@ -1715,164 +1662,7 @@ end;
 
 procedure TDSpecCreatorForm.tvTemplatesEditing(Sender: TObject; Node: TTreeNode; var AllowEdit: Boolean);
 begin
-   AllowEdit := (Node as TTemplateTreenode).TemplateHeading;
-end;
-
-{ TTemplateTreeNode }
-
-function TTemplateTreeNode.CommonFileEntry: ISpecFileEntry;
-begin
-  if IsSource then
-    Result := source
-  else if IsFileEntry then
-    Result := fileEntry
-  else if IsLibEntry then
-    Result := libEntry
-  else
-    Result := nil;
-
-end;
-
-procedure TTemplateTreeNode.DeleteBuild;
-begin
-  Template.DeleteBuildEntryById(Build.Id);
-end;
-
-procedure TTemplateTreeNode.DeleteDependency;
-begin
-  Template.DeleteDependencyById(dependency.Id);
-end;
-
-procedure TTemplateTreeNode.DeleteDesign;
-begin
-  Template.DeleteDesignBplBySrc(design.Source);
-end;
-
-procedure TTemplateTreeNode.DeleteFileEntry;
-begin
-  Template.DeleteFiles(fileEntry.Source);
-end;
-
-procedure TTemplateTreeNode.DeleteLibEntry;
-begin
-  Template.DeleteLib(LibEntry.Source);
-end;
-
-procedure TTemplateTreeNode.DeleteRuntime;
-begin
-  Template.DeleteRuntimeBplBySrc(runtime.Source);
-end;
-
-procedure TTemplateTreeNode.DeleteSearchPath;
-begin
-  Template.DeleteSearchPath(searchpath.Path);
-end;
-
-procedure TTemplateTreeNode.DeleteSource;
-begin
-  Template.DeleteSource(source.Source);
-end;
-
-function TTemplateTreeNode.IsBuild: Boolean;
-begin
-  Result := (build <> nil);
-end;
-
-function TTemplateTreeNode.IsDependency: Boolean;
-begin
-  Result := (dependency <> nil);
-end;
-
-function TTemplateTreeNode.IsDesign: Boolean;
-begin
-  Result := (design <> nil);
-end;
-
-function TTemplateTreeNode.IsFileEntry: Boolean;
-begin
-  Result := (fileEntry <> nil);
-end;
-
-function TTemplateTreeNode.IsHeading: Boolean;
-begin
-  Result := (build = nil) and (runtime = nil) and (source = nil) and (searchpath = nil);
-end;
-
-function TTemplateTreeNode.IsLibEntry: Boolean;
-begin
-  Result := (libEntry <> nil);
-end;
-
-function TTemplateTreeNode.IsRuntime: Boolean;
-begin
-  Result := (runtime <> nil);
-end;
-
-function TTemplateTreeNode.IsSearchPath: Boolean;
-begin
-  Result := (searchpath <> nil);
-end;
-
-function TTemplateTreeNode.IsSource: Boolean;
-begin
-  Result := (source <> nil);
-end;
-
-{ TDSpecLogger }
-
-procedure TDSpecLogger.Clear;
-begin
-
-end;
-
-constructor TDSpecLogger.Create(sl: TStrings);
-begin
-  strList := sl;
-end;
-
-procedure TDSpecLogger.Debug(const data: string);
-begin
-  strList.Add('DEBUG: ' + data);
-end;
-
-procedure TDSpecLogger.Error(const data: string);
-begin
-  strList.Add('ERROR: ' + data);
-end;
-
-function TDSpecLogger.GetVerbosity: TVerbosity;
-begin
-  Result := FVerbosity;
-end;
-
-procedure TDSpecLogger.Information(const data: string; const important: boolean);
-begin
-
-end;
-
-procedure TDSpecLogger.NewLine;
-begin
-  strList.Add('');
-end;
-
-procedure TDSpecLogger.SetVerbosity(const value: TVerbosity);
-begin
-  FVerbosity := value;
-end;
-
-procedure TDSpecLogger.Success(const data: string; const important: boolean);
-begin
-  strList.Add('SUCCESS: ' + data);
-end;
-
-procedure TDSpecLogger.Verbose(const data: string; const important: boolean);
-begin
-  strList.Add('VERBOSE: ' + data);
-end;
-
-procedure TDSpecLogger.Warning(const data: string; const important: boolean);
-begin
-  strList.Add('WARNING: ' + data);
+  AllowEdit := (Node as TTemplateTreenode).TemplateHeading;
 end;
 
 end.
