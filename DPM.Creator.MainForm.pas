@@ -20,6 +20,8 @@ uses
   Vcl.Menus,
   Vcl.WinXPanels,
   Vcl.ExtCtrls,
+  Vcl.Grids,
+  Vcl.ValEdit,
   System.RegularExpressions,
   Spring.Collections,
   DosCommand,
@@ -128,6 +130,7 @@ type
     tsLogging: TTabSheet;
     Memo2: TMemo;
     chkInstall: TCheckBox;
+    VariablesList: TValueListEditor;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
@@ -196,6 +199,7 @@ type
     procedure PopupDeleteDependencyItem(Sender: TObject);
     procedure tvTemplatesEdited(Sender: TObject; Node: TTreeNode; var S: string);
     procedure tvTemplatesEditing(Sender: TObject; Node: TTreeNode; var AllowEdit: Boolean);
+    procedure VariablesListStringsChange(Sender: TObject);
   private
     { Private declarations }
     FtmpFilename : string;
@@ -204,6 +208,7 @@ type
     FTemplate : ISpecTemplate;
     FSavefilename : string;
     FLogger: ILogger;
+    FInVariableUpdate: Boolean;
     procedure LoadTemplates;
     procedure EnableDisablePlatform(compilerVersion : TCompilerVersion);
     function ReplaceVars(inputStr: String; compiler: TCompilerVersion): string;
@@ -424,10 +429,16 @@ end;
 
 procedure TDSpecCreatorForm.clbCompilersClick(Sender: TObject);
 var
-  j : Integer;
+  i, j : Integer;
   vplatform : ISpecTargetPlatform;
   compilerVersion : TCompilerVersion;
 begin
+  FInVariableUpdate := True;
+  try
+    VariablesList.Strings.Clear;
+  finally
+    FInVariableUpdate := False;
+  end;
   if clbCompilers.ItemIndex < 0 then
   begin
     cboTemplate.ItemIndex := -1;
@@ -500,6 +511,13 @@ begin
     j := clbPlatforms.Items.IndexOf('OSX64');
     if j >= 0 then
       clbPlatforms.Checked[j] := j >= 0;
+  end;
+  FInVariableUpdate := True;
+  try
+    VariablesList.Strings.Clear;
+    VariablesList.Strings.AddStrings(vplatform.Variables);
+  finally
+    FInVariableUpdate := False;
   end;
 
   cboTemplate.Clear;
@@ -1677,6 +1695,25 @@ end;
 procedure TDSpecCreatorForm.tvTemplatesEditing(Sender: TObject; Node: TTreeNode; var AllowEdit: Boolean);
 begin
   AllowEdit := (Node as TTemplateTreenode).TemplateHeading;
+end;
+
+procedure TDSpecCreatorForm.VariablesListStringsChange(Sender: TObject);
+var
+  vplatform : ISpecTargetPlatform;
+begin
+  vplatform := FOpenFile.GetPlatform(clbCompilers.Items[clbCompilers.ItemIndex]);
+
+  if clbCompilers.Checked[clbCompilers.ItemIndex] and not Assigned(vplatform) then
+  begin
+    vplatform := FOpenFile.AddCompiler(clbCompilers.Items[clbCompilers.ItemIndex]);
+  end;
+  if FInVariableUpdate then
+    Exit;
+  if Assigned(vplatform) then
+  begin
+    vplatform.Variables.Clear;
+    vplatform.Variables.AddStrings(VariablesList.Strings);
+  end;
 end;
 
 end.

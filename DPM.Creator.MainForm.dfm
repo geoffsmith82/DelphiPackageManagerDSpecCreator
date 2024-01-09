@@ -243,6 +243,20 @@ object DSpecCreatorForm: TDSpecCreatorForm
         TabOrder = 2
         OnClickCheck = clbPlatformsClickCheck
       end
+      object VariablesList: TValueListEditor
+        Left = 256
+        Top = 253
+        Width = 297
+        Height = 145
+        DoubleBuffered = True
+        KeyOptions = [keyEdit, keyAdd, keyDelete, keyUnique]
+        ParentDoubleBuffered = False
+        TabOrder = 3
+        OnStringsChange = VariablesListStringsChange
+        ColWidths = (
+          150
+          141)
+      end
     end
     object tsTemplates: TTabSheet
       Caption = 'Templates'
