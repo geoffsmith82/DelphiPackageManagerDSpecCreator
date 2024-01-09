@@ -4,9 +4,9 @@ program DspecCreator;
 
 uses
   Vcl.Forms,
-  frmDSpecCreator in 'frmDSpecCreator.pas' {DSpecCreatorForm},
-  dspec.filehandler in 'dspec.filehandler.pas',
-  dpm.dspec.replacer in 'dpm.dspec.replacer.pas',
+  DPM.Creator.MainForm in 'DPM.Creator.MainForm.pas' {DSpecCreatorForm},
+  DPM.Creator.Dspec.FileHandler in 'DPM.Creator.Dspec.FileHandler.pas',
+  DPM.Creator.Dspec.Replacer in 'DPM.Creator.Dspec.Replacer.pas',
   DPM.Creator.TemplateForm in 'DPM.Creator.TemplateForm.pas' {TemplateForm},
   DPM.Creator.SourceForm in 'DPM.Creator.SourceForm.pas' {SourceForm},
   DPM.Creator.BuildForm in 'DPM.Creator.BuildForm.pas' {BuildForm},

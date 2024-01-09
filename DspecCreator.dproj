@@ -130,12 +130,12 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frmDSpecCreator.pas">
+        <DCCReference Include="DPM.Creator.MainForm.pas">
             <Form>DSpecCreatorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="dspec.filehandler.pas"/>
-        <DCCReference Include="dpm.dspec.replacer.pas"/>
+        <DCCReference Include="DPM.Creator.Dspec.FileHandler.pas"/>
+        <DCCReference Include="DPM.Creator.Dspec.Replacer.pas"/>
         <DCCReference Include="DPM.Creator.TemplateForm.pas">
             <Form>TemplateForm</Form>
             <FormType>dfm</FormType>

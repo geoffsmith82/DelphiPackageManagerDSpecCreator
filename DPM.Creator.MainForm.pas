@@ -1,4 +1,4 @@
-unit frmDSpecCreator;
+unit DPM.Creator.MainForm;
 
 interface
 
@@ -27,7 +27,7 @@ uses
   DPM.Core.Logging,
   DPM.Core.Spec.Interfaces,
   DPM.Creator.TemplateTreeNode,
-  dspec.filehandler
+  DPM.Creator.Dspec.FileHandler
   ;
 
 type
@@ -245,7 +245,7 @@ uses
   DPM.Creator.OptionsForm,
   DPM.Creator.DependencyForm,
   DPM.Creator.Logger,
-  dpm.dspec.replacer
+  DPM.Creator.Dspec.Replacer
   ;
 
 
@@ -1517,24 +1517,18 @@ end;
 procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
 var
   lNode: TTemplateTreeNode;
+  lNodeParent: TTemplateTreeNode;
 begin
   lNode := Node as TTemplateTreeNode;
+  lNodeParent := Node.Parent as TTemplateTreeNode;
   if lNode.IsSearchPathHeading then
   begin
     CardPanel.ActiveCard := crdSearchPaths;
     CardPanel.Visible := False;
   end
-  else if lNode.IsSourceHeading then
-  begin
-    CardPanel.ActiveCard := crdSource;
-    CardPanel.Visible := False;
-  end
-  else if lNode.IsFileEntryHeading then
-  begin
-    CardPanel.ActiveCard := crdSource;
-    CardPanel.Visible := False;
-  end
-  else if lNode.IsLibEntryHeading then
+  else if lNode.IsSourceHeading or
+          lNode.IsFileEntryHeading or
+          lNode.IsLibEntryHeading then
   begin
     CardPanel.ActiveCard := crdSource;
     CardPanel.Visible := False;
@@ -1543,7 +1537,6 @@ begin
   begin
     CardPanel.ActiveCard := crdBuild;
     CardPanel.Visible := False;
-
   end
   else if lNode.IsDesignHeading then
   begin
@@ -1568,15 +1561,17 @@ begin
   end
   else
   begin
-    if (lNode.Parent <> nil) then
+    if (lNodeParent <> nil) then
     begin
-      if lNode.Parent.Text = 'SearchPaths' then
+      if lNodeParent.IsSearchPath then
       begin
         edtSearchPath.Text := lNode.searchpath.path;
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSearchPaths;
       end;
-      if lNode.Parent.Text = 'Source' then
+      if lNodeParent.IsSource or
+         lNodeParent.IsFileEntry or
+         lNodeParent.IsLibEntry then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSource;
@@ -1589,33 +1584,7 @@ begin
           lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
         end;
       end;
-      if lNode.Parent.Text = 'Files' then
-      begin
-        CardPanel.Visible := True;
-        CardPanel.ActiveCard := crdSource;
-        edtSource.Text := lNode.fileEntry.Source;
-        chkFlatten.Checked := lNode.fileEntry.flatten;
-        edtDest.Text := lNode.fileEntry.Destination;
-        lbExclude.Clear;
-        for var j := 0 to lNode.fileEntry.Exclude.Count - 1 do
-        begin
-          lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
-        end;
-      end;
-      if lNode.Parent.Text = 'Lib' then
-      begin
-        CardPanel.Visible := True;
-        CardPanel.ActiveCard := crdSource;
-        edtSource.Text := lNode.fileEntry.Source;
-        chkFlatten.Checked := lNode.fileEntry.flatten;
-        edtDest.Text := lNode.fileEntry.Destination;
-        lbExclude.Clear;
-        for var j := 0 to lNode.fileEntry.Exclude.Count - 1 do
-        begin
-          lbExclude.Items.Add(lNode.fileEntry.Exclude[j]);
-        end;
-      end;
-      if lNode.Parent.Text = 'Build' then
+      if lNodeParent.IsBuild then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdBuild;
@@ -1625,14 +1594,14 @@ begin
         chkBuildForDesign.Checked := lNode.build.buildForDesign;
         chkDesignOnly.Checked := lNode.build.DesignOnly;
       end;
-      if lNode.Parent.Text = 'Design' then
+      if lNodeParent.IsDesign then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDesign;
         edtDesignBuildId.Text := lNode.bplEntry.buildId;
         edtDesignSrc.Text := lNode.bplEntry.Source;
       end;
-      if lNode.Parent.Text = 'Runtime' then
+      if lNodeParent.IsRuntime then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdRuntime;
@@ -1640,7 +1609,7 @@ begin
         edtRuntimeSrc.Text := lNode.bplEntry.Source;
         chkCopyLocal.Checked := lNode.bplEntry.copyLocal;
       end;
-      if lNode.Parent.Text = 'Dependencies' then
+      if lNodeParent.IsDependency then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDependencies;

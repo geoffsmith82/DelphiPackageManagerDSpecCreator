@@ -21,7 +21,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
     Top = 0
     Width = 871
     Height = 441
-    ActivePage = tsInfo
+    ActivePage = tsTemplates
     Align = alClient
     TabOrder = 0
     object tsInfo: TTabSheet
@@ -302,7 +302,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Width = 532
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ActiveCard = crdDesign
+        ActiveCard = crdRuntime
         Caption = 'CardPanel'
         TabOrder = 3
         object crdSource: TCard
@@ -313,7 +313,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdSource'
           CardIndex = 0
           TabOrder = 0
-          ExplicitWidth = 524
           DesignSize = (
             530
             340)
@@ -343,7 +342,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 0
             Text = 'edtSource'
             OnChange = edtSourceChange
-            ExplicitWidth = 370
           end
           object chkFlatten: TCheckBox
             Left = 74
@@ -364,7 +362,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 2
             Text = 'Edit1'
             OnChange = edtDestChange
-            ExplicitWidth = 370
           end
           object lbExclude: TListBox
             Left = 74
@@ -374,7 +371,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 15
             TabOrder = 3
-            ExplicitWidth = 370
           end
           object btnAddExclude: TButton
             Left = 192
@@ -386,7 +382,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             OnClick = btnAddExcludeClick
           end
           object btnDeleteExclude: TButton
-            Left = 282
+            Left = 273
             Top = 229
             Width = 88
             Height = 25
@@ -403,7 +399,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdSearchPaths'
           CardIndex = 1
           TabOrder = 1
-          ExplicitWidth = 524
           object lblSearchPaths: TLabel
             Left = 64
             Top = 32
@@ -429,8 +424,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdBuild'
           CardIndex = 2
           TabOrder = 2
-          ExplicitLeft = 17
-          ExplicitWidth = 524
           DesignSize = (
             530
             340)
@@ -471,7 +464,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtBuildIdChange
-            ExplicitWidth = 411
           end
           object edtProject: TEdit
             Left = 96
@@ -484,7 +476,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtProjectChange
-            ExplicitWidth = 411
           end
           object edtConfiguration: TEdit
             Left = 96
@@ -497,7 +488,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 2
             Text = 'edtConfiguration'
             OnChange = edtConfigurationChange
-            ExplicitWidth = 411
           end
           object chkBuildForDesign: TCheckBox
             Left = 96
@@ -527,7 +517,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdRuntime'
           CardIndex = 3
           TabOrder = 3
-          ExplicitLeft = 0
           DesignSize = (
             524
             334)
@@ -560,7 +549,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             OnChange = edtRuntimeSrcOnChange
-            ExplicitWidth = 413
           end
           object edtRuntimeSrc: TEdit
             Left = 86
@@ -572,7 +560,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ShowHint = True
             TabOrder = 1
             OnChange = edtRuntimeSrcChange
-            ExplicitWidth = 413
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -592,7 +579,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdDependencies'
           CardIndex = 4
           TabOrder = 4
-          ExplicitWidth = 524
           DesignSize = (
             530
             340)
@@ -619,7 +605,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 0
             Text = 'edtBuildId'
             OnChange = edtDependencyIdChange
-            ExplicitWidth = 411
           end
           object edtDependencyVersion: TEdit
             Left = 104
@@ -632,7 +617,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtDependencyVersionChange
-            ExplicitWidth = 411
           end
         end
         object crdDesign: TCard
@@ -643,7 +627,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdDesign'
           CardIndex = 5
           TabOrder = 5
-          ExplicitWidth = 524
           DesignSize = (
             530
             340)
@@ -673,7 +656,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 0
             Text = 'edtSource'
             OnChange = edtDesignBuildIdChange
-            ExplicitWidth = 370
           end
           object edtDesignSrc: TEdit
             Left = 81
@@ -686,7 +668,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtDesignSrcChange
-            ExplicitWidth = 370
           end
           object chkDesignInstall: TCheckBox
             Left = 82
@@ -706,10 +687,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
           Caption = 'crdTemplates'
           CardIndex = 6
           TabOrder = 6
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           object lblTemplateName: TLabel
             Left = 72
             Top = 40

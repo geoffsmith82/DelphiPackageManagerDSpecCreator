@@ -1,4 +1,4 @@
-unit dpm.dspec.replacer;
+unit DPM.Creator.Dspec.Replacer;
 
 interface
 
