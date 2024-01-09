@@ -235,17 +235,17 @@ implementation
 uses
   System.UITypes,
   System.IOUtils,
-  frmTemplates,
-  frmBuild,
-  frmSource,
-  frmRuntime,
-  frmDesign,
-  frmSearchPath,
-  frmOptions,
-  frmDependency,
-  dpm.dspec.replacer,
   DPM.Core.Dependency.Version,
-  DPM.Creator.Logger
+  DPM.Creator.TemplateForm,
+  DPM.Creator.BuildForm,
+  DPM.Creator.SourceForm,
+  DPM.Creator.RuntimeForm,
+  DPM.Creator.DesignForm,
+  DPM.Creator.SearchPathForm,
+  DPM.Creator.OptionsForm,
+  DPM.Creator.DependencyForm,
+  DPM.Creator.Logger,
+  dpm.dspec.replacer
   ;
 
 

@@ -1,4 +1,4 @@
-unit frmRuntime;
+unit DPM.Creator.DependencyForm;
 
 interface
 
@@ -16,14 +16,13 @@ uses
   ;
 
 type
-  TRuntimeForm = class(TForm)
+  TDependencyForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
-    chkCopyLocal: TCheckBox;
-    lblRuntimeSrc: TLabel;
-    edtRuntimeSrc: TEdit;
-    lblRuntimeBuildId: TLabel;
-    edtRuntimeBuildId: TEdit;
+    lblBuildId: TLabel;
+    edtDependencyId: TEdit;
+    lblProject: TLabel;
+    edtVersion: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -36,13 +35,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TRuntimeForm.btnCancelClick(Sender: TObject);
+procedure TDependencyForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TRuntimeForm.btnOkClick(Sender: TObject);
+procedure TDependencyForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;

@@ -1,4 +1,4 @@
-unit frmDesign;
+unit DPM.Creator.RuntimeForm;
 
 interface
 
@@ -16,14 +16,14 @@ uses
   ;
 
 type
-  TDesignForm = class(TForm)
+  TRuntimeForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
-    chkInstall: TCheckBox;
-    lblDesignSrc: TLabel;
-    edtDesignSrc: TEdit;
-    lblDesignBuildId: TLabel;
-    edtDesignBuildId: TEdit;
+    chkCopyLocal: TCheckBox;
+    lblRuntimeSrc: TLabel;
+    edtRuntimeSrc: TEdit;
+    lblRuntimeBuildId: TLabel;
+    edtRuntimeBuildId: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -36,13 +36,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TDesignForm.btnCancelClick(Sender: TObject);
+procedure TRuntimeForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TDesignForm.btnOkClick(Sender: TObject);
+procedure TRuntimeForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;

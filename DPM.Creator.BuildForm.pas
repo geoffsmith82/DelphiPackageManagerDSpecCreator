@@ -1,4 +1,4 @@
-unit frmSource;
+unit DPM.Creator.BuildForm;
 
 interface
 
@@ -16,14 +16,13 @@ uses
   ;
 
 type
-  TSourceForm = class(TForm)
+  TBuildForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
-    lblSrc: TLabel;
-    edtSource: TEdit;
-    chkFlatten: TCheckBox;
-    lblDest: TLabel;
-    edtDest: TEdit;
+    lblBuildId: TLabel;
+    edtBuildId: TEdit;
+    lblProject: TLabel;
+    edtProject: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -36,13 +35,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TSourceForm.btnCancelClick(Sender: TObject);
+procedure TBuildForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TSourceForm.btnOkClick(Sender: TObject);
+procedure TBuildForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;

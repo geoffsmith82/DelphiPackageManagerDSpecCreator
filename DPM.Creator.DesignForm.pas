@@ -1,4 +1,4 @@
-unit frmBuild;
+unit DPM.Creator.DesignForm;
 
 interface
 
@@ -16,13 +16,14 @@ uses
   ;
 
 type
-  TBuildForm = class(TForm)
+  TDesignForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
-    lblBuildId: TLabel;
-    edtBuildId: TEdit;
-    lblProject: TLabel;
-    edtProject: TEdit;
+    chkInstall: TCheckBox;
+    lblDesignSrc: TLabel;
+    edtDesignSrc: TEdit;
+    lblDesignBuildId: TLabel;
+    edtDesignBuildId: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -35,13 +36,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TBuildForm.btnCancelClick(Sender: TObject);
+procedure TDesignForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TBuildForm.btnOkClick(Sender: TObject);
+procedure TDesignForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;

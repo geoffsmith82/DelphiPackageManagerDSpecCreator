@@ -21,10 +21,12 @@ object OptionsForm: TOptionsForm
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 859
+    ExplicitHeight = 463
     inherited pgOptions: TPageControl
       Width = 859
       Height = 463
       ExplicitWidth = 859
+      ExplicitHeight = 463
       inherited tsSources: TTabSheet
         ExplicitWidth = 851
         ExplicitHeight = 429
@@ -62,6 +64,7 @@ object OptionsForm: TOptionsForm
           Top = 218
           Width = 851
           StyleElements = [seFont, seClient, seBorder]
+          ExplicitTop = 218
           ExplicitWidth = 851
           inherited Label1: TLabel
             StyleElements = [seFont, seClient, seBorder]
@@ -99,17 +102,17 @@ object OptionsForm: TOptionsForm
           Height = 129
           StyleElements = [seFont, seClient, seBorder]
           ExplicitWidth = 851
+          ExplicitHeight = 129
           inherited lvSources: TListView
             Width = 851
             Height = 129
             ExplicitWidth = 851
+            ExplicitHeight = 129
           end
         end
       end
       inherited tsIDEOptions: TTabSheet
-        ExplicitWidth = 851
         inherited pnlIDEOptions: TPanel
-          Width = 851
           StyleElements = [seFont, seClient, seBorder]
           inherited Label4: TLabel
             StyleElements = [seFont, seClient, seBorder]

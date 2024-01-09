@@ -1,4 +1,4 @@
-unit frmTemplates;
+unit DPM.Creator.TemplateForm;
 
 interface
 

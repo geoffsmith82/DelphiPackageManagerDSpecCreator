@@ -1,4 +1,4 @@
-unit frmSearchPath;
+unit DPM.Creator.SourceForm;
 
 interface
 
@@ -16,11 +16,14 @@ uses
   ;
 
 type
-  TSearchPathForm = class(TForm)
+  TSourceForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
-    lblRuntimeSrc: TLabel;
-    edtSearchPath: TEdit;
+    lblSrc: TLabel;
+    edtSource: TEdit;
+    chkFlatten: TCheckBox;
+    lblDest: TLabel;
+    edtDest: TEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -33,13 +36,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TSearchPathForm.btnCancelClick(Sender: TObject);
+procedure TSourceForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TSearchPathForm.btnOkClick(Sender: TObject);
+procedure TSourceForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;
