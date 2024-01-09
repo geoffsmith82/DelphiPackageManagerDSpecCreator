@@ -1515,7 +1515,7 @@ var
   j: Integer;
 begin
   lNode := Node as TTemplateTreeNode;
-  lNodeParent := Node.Parent as TTemplateTreeNode;
+  lNodeParent := lNode.Parent as TTemplateTreeNode;
   if lNode.IsSearchPathHeading then
   begin
     CardPanel.ActiveCard := crdSearchPaths;
@@ -1553,15 +1553,15 @@ begin
   begin
     if (lNodeParent <> nil) then
     begin
-      if lNodeParent.IsSearchPath then
+      if lNodeParent.IsSearchPathHeading then
       begin
         edtSearchPath.Text := lNode.searchpath.path;
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSearchPaths;
       end;
-      if lNodeParent.IsSource or
-         lNodeParent.IsFileEntry or
-         lNodeParent.IsLibEntry then
+      if lNodeParent.IsSourceHeading or
+         lNodeParent.IsFileEntryHeading or
+         lNodeParent.IsLibEntryHeading then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdSource;
@@ -1574,7 +1574,7 @@ begin
           lbFileEntryExclude.Items.Add(lNode.fileEntry.Exclude[j]);
         end;
       end;
-      if lNodeParent.IsBuild then
+      if lNodeParent.IsBuildHeading then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdBuild;
@@ -1584,7 +1584,7 @@ begin
         chkBuildForDesign.Checked := lNode.build.buildForDesign;
         chkDesignOnly.Checked := lNode.build.DesignOnly;
       end;
-      if lNodeParent.IsRuntime or lNodeParent.IsDesign then
+      if lNodeParent.IsRuntimeHeading or lNodeParent.IsDesignHeading then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdRuntimeOrDesignBpl;
@@ -1592,7 +1592,7 @@ begin
         edtBPLEntrySrc.Text := lNode.bplEntry.Source;
         chkCopyLocal.Checked := lNode.bplEntry.copyLocal;
       end;
-      if lNodeParent.IsDependency then
+      if lNodeParent.IsDependencyHeading then
       begin
         CardPanel.Visible := True;
         CardPanel.ActiveCard := crdDependencies;
