@@ -75,6 +75,8 @@ begin
     Result := (Parent as TTemplateTreeNode)
   else if (Parent as TTemplateTreeNode).IsHeading then
     Result := (Parent.Parent as TTemplateTreeNode)
+  else
+    raise Exception.Create('Category node not found');
 end;
 
 procedure TTemplateTreeNode.DeleteBuild;

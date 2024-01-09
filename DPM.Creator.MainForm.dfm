@@ -302,7 +302,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Width = 532
         Height = 342
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ActiveCard = crdRuntime
+        ActiveCard = crdSource
         Caption = 'CardPanel'
         TabOrder = 3
         object crdSource: TCard
@@ -330,7 +330,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Dest:'
           end
-          object edtSource: TEdit
+          object edtFileEntrySource: TEdit
             Left = 74
             Top = 45
             Width = 376
@@ -340,10 +340,10 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
-            Text = 'edtSource'
-            OnChange = edtSourceChange
+            Text = 'edtFileEntrySource'
+            OnChange = edtFileEntrySourceChange
           end
-          object chkFlatten: TCheckBox
+          object chkFileEntryFlatten: TCheckBox
             Left = 74
             Top = 74
             Width = 97
@@ -351,7 +351,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Caption = 'Flatten'
             TabOrder = 1
           end
-          object edtDest: TEdit
+          object edtFileEntryDest: TEdit
             Left = 73
             Top = 97
             Width = 376
@@ -361,9 +361,9 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ShowHint = True
             TabOrder = 2
             Text = 'Edit1'
-            OnChange = edtDestChange
+            OnChange = edtFileEntryDestChange
           end
-          object lbExclude: TListBox
+          object lbFileEntryExclude: TListBox
             Left = 74
             Top = 126
             Width = 376
@@ -508,7 +508,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             OnClick = chkDesignOnlyClick
           end
         end
-        object crdRuntime: TCard
+        object crdRuntimeOrDesignBpl: TCard
           AlignWithMargins = True
           Left = 4
           Top = 4
@@ -541,16 +541,16 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Height = 15
             Caption = 'Src:'
           end
-          object edtRuntimeBuildId: TEdit
+          object edtBPLEntryBuildId: TEdit
             Left = 86
             Top = 69
             Width = 419
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
-            OnChange = edtRuntimeSrcOnChange
+            OnChange = edtBPLEntryBuildIdOnChange
           end
-          object edtRuntimeSrc: TEdit
+          object edtBPLEntrySrc: TEdit
             Left = 86
             Top = 109
             Width = 419
@@ -559,7 +559,7 @@ object DSpecCreatorForm: TDSpecCreatorForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            OnChange = edtRuntimeSrcChange
+            OnChange = edtBPLEntrySrcChange
           end
           object chkCopyLocal: TCheckBox
             Left = 86
@@ -569,6 +569,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
             Caption = 'Copy Local'
             TabOrder = 2
             OnClick = chkCopyLocalClick
+          end
+          object chkInstall: TCheckBox
+            Left = 86
+            Top = 167
+            Width = 97
+            Height = 17
+            Caption = 'Install'
+            TabOrder = 3
+            OnClick = chkDesignInstallClick
           end
         end
         object crdDependencies: TCard
@@ -617,66 +626,6 @@ object DSpecCreatorForm: TDSpecCreatorForm
             TabOrder = 1
             Text = 'Edit1'
             OnChange = edtDependencyVersionChange
-          end
-        end
-        object crdDesign: TCard
-          Left = 1
-          Top = 1
-          Width = 530
-          Height = 340
-          Caption = 'crdDesign'
-          CardIndex = 5
-          TabOrder = 5
-          DesignSize = (
-            530
-            340)
-          object lblDesignBuildId: TLabel
-            Left = 32
-            Top = 56
-            Width = 43
-            Height = 15
-            Caption = 'Build Id:'
-          end
-          object lblDesignSrc: TLabel
-            Left = 49
-            Top = 108
-            Width = 19
-            Height = 15
-            Caption = 'Src:'
-          end
-          object edtDesignBuildId: TEdit
-            Left = 81
-            Top = 53
-            Width = 376
-            Height = 23
-            CustomHint = BalloonHint1
-            Anchors = [akLeft, akTop, akRight]
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            Text = 'edtSource'
-            OnChange = edtDesignBuildIdChange
-          end
-          object edtDesignSrc: TEdit
-            Left = 81
-            Top = 105
-            Width = 376
-            Height = 23
-            Anchors = [akLeft, akTop, akRight]
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 1
-            Text = 'Edit1'
-            OnChange = edtDesignSrcChange
-          end
-          object chkDesignInstall: TCheckBox
-            Left = 82
-            Top = 82
-            Width = 97
-            Height = 17
-            Caption = 'Install'
-            TabOrder = 2
-            OnClick = chkDesignInstallClick
           end
         end
         object crdTemplates: TCard

@@ -16,14 +16,15 @@ uses
   ;
 
 type
-  TRuntimeForm = class(TForm)
+  TBplForm = class(TForm)
     btnCancel: TButton;
     btnOk: TButton;
     chkCopyLocal: TCheckBox;
     lblRuntimeSrc: TLabel;
-    edtRuntimeSrc: TEdit;
+    edtSource: TEdit;
     lblRuntimeBuildId: TLabel;
-    edtRuntimeBuildId: TEdit;
+    edtBuildId: TEdit;
+    chkInstall: TCheckBox;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
   private
@@ -36,13 +37,13 @@ implementation
 
 {$R *.dfm}
 
-procedure TRuntimeForm.btnCancelClick(Sender: TObject);
+procedure TBplForm.btnCancelClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrCancel;
 end;
 
-procedure TRuntimeForm.btnOkClick(Sender: TObject);
+procedure TBplForm.btnOkClick(Sender: TObject);
 begin
   Close;
   ModalResult := mrOk;

@@ -8,13 +8,11 @@ uses
   DPM.Creator.Dspec.FileHandler in 'DPM.Creator.Dspec.FileHandler.pas',
   DPM.Creator.Dspec.Replacer in 'DPM.Creator.Dspec.Replacer.pas',
   DPM.Creator.TemplateForm in 'DPM.Creator.TemplateForm.pas' {TemplateForm},
-  DPM.Creator.SourceForm in 'DPM.Creator.SourceForm.pas' {SourceForm},
-  DPM.Creator.BuildForm in 'DPM.Creator.BuildForm.pas' {BuildForm},
-  DPM.Creator.RuntimeForm in 'DPM.Creator.RuntimeForm.pas' {RuntimeForm},
+  DPM.Creator.FileForm in 'DPM.Creator.FileForm.pas' {SourceForm},
+  DPM.Creator.RuntimeForm in 'DPM.Creator.RuntimeForm.pas' {BplForm},
   DPM.Creator.SearchPathForm in 'DPM.Creator.SearchPathForm.pas' {SearchPathForm},
   DPM.Creator.OptionsForm in 'DPM.Creator.OptionsForm.pas' {OptionsForm},
   DPM.Creator.DependencyForm in 'DPM.Creator.DependencyForm.pas' {DependencyForm},
-  DPM.Creator.DesignForm in 'DPM.Creator.DesignForm.pas' {DesignForm},
   DPM.Core.Types in 'Libs\DPM\Source\Core\DPM.Core.Types.pas',
   DPM.Core.TargetPlatform in 'Libs\DPM\Source\Core\DPM.Core.TargetPlatform.pas',
   DPM.Core.Init in 'Libs\DPM\Source\Core\DPM.Core.Init.pas',
@@ -114,7 +112,8 @@ uses
   DPM.IDE.Types in 'Libs\DPM\Source\IDE\DPM.IDE.Types.pas',
   DPM.Creator.Logger in 'DPM.Creator.Logger.pas',
   DPM.Creator.TemplateTreeNode in 'DPM.Creator.TemplateTreeNode.pas',
-  DPM.Creator.FakeIDEOptions in 'DPM.Creator.FakeIDEOptions.pas';
+  DPM.Creator.FakeIDEOptions in 'DPM.Creator.FakeIDEOptions.pas',
+  DPM.Creator.BuildForm in 'DPM.Creator.BuildForm.pas' {BuildForm};
 
 {$R *.res}
 

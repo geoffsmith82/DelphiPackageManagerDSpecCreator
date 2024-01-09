@@ -1,4 +1,4 @@
-object RuntimeForm: TRuntimeForm
+object BplForm: TBplForm
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -58,7 +58,7 @@ object RuntimeForm: TRuntimeForm
     Caption = 'Copy Local'
     TabOrder = 2
   end
-  object edtRuntimeSrc: TEdit
+  object edtSource: TEdit
     Left = 75
     Top = 85
     Width = 413
@@ -68,12 +68,20 @@ object RuntimeForm: TRuntimeForm
     ShowHint = True
     TabOrder = 3
   end
-  object edtRuntimeBuildId: TEdit
+  object edtBuildId: TEdit
     Left = 75
     Top = 45
     Width = 413
     Height = 23
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 4
+  end
+  object chkInstall: TCheckBox
+    Left = 75
+    Top = 143
+    Width = 97
+    Height = 17
+    Caption = 'Install In IDE'
+    TabOrder = 5
   end
 end
