@@ -252,6 +252,9 @@ object DSpecCreatorForm: TDSpecCreatorForm
         KeyOptions = [keyEdit, keyAdd, keyDelete, keyUnique]
         ParentDoubleBuffered = False
         TabOrder = 3
+        TitleCaptions.Strings = (
+          'Variable Name'
+          'Value')
         OnStringsChange = VariablesListStringsChange
         ColWidths = (
           150
