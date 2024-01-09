@@ -613,13 +613,18 @@ begin
 end;
 
 procedure TDSpecCreatorForm.edtDependencyVersionChange(Sender: TObject);
+var
+  ver : TVersionRange;
 begin
   if Assigned(tvTemplates.Selected) then
   begin
     if length(edtDependencyVersion.Text) > 0 then
     begin
-      (tvTemplates.Selected as TTemplateTreeNode).dependency.version := TVersionRange.Parse(edtDependencyVersion.Text);
-      (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
+      if TVersionRange.TryParse(edtDependencyVersion.Text, ver) then
+      begin
+        (tvTemplates.Selected as TTemplateTreeNode).dependency.version := ver;
+        (tvTemplates.Selected as TTemplateTreeNode).Text := edtDependencyId.Text + ' - ' + edtDependencyVersion.Text;
+      end;
     end;
   end;
 end;
@@ -1295,6 +1300,7 @@ var
   dependancyId : string;
   DependencyForm: TDependencyForm;
   dependency : ISpecDependency;
+  ver : TVersionRange;
 begin
   DependencyForm := TDependencyForm.Create(nil);
   try
@@ -1307,7 +1313,12 @@ begin
       Exit;
     dependency := FTemplate.NewDependencyById(dependancyId);
     if length(DependencyForm.edtVersion.Text) > 0 then
-      dependency.version := TVersionRange.Parse(DependencyForm.edtVersion.Text);
+    begin
+       if TVersionRange.TryParse(DependencyForm.edtVersion.Text, ver) then
+       begin
+         dependency.version := ver;
+       end;
+    end;
   finally
     FreeAndNil(DependencyForm);
   end;
