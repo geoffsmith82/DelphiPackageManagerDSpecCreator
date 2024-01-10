@@ -218,6 +218,7 @@ type
     procedure AddBuildNode(node: TTemplateTreeNode; template: ISpecTemplate);
     procedure AddBPLNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecBPLEntry>; nodeName: string);
     procedure AddDependencyNode(node: TTemplateTreeNode; template: ISpecTemplate);
+    procedure UpdatePlatformCheckListbox(vplatform: ISpecTargetPlatform; platformName: string; platformListboxName: string = '');
   public
     { Public declarations }
     procedure LoadDspecStructure;
@@ -429,7 +430,7 @@ end;
 
 procedure TDSpecCreatorForm.clbCompilersClick(Sender: TObject);
 var
-  i, j : Integer;
+  j : Integer;
   vplatform : ISpecTargetPlatform;
   compilerVersion : TCompilerVersion;
 begin
@@ -470,48 +471,15 @@ begin
     Exit;
   end;
 
-  if vplatform.PlatformContains('Win32') then
-  begin
-    j := clbPlatforms.Items.IndexOf('Win32');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('Win64') then
-  begin
-    j := clbPlatforms.Items.IndexOf('Win64');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('Android32') then
-  begin
-    j := clbPlatforms.Items.IndexOf('Android');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('Android') then
-  begin
-    j := clbPlatforms.Items.IndexOf('Android');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('Android64') then
-  begin
-    j := clbPlatforms.Items.IndexOf('Android64');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('iOS64') then
-  begin
-    j := clbPlatforms.Items.IndexOf('iOS64');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
-  if vplatform.PlatformContains('OSX64') then
-  begin
-    j := clbPlatforms.Items.IndexOf('OSX64');
-    if j >= 0 then
-      clbPlatforms.Checked[j] := j >= 0;
-  end;
+  UpdatePlatformCheckListbox(vplatform, 'Win32');
+  UpdatePlatformCheckListbox(vplatform, 'Win64');
+  UpdatePlatformCheckListbox(vplatform, 'Android32', 'Android');
+  UpdatePlatformCheckListbox(vplatform, 'Android');
+  UpdatePlatformCheckListbox(vplatform, 'Android64');
+  UpdatePlatformCheckListbox(vplatform, 'LinuxIntel64', 'Linux');
+  UpdatePlatformCheckListbox(vplatform, 'iOS64');
+  UpdatePlatformCheckListbox(vplatform, 'OSX64');
+
   FInVariableUpdate := True;
   try
     VariablesList.Strings.Clear;
@@ -698,7 +666,6 @@ begin
   end;
 end;
 
-
 function TDSpecCreatorForm.AddRootTemplateNode(template: ISpecTemplate): TTemplateTreeNode;
 begin
   cboTemplate.Items.Add(template.name);
@@ -709,7 +676,6 @@ begin
   Result.SelectedIndex := 5;
   Result.TemplateHeading := True;
 end;
-
 
 procedure TDSpecCreatorForm.AddFileEntryNode(node: TTemplateTreeNode; template: ISpecTemplate; fileList: IList<ISpecFileEntry>; NodeName: string);
 var
@@ -1154,6 +1120,23 @@ begin
   Result := FOpenFile.GetPlatform(clbPlatforms.Items[clbPlatforms.ItemIndex]);
 end;
 
+procedure TDSpecCreatorForm.UpdatePlatformCheckListbox(vplatform: ISpecTargetPlatform; platformName: string; platformListboxName: string);
+var
+  j: Integer;
+begin
+  if Length(platformListboxName) = 0 then
+  begin
+    platformListboxName := platformName;
+  end;
+
+  if vplatform.PlatformContains(platformName) then
+  begin
+    j := clbPlatforms.Items.IndexOf(platformListboxName);
+    if j >= 0 then
+      clbPlatforms.Checked[j] := j >= 0;
+  end;
+end;
+
 procedure TDSpecCreatorForm.EnableDisablePlatform(compilerVersion : TCompilerVersion);
 var
   DpmPlatforms : TDPMPlatforms;
@@ -1173,6 +1156,7 @@ begin
 
     DpmPlatform := StringToDPMPlatform(platformString);
     clbPlatforms.ItemEnabled[i] := DpmPlatform in DpmPlatforms;
+    clbPlatforms.Checked[i] := False;
   end;
 end;
 
